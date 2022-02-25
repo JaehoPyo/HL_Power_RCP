@@ -1,0 +1,2 @@
+Function fnSetSCSetInfo SC(1) Error[ORA-00904: "PROGRAM_START": 부적합한 식별자] , SQL [ UPDATE TC_SCSETINFO     SET PROGRAM_START = '1'    WHERE SC_NO = 1]
+Function fnSetSCSetInfo SC(1) Error[ORA-00904: "PROGRAM_END": 부적합한 식별자] , SQL [ UPDATE TC_SCSETINFO     SET PROGRAM_END = '0'    WHERE SC_NO = 1]

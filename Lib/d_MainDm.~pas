@@ -1,0 +1,89 @@
+unit d_MainDm;
+
+interface
+
+uses
+  Windows, SysUtils, ADODB, DB, Dialogs, Classes, h_MainLib, h_ReferLib;
+
+type
+  TMainDm = class(TDataModule)
+    MainDatabase: TADOConnection;
+    qryPLC: TADOQuery;
+  private
+     { Private declarations }
+  public
+    { Public declarations }
+  end;
+   Function DBConnection () : Boolean;
+   Function  ADODBConnection ( DBInfo : TDB_Info ) : Boolean;
+
+var
+  MainDm: TMainDm;
+
+implementation
+
+
+{$R *.dfm}
+
+//==============================================================================
+//데이타 베이스 연결
+//==============================================================================
+Function DBConnection ( ) : Boolean;
+Var
+  OraInfo : TDB_Info ;
+Begin
+  Result := False ;
+  //---------------------------------------------------------------------------
+  // Oracle Server 연결을 위한 ini Read
+  //---------------------------------------------------------------------------
+  try
+    with OraInfo do
+    begin
+      DBProvider := IniRead(INI_PATH, 'Database', 'Provider', 'IniRead Fail');
+      DBAlias    := IniRead(INI_PATH, 'Database', 'Alais'   , 'IniRead Fail');
+      DBUser     := IniRead(INI_PATH, 'Database', 'User'    , 'IniRead Fail');
+      DBPswd     := IniRead(INI_PATH, 'Database', 'Pswd'    , 'IniRead Fail');
+    end;
+
+    //---------------------------------------------------------------------------
+    // Oracle Server 연결
+    //---------------------------------------------------------------------------
+      if ADODBConnection(OraInfo)  then Result := True ;
+
+  Except
+    //
+  End;
+End;
+
+//==============================================================================
+//데이타 베이스 연결
+//==============================================================================
+function ADODBConnection ( DBInfo : TDB_Info ) : Boolean;
+begin
+  //---------------------------------------------------------------------------
+  // Oracle Server 연결
+  //---------------------------------------------------------------------------
+  try
+    with MainDm.MainDatabase do
+    begin
+      Close;
+      ConnectionString := '';
+      ConnectionString := 'Provider=' + DBInfo.DBProvider +
+                          ';Persist Security Info=True' +
+                          ';User ID=' + DBInfo.DBUser  +
+                          ';Data Source=' + DBInfo.DBAlias +
+                          ';Password=' + DBInfo.DBPswd ;
+      Connected := True;
+      Result:= True ;
+      Exit;
+    end;
+  except
+    On E: Exception do
+    begin
+      ShowMessage('커넥션 실패 관리자에게 문의 하시기 바랍니다....?');
+    end ;
+  end;
+  Result := False;
+end;
+
+end.

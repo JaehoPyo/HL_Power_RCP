@@ -1,0 +1,4084 @@
+object frmSCComm: TfrmSCComm
+  Left = 529
+  Top = 325
+  Width = 808
+  Height = 580
+  Caption = 'Stand Alone MFC For WIA Machine Tools Ver 1.0'
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  OnClose = FormClose
+  OnCreate = FormCreate
+  PixelsPerInch = 96
+  TextHeight = 13
+  object pcStatus: TPageControl
+    Left = 0
+    Top = 0
+    Width = 792
+    Height = 411
+    ActivePage = TabSheet8
+    Align = alClient
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = #46027#50880
+    Font.Style = []
+    ParentFont = False
+    Style = tsFlatButtons
+    TabIndex = 1
+    TabOrder = 0
+    object tsCommLog: TTabSheet
+      Caption = #53685#49888#47196#44536
+      object CommLog: TMemo
+        Left = 0
+        Top = 0
+        Width = 576
+        Height = 380
+        Align = alClient
+        BiDiMode = bdLeftToRight
+        Color = clWhite
+        Ctl3D = True
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clBlack
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ImeName = 'Microsoft IME 2003'
+        ParentBiDiMode = False
+        ParentCtl3D = False
+        ParentFont = False
+        ParentShowHint = False
+        ScrollBars = ssBoth
+        ShowHint = False
+        TabOrder = 0
+      end
+      object ListBoxOrder: TListBox
+        Left = 576
+        Top = 0
+        Width = 208
+        Height = 380
+        Style = lbOwnerDrawFixed
+        Align = alRight
+        BevelInner = bvNone
+        BevelOuter = bvNone
+        Color = clWindowText
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clYellow
+        Font.Height = -12
+        Font.Name = #44404#47548#52404
+        Font.Style = []
+        ImeName = #54620#44397#50612'('#54620#44544') (MS-IME98)'
+        ItemHeight = 16
+        Items.Strings = (
+          #51089#50629#51648#49884)
+        MultiSelect = True
+        ParentFont = False
+        TabOrder = 1
+      end
+    end
+    object TabSheet8: TTabSheet
+      Caption = 'SC'#49345#53468' '#48143' '#51648#49884
+      ImageIndex = 3
+      object pcScStatus: TPageControl
+        Left = 0
+        Top = 0
+        Width = 784
+        Height = 380
+        ActivePage = TabSheet7
+        Align = alClient
+        BiDiMode = bdLeftToRight
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #46027#50880
+        Font.Style = []
+        ParentBiDiMode = False
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = False
+        TabHeight = 16
+        TabIndex = 3
+        TabOrder = 0
+        TabWidth = 60
+        object TabSheet9: TTabSheet
+          Caption = 'SC #11'
+          object GroupBox7: TGroupBox
+            Left = 550
+            Top = 253
+            Width = 220
+            Height = 96
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 5
+            object Label119: TLabel
+              Left = 7
+              Top = 50
+              Width = 62
+              Height = 11
+              Caption = 'Ack Status'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label120: TLabel
+              Left = 7
+              Top = 25
+              Width = 56
+              Height = 11
+              Caption = 'Lugg High'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label121: TLabel
+              Left = 115
+              Top = 25
+              Width = 53
+              Height = 11
+              Caption = 'Lugg Low'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtACK_Status11: TEdit
+              Left = 8
+              Top = 64
+              Width = 204
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object Ack_Lugg_Hi11: TEdit
+              Left = 67
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object Ack_Lugg_Lo11: TEdit
+              Left = 171
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+          end
+          object GroupBox8: TGroupBox
+            Left = 550
+            Top = 17
+            Width = 220
+            Height = 206
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 4
+            object Label122: TLabel
+              Left = 16
+              Top = 14
+              Width = 50
+              Height = 11
+              Caption = 'Sts_SMC'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label123: TLabel
+              Left = 16
+              Top = 51
+              Width = 33
+              Height = 11
+              Caption = 'Sts_X'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label124: TLabel
+              Left = 16
+              Top = 125
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z1'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label125: TLabel
+              Left = 16
+              Top = 88
+              Width = 33
+              Height = 11
+              Caption = 'Sts_Y'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label126: TLabel
+              Left = 16
+              Top = 162
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z2'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtSTS_SMC11: TEdit
+              Left = 9
+              Top = 28
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object EdtSTS_X11: TEdit
+              Left = 9
+              Top = 65
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object EdtSTS_Y11: TEdit
+              Left = 9
+              Top = 102
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+            object EdtSTS_Z111: TEdit
+              Left = 9
+              Top = 139
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 3
+            end
+            object EdtSTS_Z211: TEdit
+              Left = 9
+              Top = 176
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 4
+            end
+          end
+          object GroupBox12: TGroupBox
+            Left = 228
+            Top = 17
+            Width = 310
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 2
+            object Label55: TLabel
+              Left = 11
+              Top = 18
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = 'Phase'
+            end
+            object Label56: TLabel
+              Left = 11
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#54788#51116#50948#52824
+            end
+            object Label57: TLabel
+              Left = 158
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#54788#51116#50948#52824
+            end
+            object Label58: TLabel
+              Left = 11
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51648#49345#48152' SW'
+            end
+            object Label59: TLabel
+              Left = 11
+              Top = 186
+              Width = 125
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#54805#53468'('#51648#49884#49884' '#47784#46300')'
+            end
+            object Label60: TLabel
+              Left = 11
+              Top = 234
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#50756#47308'(A)'
+            end
+            object Label61: TLabel
+              Left = 11
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'H(A)'
+            end
+            object Label62: TLabel
+              Left = 11
+              Top = 210
+              Width = 113
+              Height = 13
+              AutoSize = False
+              Caption = #50896#44201' '#50640#47084#53076#46300'(S)'
+            end
+            object Label63: TLabel
+              Left = 158
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'L(A)'
+            end
+            object Label64: TLabel
+              Left = 158
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #44592#49345#48152' SW'
+            end
+            object Label65: TLabel
+              Left = 11
+              Top = 114
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356#49345#53468'('#44592#51456')'
+            end
+            object Label66: TLabel
+              Left = 158
+              Top = 114
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #54868#47932#50976#47924'('#44592#51456')'
+            end
+            object Label67: TLabel
+              Left = 11
+              Top = 162
+              Width = 86
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+              Caption = #51204#50896' Off/On Bit'
+            end
+            object Lbl_Phase11: TLabel
+              Left = 158
+              Top = 16
+              Width = 136
+              Height = 13
+              AutoSize = False
+            end
+            object Label69: TLabel
+              Left = 158
+              Top = 162
+              Width = 88
+              Height = 13
+              AutoSize = False
+              Caption = #51116#44592#46041' '#50836#44396
+            end
+            object Label70: TLabel
+              Left = 158
+              Top = 138
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#51473
+            end
+            object Label133: TLabel
+              Left = 11
+              Top = 138
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #50948#52824' '#54028#50501
+            end
+            object Label134: TLabel
+              Left = 11
+              Top = 66
+              Width = 58
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#50948#52824
+            end
+            object Label135: TLabel
+              Left = 158
+              Top = 66
+              Width = 57
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#50948#52824
+            end
+            object Label141: TLabel
+              Left = 11
+              Top = 282
+              Width = 99
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53076#46300'(A)'
+            end
+            object Edt_Phase11: TEdit
+              Left = 103
+              Top = 14
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_CurrBay11: TEdit
+              Left = 103
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_CurrLevel11: TEdit
+              Left = 249
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ModeSWSCT11: TEdit
+              Left = 103
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_OrdMode11: TEdit
+              Left = 129
+              Top = 182
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_RetryBit11: TEdit
+              Left = 249
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object Edt_JobComplete11: TEdit
+              Left = 129
+              Top = 230
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_AErrHigh11: TEdit
+              Left = 77
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_ErrorCode11: TEdit
+              Left = 129
+              Top = 206
+              Width = 170
+              Height = 19
+              Color = clWhite
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 8
+            end
+            object Edt_AErrLow11: TEdit
+              Left = 223
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 9
+            end
+            object Edt_ModeSWSCC11: TEdit
+              Left = 249
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 10
+            end
+            object Edt_ForkStatusFR11: TEdit
+              Left = 103
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 11
+            end
+            object Edt_ForKStockFR11: TEdit
+              Left = 249
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 12
+            end
+            object Edt_PowerBit11: TEdit
+              Left = 103
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 13
+            end
+            object pnlSCC_Comm11: TPanel
+              Left = 14
+              Top = 302
+              Width = 136
+              Height = 22
+              Caption = 'SCT '#8596'SCC '#53685#49888#51060#49345
+              TabOrder = 14
+            end
+            object pnlEmgStop11: TPanel
+              Left = 162
+              Top = 302
+              Width = 136
+              Height = 22
+              TabOrder = 15
+            end
+            object Edt_SCPOSOK11: TEdit
+              Left = 103
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 16
+            end
+            object Edt_SCWorking11: TEdit
+              Left = 249
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 17
+            end
+            object Edt_POS_X_OK11: TEdit
+              Left = 66
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 18
+            end
+            object Edt_POS_Y_OK11: TEdit
+              Left = 212
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 19
+            end
+            object Edt_AErrCode11: TEdit
+              Left = 126
+              Top = 278
+              Width = 173
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 20
+            end
+          end
+          object GroupBox31: TGroupBox
+            Left = 5
+            Top = 16
+            Width = 210
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            object Label49: TLabel
+              Left = 9
+              Top = 190
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#48264#54840
+            end
+            object Label50: TLabel
+              Left = 9
+              Top = 166
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356
+            end
+            object Label51: TLabel
+              Left = 9
+              Top = 262
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53364#47532#50612
+            end
+            object Label52: TLabel
+              Left = 9
+              Top = 238
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#51064#53552#47197
+            end
+            object Label53: TLabel
+              Left = 9
+              Top = 214
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#49325#51228
+            end
+            object Label48: TLabel
+              Left = 9
+              Top = 94
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#50676
+            end
+            object Label139: TLabel
+              Left = 9
+              Top = 118
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#48264#51648
+            end
+            object Label140: TLabel
+              Left = 9
+              Top = 142
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#45800
+            end
+            object Edt_Bank11: TEdit
+              Left = 87
+              Top = 90
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_Bay11: TEdit
+              Left = 87
+              Top = 114
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_IOStnNo11: TEdit
+              Left = 87
+              Top = 186
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_Fork11: TEdit
+              Left = 87
+              Top = 162
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_Level11: TEdit
+              Left = 87
+              Top = 138
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ErrorClear11: TEdit
+              Left = 87
+              Top = 258
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_InterLoc11: TEdit
+              Left = 87
+              Top = 234
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_JobDelete11: TEdit
+              Left = 87
+              Top = 210
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object RG_JobType11: TRadioGroup
+              Left = 2
+              Top = 13
+              Width = 206
+              Height = 69
+              Align = alTop
+              Caption = '['#51089#50629#51333#47448']'
+              Columns = 2
+              Items.Strings = (
+                #51077#44256#45824' '#49891#44592
+                #47001#50640#49436' '#49891#44592
+                #47001#50640' '#45236#47532#44592
+                #52636#44256#45824' '#45236#47532#44592
+                #54856#51004#47196' '#51060#46041)
+              TabOrder = 8
+            end
+            object Edt_Status11: TLabeledEdit
+              Left = 6
+              Top = 305
+              Width = 123
+              Height = 20
+              AutoSize = False
+              BevelInner = bvNone
+              BevelKind = bkFlat
+              BorderStyle = bsNone
+              Color = clBtnFace
+              EditLabel.Width = 85
+              EditLabel.Height = 11
+              EditLabel.Caption = #49345#53468' '#54540#47000#44536' '#54364#49884
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clGreen
+              Font.Height = -13
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ImeName = 'Microsoft IME 2003'
+              LabelPosition = lpAbove
+              LabelSpacing = 3
+              ParentFont = False
+              ReadOnly = True
+              TabOrder = 9
+            end
+          end
+          object Panel15: TPanel
+            Left = 5
+            Top = 1
+            Width = 209
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'PC '#8594' STC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+          end
+          object Panel1: TPanel
+            Left = 228
+            Top = 1
+            Width = 309
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'STC '#8594' PC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 3
+          end
+          object Panel2: TPanel
+            Left = 550
+            Top = 1
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ S-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 6
+          end
+          object Panel4: TPanel
+            Left = 550
+            Top = 237
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ A-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 7
+          end
+        end
+        object TabSheet13: TTabSheet
+          Caption = 'SC #12'
+          ImageIndex = 1
+          object GroupBox1: TGroupBox
+            Left = 5
+            Top = 16
+            Width = 210
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            object Label1: TLabel
+              Left = 9
+              Top = 190
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#48264#54840
+            end
+            object Label2: TLabel
+              Left = 9
+              Top = 166
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356
+            end
+            object Label3: TLabel
+              Left = 9
+              Top = 262
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53364#47532#50612
+            end
+            object Label4: TLabel
+              Left = 9
+              Top = 238
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#51064#53552#47197
+            end
+            object Label5: TLabel
+              Left = 9
+              Top = 214
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#49325#51228
+            end
+            object Label7: TLabel
+              Left = 9
+              Top = 94
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#50676
+            end
+            object Label8: TLabel
+              Left = 9
+              Top = 118
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#48264#51648
+            end
+            object Label9: TLabel
+              Left = 9
+              Top = 142
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#45800
+            end
+            object Edt_Bank12: TEdit
+              Left = 87
+              Top = 90
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_Bay12: TEdit
+              Left = 87
+              Top = 114
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_IOStnNo12: TEdit
+              Left = 87
+              Top = 186
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_Fork12: TEdit
+              Left = 87
+              Top = 162
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_Level12: TEdit
+              Left = 87
+              Top = 138
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ErrorClear12: TEdit
+              Left = 87
+              Top = 258
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_InterLoc12: TEdit
+              Left = 87
+              Top = 234
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_JobDelete12: TEdit
+              Left = 87
+              Top = 210
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object RG_JobType12: TRadioGroup
+              Left = 2
+              Top = 13
+              Width = 206
+              Height = 69
+              Align = alTop
+              Caption = '['#51089#50629#51333#47448']'
+              Columns = 2
+              Items.Strings = (
+                #51077#44256#45824' '#49891#44592
+                #47001#50640#49436' '#49891#44592
+                #47001#50640' '#45236#47532#44592
+                #52636#44256#45824' '#45236#47532#44592
+                #54856#51004#47196' '#51060#46041)
+              TabOrder = 8
+            end
+            object Edt_Status12: TLabeledEdit
+              Left = 6
+              Top = 305
+              Width = 123
+              Height = 20
+              AutoSize = False
+              BevelInner = bvNone
+              BevelKind = bkFlat
+              BorderStyle = bsNone
+              Color = clBtnFace
+              EditLabel.Width = 85
+              EditLabel.Height = 11
+              EditLabel.Caption = #49345#53468' '#54540#47000#44536' '#54364#49884
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clGreen
+              Font.Height = -13
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ImeName = 'Microsoft IME 2003'
+              LabelPosition = lpAbove
+              LabelSpacing = 3
+              ParentFont = False
+              ReadOnly = True
+              TabOrder = 9
+            end
+          end
+          object GroupBox4: TGroupBox
+            Left = 228
+            Top = 17
+            Width = 310
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 3
+            object Label28: TLabel
+              Left = 11
+              Top = 18
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = 'Phase'
+            end
+            object Label29: TLabel
+              Left = 11
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#54788#51116#50948#52824
+            end
+            object Label30: TLabel
+              Left = 158
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#54788#51116#50948#52824
+            end
+            object Label31: TLabel
+              Left = 11
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51648#49345#48152' SW'
+            end
+            object Label32: TLabel
+              Left = 11
+              Top = 186
+              Width = 125
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#54805#53468'('#51648#49884#49884' '#47784#46300')'
+            end
+            object Label33: TLabel
+              Left = 11
+              Top = 234
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#50756#47308'(A)'
+            end
+            object Label34: TLabel
+              Left = 11
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'H(A)'
+            end
+            object Label35: TLabel
+              Left = 11
+              Top = 210
+              Width = 113
+              Height = 13
+              AutoSize = False
+              Caption = #50896#44201' '#50640#47084#53076#46300'(S)'
+            end
+            object Label36: TLabel
+              Left = 155
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'L(A)'
+            end
+            object Label37: TLabel
+              Left = 158
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #44592#49345#48152' SW'
+            end
+            object Label38: TLabel
+              Left = 11
+              Top = 114
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356#49345#53468'('#44592#51456')'
+            end
+            object Label39: TLabel
+              Left = 158
+              Top = 114
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #54868#47932#50976#47924'('#44592#51456')'
+            end
+            object Label40: TLabel
+              Left = 11
+              Top = 162
+              Width = 86
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+              Caption = #51204#50896' Off/On Bit'
+            end
+            object Lbl_Phase12: TLabel
+              Left = 158
+              Top = 16
+              Width = 136
+              Height = 13
+              AutoSize = False
+            end
+            object Label42: TLabel
+              Left = 158
+              Top = 162
+              Width = 88
+              Height = 13
+              AutoSize = False
+              Caption = #51116#44592#46041' '#50836#44396
+            end
+            object Label43: TLabel
+              Left = 158
+              Top = 138
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#51473
+            end
+            object Label44: TLabel
+              Left = 11
+              Top = 138
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #50948#52824' '#54028#50501
+            end
+            object Label45: TLabel
+              Left = 11
+              Top = 66
+              Width = 58
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#50948#52824
+            end
+            object Label46: TLabel
+              Left = 158
+              Top = 66
+              Width = 57
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#50948#52824
+            end
+            object Label47: TLabel
+              Left = 11
+              Top = 282
+              Width = 99
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53076#46300'(A)'
+            end
+            object Edt_Phase12: TEdit
+              Left = 103
+              Top = 14
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_CurrBay12: TEdit
+              Left = 103
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_CurrLevel12: TEdit
+              Left = 249
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ModeSWSCT12: TEdit
+              Left = 103
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_OrdMode12: TEdit
+              Left = 129
+              Top = 182
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_RetryBit12: TEdit
+              Left = 249
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object Edt_JobComplete12: TEdit
+              Left = 129
+              Top = 230
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_AErrHigh12: TEdit
+              Left = 77
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_ErrorCode12: TEdit
+              Left = 129
+              Top = 206
+              Width = 170
+              Height = 19
+              Color = clWhite
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 8
+            end
+            object Edt_AErrLow12: TEdit
+              Left = 223
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 9
+            end
+            object Edt_ModeSWSCC12: TEdit
+              Left = 249
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 10
+            end
+            object Edt_ForkStatusFR12: TEdit
+              Left = 103
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 11
+            end
+            object Edt_ForKStockFR12: TEdit
+              Left = 249
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 12
+            end
+            object Edt_PowerBit12: TEdit
+              Left = 103
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 13
+            end
+            object pnlSCC_Comm12: TPanel
+              Left = 14
+              Top = 302
+              Width = 136
+              Height = 22
+              Caption = 'SCT '#8596'SCC '#53685#49888#51060#49345
+              TabOrder = 14
+            end
+            object pnlEmgStop12: TPanel
+              Left = 162
+              Top = 302
+              Width = 136
+              Height = 22
+              TabOrder = 15
+            end
+            object Edt_SCPOSOK12: TEdit
+              Left = 103
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 16
+            end
+            object Edt_SCWorking12: TEdit
+              Left = 249
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 17
+            end
+            object Edt_POS_X_OK12: TEdit
+              Left = 66
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 18
+            end
+            object Edt_POS_Y_OK12: TEdit
+              Left = 212
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 19
+            end
+            object Edt_AErrCode12: TEdit
+              Left = 126
+              Top = 278
+              Width = 173
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 20
+            end
+          end
+          object GroupBox10: TGroupBox
+            Left = 550
+            Top = 253
+            Width = 220
+            Height = 96
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 7
+            object Label115: TLabel
+              Left = 7
+              Top = 50
+              Width = 62
+              Height = 11
+              Caption = 'Ack Status'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label116: TLabel
+              Left = 7
+              Top = 25
+              Width = 56
+              Height = 11
+              Caption = 'Lugg High'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label117: TLabel
+              Left = 115
+              Top = 25
+              Width = 53
+              Height = 11
+              Caption = 'Lugg Low'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtACK_Status12: TEdit
+              Left = 8
+              Top = 64
+              Width = 204
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object Ack_Lugg_Hi12: TEdit
+              Left = 67
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object Ack_Lugg_Lo12: TEdit
+              Left = 171
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+          end
+          object GroupBox9: TGroupBox
+            Left = 550
+            Top = 17
+            Width = 220
+            Height = 206
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 5
+            object Label110: TLabel
+              Left = 16
+              Top = 14
+              Width = 50
+              Height = 11
+              Caption = 'Sts_SMC'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label111: TLabel
+              Left = 16
+              Top = 51
+              Width = 33
+              Height = 11
+              Caption = 'Sts_X'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label112: TLabel
+              Left = 16
+              Top = 125
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z1'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label113: TLabel
+              Left = 16
+              Top = 88
+              Width = 33
+              Height = 11
+              Caption = 'Sts_Y'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label114: TLabel
+              Left = 16
+              Top = 162
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z2'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtSTS_SMC12: TEdit
+              Left = 9
+              Top = 28
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object EdtSTS_X12: TEdit
+              Left = 9
+              Top = 65
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object EdtSTS_Y12: TEdit
+              Left = 9
+              Top = 102
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+            object EdtSTS_Z112: TEdit
+              Left = 9
+              Top = 139
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 3
+            end
+            object EdtSTS_Z212: TEdit
+              Left = 9
+              Top = 176
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 4
+            end
+          end
+          object Panel5: TPanel
+            Left = 5
+            Top = 1
+            Width = 209
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'PC '#8594' STC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+          end
+          object Panel9: TPanel
+            Left = 228
+            Top = 1
+            Width = 309
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'STC '#8594' PC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 2
+          end
+          object Panel19: TPanel
+            Left = 550
+            Top = 1
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ S-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 4
+          end
+          object Panel20: TPanel
+            Left = 550
+            Top = 237
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ A-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 6
+          end
+        end
+        object TabSheet14: TTabSheet
+          Caption = 'SC #13'
+          ImageIndex = 2
+          object GroupBox2: TGroupBox
+            Left = 5
+            Top = 16
+            Width = 210
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            object Label10: TLabel
+              Left = 9
+              Top = 190
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#48264#54840
+            end
+            object Label11: TLabel
+              Left = 9
+              Top = 166
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356
+            end
+            object Label12: TLabel
+              Left = 9
+              Top = 262
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53364#47532#50612
+            end
+            object Label13: TLabel
+              Left = 9
+              Top = 238
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#51064#53552#47197
+            end
+            object Label14: TLabel
+              Left = 9
+              Top = 214
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#49325#51228
+            end
+            object Label16: TLabel
+              Left = 9
+              Top = 94
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#50676
+            end
+            object Label17: TLabel
+              Left = 9
+              Top = 118
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#48264#51648
+            end
+            object Label18: TLabel
+              Left = 9
+              Top = 142
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#45800
+            end
+            object Edt_Bank13: TEdit
+              Left = 87
+              Top = 90
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_Bay13: TEdit
+              Left = 87
+              Top = 114
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_IOStnNo13: TEdit
+              Left = 87
+              Top = 186
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_Fork13: TEdit
+              Left = 87
+              Top = 162
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_Level13: TEdit
+              Left = 87
+              Top = 138
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ErrorClear13: TEdit
+              Left = 87
+              Top = 258
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_InterLoc13: TEdit
+              Left = 87
+              Top = 234
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_JobDelete13: TEdit
+              Left = 87
+              Top = 210
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object RG_JobType13: TRadioGroup
+              Left = 2
+              Top = 13
+              Width = 206
+              Height = 69
+              Align = alTop
+              Caption = '['#51089#50629#51333#47448']'
+              Columns = 2
+              Items.Strings = (
+                #51077#44256#45824' '#49891#44592
+                #47001#50640#49436' '#49891#44592
+                #47001#50640' '#45236#47532#44592
+                #52636#44256#45824' '#45236#47532#44592
+                #54856#51004#47196' '#51060#46041)
+              TabOrder = 8
+            end
+            object Edt_Status13: TLabeledEdit
+              Left = 6
+              Top = 305
+              Width = 123
+              Height = 20
+              AutoSize = False
+              BevelInner = bvNone
+              BevelKind = bkFlat
+              BorderStyle = bsNone
+              Color = clBtnFace
+              EditLabel.Width = 85
+              EditLabel.Height = 11
+              EditLabel.Caption = #49345#53468' '#54540#47000#44536' '#54364#49884
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clGreen
+              Font.Height = -13
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ImeName = 'Microsoft IME 2003'
+              LabelPosition = lpAbove
+              LabelSpacing = 3
+              ParentFont = False
+              ReadOnly = True
+              TabOrder = 9
+            end
+          end
+          object GroupBox13: TGroupBox
+            Left = 550
+            Top = 253
+            Width = 220
+            Height = 96
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 7
+            object Label131: TLabel
+              Left = 7
+              Top = 50
+              Width = 62
+              Height = 11
+              Caption = 'Ack Status'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label132: TLabel
+              Left = 7
+              Top = 25
+              Width = 56
+              Height = 11
+              Caption = 'Lugg High'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label136: TLabel
+              Left = 115
+              Top = 25
+              Width = 53
+              Height = 11
+              Caption = 'Lugg Low'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtACK_Status13: TEdit
+              Left = 8
+              Top = 64
+              Width = 204
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object Ack_Lugg_Hi13: TEdit
+              Left = 67
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object Ack_Lugg_Lo13: TEdit
+              Left = 171
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+          end
+          object GroupBox11: TGroupBox
+            Left = 550
+            Top = 17
+            Width = 220
+            Height = 206
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 5
+            object Label118: TLabel
+              Left = 16
+              Top = 14
+              Width = 50
+              Height = 11
+              Caption = 'Sts_SMC'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label127: TLabel
+              Left = 16
+              Top = 51
+              Width = 33
+              Height = 11
+              Caption = 'Sts_X'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label128: TLabel
+              Left = 16
+              Top = 125
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z1'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label129: TLabel
+              Left = 16
+              Top = 88
+              Width = 33
+              Height = 11
+              Caption = 'Sts_Y'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label130: TLabel
+              Left = 16
+              Top = 162
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z2'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtSTS_SMC13: TEdit
+              Left = 9
+              Top = 28
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object EdtSTS_X13: TEdit
+              Left = 9
+              Top = 65
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object EdtSTS_Y13: TEdit
+              Left = 9
+              Top = 102
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+            object EdtSTS_Z113: TEdit
+              Left = 9
+              Top = 139
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 3
+            end
+            object EdtSTS_Z213: TEdit
+              Left = 9
+              Top = 176
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 4
+            end
+          end
+          object GroupBox5: TGroupBox
+            Left = 228
+            Top = 17
+            Width = 310
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 3
+            object Label68: TLabel
+              Left = 11
+              Top = 18
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = 'Phase'
+            end
+            object Label71: TLabel
+              Left = 11
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#54788#51116#50948#52824
+            end
+            object Label72: TLabel
+              Left = 158
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#54788#51116#50948#52824
+            end
+            object Label73: TLabel
+              Left = 11
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51648#49345#48152' SW'
+            end
+            object Label74: TLabel
+              Left = 11
+              Top = 186
+              Width = 125
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#54805#53468'('#51648#49884#49884' '#47784#46300')'
+            end
+            object Label75: TLabel
+              Left = 11
+              Top = 234
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#50756#47308'(A)'
+            end
+            object Label76: TLabel
+              Left = 11
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'H(A)'
+            end
+            object Label77: TLabel
+              Left = 11
+              Top = 210
+              Width = 113
+              Height = 13
+              AutoSize = False
+              Caption = #50896#44201' '#50640#47084#53076#46300'(S)'
+            end
+            object Label78: TLabel
+              Left = 155
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'L(A)'
+            end
+            object Label79: TLabel
+              Left = 158
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #44592#49345#48152' SW'
+            end
+            object Label80: TLabel
+              Left = 11
+              Top = 114
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356#49345#53468'('#44592#51456')'
+            end
+            object Label81: TLabel
+              Left = 158
+              Top = 114
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #54868#47932#50976#47924'('#44592#51456')'
+            end
+            object Label82: TLabel
+              Left = 11
+              Top = 162
+              Width = 86
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+              Caption = #51204#50896' Off/On Bit'
+            end
+            object Lbl_Phase13: TLabel
+              Left = 158
+              Top = 16
+              Width = 136
+              Height = 13
+              AutoSize = False
+            end
+            object Label84: TLabel
+              Left = 158
+              Top = 162
+              Width = 88
+              Height = 13
+              AutoSize = False
+              Caption = #51116#44592#46041' '#50836#44396
+            end
+            object Label85: TLabel
+              Left = 158
+              Top = 138
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#51473
+            end
+            object Label86: TLabel
+              Left = 11
+              Top = 138
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #50948#52824' '#54028#50501
+            end
+            object Label87: TLabel
+              Left = 11
+              Top = 66
+              Width = 58
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#50948#52824
+            end
+            object Label88: TLabel
+              Left = 158
+              Top = 66
+              Width = 57
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#50948#52824
+            end
+            object Label89: TLabel
+              Left = 11
+              Top = 282
+              Width = 99
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53076#46300'(A)'
+            end
+            object Edt_Phase13: TEdit
+              Left = 103
+              Top = 14
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_CurrBay13: TEdit
+              Left = 103
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_CurrLevel13: TEdit
+              Left = 249
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ModeSWSCT13: TEdit
+              Left = 103
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_OrdMode13: TEdit
+              Left = 129
+              Top = 182
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_RetryBit13: TEdit
+              Left = 249
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object Edt_JobComplete13: TEdit
+              Left = 129
+              Top = 230
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_AErrHigh13: TEdit
+              Left = 77
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_ErrorCode13: TEdit
+              Left = 129
+              Top = 206
+              Width = 170
+              Height = 19
+              Color = clWhite
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 8
+            end
+            object Edt_AErrLow13: TEdit
+              Left = 223
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 9
+            end
+            object Edt_ModeSWSCC13: TEdit
+              Left = 249
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 10
+            end
+            object Edt_ForkStatusFR13: TEdit
+              Left = 103
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 11
+            end
+            object Edt_ForKStockFR13: TEdit
+              Left = 249
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 12
+            end
+            object Edt_PowerBit13: TEdit
+              Left = 103
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 13
+            end
+            object pnlSCC_Comm13: TPanel
+              Left = 14
+              Top = 302
+              Width = 136
+              Height = 22
+              Caption = 'SCT '#8596'SCC '#53685#49888#51060#49345
+              TabOrder = 14
+            end
+            object pnlEmgStop13: TPanel
+              Left = 162
+              Top = 302
+              Width = 136
+              Height = 22
+              TabOrder = 15
+            end
+            object Edt_SCPOSOK13: TEdit
+              Left = 103
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 16
+            end
+            object Edt_SCWorking13: TEdit
+              Left = 249
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 17
+            end
+            object Edt_POS_X_OK13: TEdit
+              Left = 66
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 18
+            end
+            object Edt_POS_Y_OK13: TEdit
+              Left = 212
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 19
+            end
+            object Edt_AErrCode13: TEdit
+              Left = 126
+              Top = 278
+              Width = 173
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 20
+            end
+          end
+          object Panel7: TPanel
+            Left = 5
+            Top = 1
+            Width = 209
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'PC '#8594' STC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+          end
+          object Panel12: TPanel
+            Left = 228
+            Top = 1
+            Width = 309
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'STC '#8594' PC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 2
+          end
+          object Panel21: TPanel
+            Left = 550
+            Top = 1
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ S-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 4
+          end
+          object Panel22: TPanel
+            Left = 550
+            Top = 237
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ A-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 6
+          end
+        end
+        object TabSheet7: TTabSheet
+          Caption = 'SC #14'
+          ImageIndex = 3
+          object GroupBox3: TGroupBox
+            Left = 5
+            Top = 16
+            Width = 210
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 1
+            object Label19: TLabel
+              Left = 9
+              Top = 190
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#48264#54840
+            end
+            object Label20: TLabel
+              Left = 9
+              Top = 166
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356
+            end
+            object Label21: TLabel
+              Left = 9
+              Top = 262
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53364#47532#50612
+            end
+            object Label22: TLabel
+              Left = 9
+              Top = 238
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#45824#51064#53552#47197
+            end
+            object Label23: TLabel
+              Left = 9
+              Top = 214
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#49325#51228
+            end
+            object Label25: TLabel
+              Left = 9
+              Top = 94
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#50676
+            end
+            object Label26: TLabel
+              Left = 9
+              Top = 118
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#48264#51648
+            end
+            object Label27: TLabel
+              Left = 9
+              Top = 142
+              Width = 65
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629' '#45800
+            end
+            object Edt_Bank14: TEdit
+              Left = 87
+              Top = 90
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_Bay14: TEdit
+              Left = 87
+              Top = 114
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_IOStnNo14: TEdit
+              Left = 87
+              Top = 186
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_Fork14: TEdit
+              Left = 87
+              Top = 162
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_Level14: TEdit
+              Left = 87
+              Top = 138
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ErrorClear14: TEdit
+              Left = 87
+              Top = 258
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_InterLoc14: TEdit
+              Left = 87
+              Top = 234
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_JobDelete14: TEdit
+              Left = 87
+              Top = 210
+              Width = 112
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object RG_JobType14: TRadioGroup
+              Left = 2
+              Top = 13
+              Width = 206
+              Height = 69
+              Align = alTop
+              Caption = '['#51089#50629#51333#47448']'
+              Columns = 2
+              Items.Strings = (
+                #51077#44256#45824' '#49891#44592
+                #47001#50640#49436' '#49891#44592
+                #47001#50640' '#45236#47532#44592
+                #52636#44256#45824' '#45236#47532#44592
+                #54856#51004#47196' '#51060#46041)
+              TabOrder = 8
+            end
+            object Edt_Status14: TLabeledEdit
+              Left = 6
+              Top = 305
+              Width = 123
+              Height = 20
+              AutoSize = False
+              BevelInner = bvNone
+              BevelKind = bkFlat
+              BorderStyle = bsNone
+              Color = clBtnFace
+              EditLabel.Width = 85
+              EditLabel.Height = 11
+              EditLabel.Caption = #49345#53468' '#54540#47000#44536' '#54364#49884
+              Font.Charset = ANSI_CHARSET
+              Font.Color = clGreen
+              Font.Height = -13
+              Font.Name = 'Tahoma'
+              Font.Style = [fsBold]
+              ImeName = 'Microsoft IME 2003'
+              LabelPosition = lpAbove
+              LabelSpacing = 3
+              ParentFont = False
+              ReadOnly = True
+              TabOrder = 9
+            end
+          end
+          object GroupBox15: TGroupBox
+            Left = 550
+            Top = 253
+            Width = 220
+            Height = 96
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 7
+            object Label145: TLabel
+              Left = 7
+              Top = 50
+              Width = 62
+              Height = 11
+              Caption = 'Ack Status'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label146: TLabel
+              Left = 7
+              Top = 25
+              Width = 56
+              Height = 11
+              Caption = 'Lugg High'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label147: TLabel
+              Left = 115
+              Top = 25
+              Width = 53
+              Height = 11
+              Caption = 'Lugg Low'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtACK_Status14: TEdit
+              Left = 8
+              Top = 64
+              Width = 204
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object Ack_Lugg_Hi14: TEdit
+              Left = 67
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object Ack_Lugg_Lo14: TEdit
+              Left = 171
+              Top = 22
+              Width = 40
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+          end
+          object GroupBox14: TGroupBox
+            Left = 550
+            Top = 17
+            Width = 220
+            Height = 206
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 5
+            object Label137: TLabel
+              Left = 16
+              Top = 14
+              Width = 50
+              Height = 11
+              Caption = 'Sts_SMC'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label138: TLabel
+              Left = 16
+              Top = 51
+              Width = 33
+              Height = 11
+              Caption = 'Sts_X'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label142: TLabel
+              Left = 16
+              Top = 125
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z1'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label143: TLabel
+              Left = 16
+              Top = 88
+              Width = 33
+              Height = 11
+              Caption = 'Sts_Y'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object Label144: TLabel
+              Left = 16
+              Top = 162
+              Width = 39
+              Height = 11
+              Caption = 'Sts_Z2'
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #44404#47548
+              Font.Style = []
+              ParentFont = False
+            end
+            object EdtSTS_SMC14: TEdit
+              Left = 9
+              Top = 28
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 0
+            end
+            object EdtSTS_X14: TEdit
+              Left = 9
+              Top = 65
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 1
+            end
+            object EdtSTS_Y14: TEdit
+              Left = 9
+              Top = 102
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 2
+            end
+            object EdtSTS_Z114: TEdit
+              Left = 9
+              Top = 139
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 3
+            end
+            object EdtSTS_Z214: TEdit
+              Left = 9
+              Top = 176
+              Width = 199
+              Height = 19
+              Font.Charset = DEFAULT_CHARSET
+              Font.Color = clWindowText
+              Font.Height = -11
+              Font.Name = #46027#50880
+              Font.Style = []
+              ImeName = 'Microsoft IME 2003'
+              ParentFont = False
+              TabOrder = 4
+            end
+          end
+          object GroupBox6: TGroupBox
+            Left = 228
+            Top = 17
+            Width = 310
+            Height = 332
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 3
+            object Label90: TLabel
+              Left = 11
+              Top = 18
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = 'Phase'
+            end
+            object Label91: TLabel
+              Left = 11
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#54788#51116#50948#52824
+            end
+            object Label92: TLabel
+              Left = 158
+              Top = 42
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#54788#51116#50948#52824
+            end
+            object Label93: TLabel
+              Left = 11
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51648#49345#48152' SW'
+            end
+            object Label94: TLabel
+              Left = 11
+              Top = 186
+              Width = 125
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#54805#53468'('#51648#49884#49884' '#47784#46300')'
+            end
+            object Label95: TLabel
+              Left = 11
+              Top = 234
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#50756#47308'(A)'
+            end
+            object Label96: TLabel
+              Left = 11
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'H(A)'
+            end
+            object Label97: TLabel
+              Left = 11
+              Top = 210
+              Width = 113
+              Height = 13
+              AutoSize = False
+              Caption = #50896#44201' '#50640#47084#53076#46300'(S)'
+            end
+            object Label98: TLabel
+              Left = 155
+              Top = 258
+              Width = 61
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084'L(A)'
+            end
+            object Label99: TLabel
+              Left = 158
+              Top = 90
+              Width = 76
+              Height = 13
+              AutoSize = False
+              Caption = #44592#49345#48152' SW'
+            end
+            object Label100: TLabel
+              Left = 11
+              Top = 114
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #54252#53356#49345#53468'('#44592#51456')'
+            end
+            object Label101: TLabel
+              Left = 158
+              Top = 114
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #54868#47932#50976#47924'('#44592#51456')'
+            end
+            object Label102: TLabel
+              Left = 11
+              Top = 162
+              Width = 86
+              Height = 13
+              Alignment = taCenter
+              AutoSize = False
+              Caption = #51204#50896' Off/On Bit'
+            end
+            object Lbl_Phase14: TLabel
+              Left = 158
+              Top = 16
+              Width = 136
+              Height = 13
+              AutoSize = False
+            end
+            object Label104: TLabel
+              Left = 158
+              Top = 162
+              Width = 88
+              Height = 13
+              AutoSize = False
+              Caption = #51116#44592#46041' '#50836#44396
+            end
+            object Label105: TLabel
+              Left = 158
+              Top = 138
+              Width = 86
+              Height = 13
+              AutoSize = False
+              Caption = #51089#50629#51473
+            end
+            object Label106: TLabel
+              Left = 11
+              Top = 138
+              Width = 87
+              Height = 13
+              AutoSize = False
+              Caption = #50948#52824' '#54028#50501
+            end
+            object Label107: TLabel
+              Left = 11
+              Top = 66
+              Width = 58
+              Height = 13
+              AutoSize = False
+              Caption = #51452#54665#50948#52824
+            end
+            object Label108: TLabel
+              Left = 158
+              Top = 66
+              Width = 57
+              Height = 13
+              AutoSize = False
+              Caption = #49849#44053#50948#52824
+            end
+            object Label109: TLabel
+              Left = 11
+              Top = 282
+              Width = 99
+              Height = 13
+              AutoSize = False
+              Caption = #50640#47084#53076#46300'(A)'
+            end
+            object Edt_Phase14: TEdit
+              Left = 103
+              Top = 14
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 0
+            end
+            object Edt_CurrBay14: TEdit
+              Left = 103
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 1
+            end
+            object Edt_CurrLevel14: TEdit
+              Left = 249
+              Top = 38
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 2
+            end
+            object Edt_ModeSWSCT14: TEdit
+              Left = 103
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 3
+            end
+            object Edt_OrdMode14: TEdit
+              Left = 129
+              Top = 182
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 4
+            end
+            object Edt_RetryBit14: TEdit
+              Left = 249
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 5
+            end
+            object Edt_JobComplete14: TEdit
+              Left = 129
+              Top = 230
+              Width = 170
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 6
+            end
+            object Edt_AErrHigh14: TEdit
+              Left = 77
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 7
+            end
+            object Edt_ErrorCode14: TEdit
+              Left = 129
+              Top = 206
+              Width = 170
+              Height = 19
+              Color = clWhite
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 8
+            end
+            object Edt_AErrLow14: TEdit
+              Left = 223
+              Top = 254
+              Width = 76
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 9
+            end
+            object Edt_ModeSWSCC14: TEdit
+              Left = 249
+              Top = 86
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 10
+            end
+            object Edt_ForkStatusFR14: TEdit
+              Left = 103
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 11
+            end
+            object Edt_ForKStockFR14: TEdit
+              Left = 249
+              Top = 110
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 12
+            end
+            object Edt_PowerBit14: TEdit
+              Left = 103
+              Top = 158
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 13
+            end
+            object pnlSCC_Comm14: TPanel
+              Left = 14
+              Top = 302
+              Width = 136
+              Height = 22
+              Caption = 'SCT '#8596'SCC '#53685#49888#51060#49345
+              TabOrder = 14
+            end
+            object pnlEmgStop14: TPanel
+              Left = 162
+              Top = 302
+              Width = 136
+              Height = 22
+              TabOrder = 15
+            end
+            object Edt_SCPOSOK14: TEdit
+              Left = 103
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 16
+            end
+            object Edt_SCWorking14: TEdit
+              Left = 249
+              Top = 134
+              Width = 50
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 17
+            end
+            object Edt_POS_X_OK14: TEdit
+              Left = 66
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 18
+            end
+            object Edt_POS_Y_OK14: TEdit
+              Left = 212
+              Top = 62
+              Width = 87
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 19
+            end
+            object Edt_AErrCode14: TEdit
+              Left = 126
+              Top = 278
+              Width = 173
+              Height = 19
+              ImeName = 'Microsoft IME 2003'
+              TabOrder = 20
+            end
+          end
+          object Panel8: TPanel
+            Left = 5
+            Top = 1
+            Width = 209
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'PC '#8594' STC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 0
+          end
+          object Panel16: TPanel
+            Left = 228
+            Top = 1
+            Width = 309
+            Height = 19
+            BevelOuter = bvNone
+            Caption = 'STC '#8594' PC'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 2
+          end
+          object Panel23: TPanel
+            Left = 550
+            Top = 1
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ S-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 4
+          end
+          object Panel24: TPanel
+            Left = 550
+            Top = 237
+            Width = 220
+            Height = 19
+            BevelOuter = bvNone
+            Caption = '[ A-Message]'
+            Color = 14408667
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentFont = False
+            TabOrder = 6
+          end
+        end
+      end
+    end
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 411
+    Width = 792
+    Height = 111
+    Align = alBottom
+    BevelOuter = bvNone
+    TabOrder = 1
+    object Panel6: TPanel
+      Left = 0
+      Top = 0
+      Width = 792
+      Height = 64
+      Align = alTop
+      BevelOuter = bvLowered
+      TabOrder = 0
+      object CBLog: TCheckBox
+        Left = 716
+        Top = 22
+        Width = 69
+        Height = 17
+        Caption = 'Log Save'
+        Checked = True
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'MS Sans Serif'
+        Font.Style = []
+        ParentFont = False
+        State = cbChecked
+        TabOrder = 0
+      end
+      object gb_SC_COMM: TGroupBox
+        Left = 1
+        Top = 1
+        Width = 243
+        Height = 62
+        Align = alLeft
+        Caption = '[ '#53685#49888' '#50672#44208' '#49345#53468' ]'
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #46027#50880
+        Font.Style = [fsBold]
+        ParentColor = False
+        ParentFont = False
+        TabOrder = 1
+        object PnlCon11: TPanel
+          Tag = 11
+          Left = 5
+          Top = 16
+          Width = 55
+          Height = 40
+          BevelOuter = bvNone
+          Caption = 'CV'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = #46027#50880
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 0
+          object ShpCon11: TShape
+            Tag = 11
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Brush.Color = clGray
+            Shape = stRoundRect
+          end
+          object lblCon11: TLabel
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'SC #11'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = [fsBold]
+            ParentFont = False
+            Transparent = True
+            Layout = tlCenter
+          end
+        end
+        object PnlCon12: TPanel
+          Tag = 12
+          Left = 63
+          Top = 16
+          Width = 55
+          Height = 40
+          BevelOuter = bvNone
+          Caption = 'SC #12'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = #46027#50880
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 1
+          object ShpCon12: TShape
+            Tag = 12
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Brush.Color = clGray
+            Shape = stRoundRect
+          end
+          object lblCon12: TLabel
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'SC #12'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = [fsBold]
+            ParentFont = False
+            Transparent = True
+            Layout = tlCenter
+          end
+        end
+        object PnlCon13: TPanel
+          Tag = 13
+          Left = 121
+          Top = 16
+          Width = 55
+          Height = 40
+          BevelOuter = bvNone
+          Caption = 'CV'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = #46027#50880
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 2
+          object ShpCon13: TShape
+            Tag = 13
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Brush.Color = clGray
+            Shape = stRoundRect
+          end
+          object lblCon13: TLabel
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'SC #13'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = [fsBold]
+            ParentFont = False
+            Transparent = True
+            Layout = tlCenter
+          end
+        end
+        object PnlCon14: TPanel
+          Tag = 14
+          Left = 179
+          Top = 16
+          Width = 55
+          Height = 40
+          BevelOuter = bvNone
+          Caption = 'CV'
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = #46027#50880
+          Font.Style = [fsBold]
+          ParentFont = False
+          TabOrder = 3
+          object ShpCon14: TShape
+            Tag = 14
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Brush.Color = clGray
+            Shape = stRoundRect
+          end
+          object lblCon14: TLabel
+            Left = 0
+            Top = 0
+            Width = 55
+            Height = 40
+            Align = alClient
+            Alignment = taCenter
+            Caption = 'SC #14'
+            Font.Charset = DEFAULT_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -11
+            Font.Name = #44404#47548
+            Font.Style = [fsBold]
+            ParentFont = False
+            Transparent = True
+            Layout = tlCenter
+          end
+        end
+      end
+      object RadioGroupComm: TRadioGroup
+        Left = 244
+        Top = 1
+        Width = 141
+        Height = 62
+        Align = alLeft
+        Caption = '[ '#51228#50612' '#47784#46300' ]'
+        Columns = 2
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = #46027#50880
+        Font.Style = [fsBold]
+        ItemIndex = 0
+        Items.Strings = (
+          #51088#46041
+          #49688#46041)
+        ParentFont = False
+        TabOrder = 2
+      end
+    end
+    object pnl_Error: TPanel
+      Left = 0
+      Top = 64
+      Width = 792
+      Height = 47
+      Align = alClient
+      BevelInner = bvRaised
+      BevelOuter = bvLowered
+      Font.Charset = HANGEUL_CHARSET
+      Font.Color = clRed
+      Font.Height = -16
+      Font.Name = #44404#47548
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 1
+      object bbComm: TBitBtn
+        Left = 554
+        Top = 5
+        Width = 120
+        Height = 37
+        Caption = #53685#49888#49884#51089
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = #46027#50880
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 0
+        OnClick = bbCommClick
+        Glyph.Data = {
+          FE0A0000424DFE0A00000000000036000000280000001E0000001E0000000100
+          180000000000C80A000012170000121700000000000000000000C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D469696A69696AC8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4757778636363
+          636363636363636363757778C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D482858663636363636363636363636363
+          6363636363636363636363828586C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D48F92946363636363636363636363636363636363636363636363
+          636363636363636363636363638F9294C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D49BA0A263
+          6363636363636363636363636363636363636363060606060606636363636363
+          6363636363636363636363636363639BA0A2C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4A8ADB06363636363636363636363
+          63636363636363636363121212000000D0D0D083838300000012121263636363
+          6363636363636363636363636363636363A8ADB0C8D0D4C8D0D4C8D0D4C8D0D4
+          0000C8D0D4C8D0D4B5BBBE636363636363636363636363636363636363636363
+          1E1E1E000000B4B4B4DEDEDEC7C7C7C9C9C98C8C8C7171710000001E1E1E6363
+          63636363636363636363636363636363636363B5BBBEC8D0D4C8D0D40000C1C9
+          CC6363636363636363636363636363636363636363632B2B2B000000989898DE
+          DEDECACACAC6C6C6C6C6C6CDCDCDCECECEC8C8C88C8C8C6060600000002B2B2B
+          636363636363636363636363636363636363636363C1C9CC0000636363636363
+          6363636363636363636363633737370000007C7C7CDEDEDEC7C7C7B7B7B7BBBB
+          BBC4C4C4C6C6C6CDCDCDCECECED6D6D6D6D6D6BEBEBE8C8C8C4E4E4E00000037
+          37376363636363636363636363636363636363630000C1C9CC63636363636363
+          6363444444000000616161DEDEDEC2C2C2B1B1B1B5B5B5BABABABDBDBDC4C4C4
+          C6C6C6C6C6C6CECECECFCFCFD6D6D6D8D8D8DEDEDEBABABA4646460000000000
+          00444444636363636363636363C1C9CC0000C8D0D4C8D0D4A2A9AC0000004545
+          45DEDEDEC8C8C8ADADADADADADB1B1B1B5B5B5B5B5B5BBBBBBBDBDBDC5C5C5C6
+          C6C6CECECECFCFCFD6D6D6D6D6D6D8D8D8DEDEDE6F6F6F402500734200231400
+          000000A2A8ACC8D0D4C8D0D40000BBC3C60000002F2F2FFFFFFFE0E0E09F9F9F
+          A5A5A5A5A5A5A9A9A9ADADADB2B2B2BABABABDBDBDBDBDBDC5C5C5C6C6C6C6C6
+          C6CFCFCFD6D6D6D8D6D6DED8D8DEDEDE6F6F6F814E00E78C00AD6F009463001B
+          1200000000BBC2C600000F0F0FFFFFFFF1F1F1B5B5B5B7B7B7BDBDBDB2B2B2A5
+          A5A5A9A9A9ADADADB2B2B2B5B5B5B5B5B5BBBBBBC5C5C5C6C6C6C6C6C6CECECE
+          CFCFCFD6D6D6D6D6D6D9D9D96F6F6F8F6100FFAD00FFAD00FFAD00A870009463
+          000906000000BBC3C6000000212121B5B5B5B7B7B7BDBDBDBDBDBDC1C1C1B3B3
+          B3A9A9A9B2B2B2B5B5B5B5B5B5BBBBBBBDBDBDC5C5C5C6C6C6C7C7C7CFCFCFD6
+          D6D6D6D6D6E7E7E77F7F7F8F6100FFAD00FFAD00FFAD002F2000000000BBC2C6
+          0000C8D0D4C8D0D4B5BCC064686A6063645B5B5B898989C1C1C1C4C4C4C8C8C8
+          C1C1C1C2C2C2B8B8B8B8B8B8BCBCBCC1C1C1C6C6C6CACACADEDEDEE3E3E3F1F1
+          F0F8F8F67D7D7D4730007F56006C624864686AB5BCC0C8D0D4C8D0D40000C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D47075770000006F6F6FC6C6C6CBCBCBCE
+          CECECECECED4D4D4BEBEBEBFBFBFE7E7E7E7E7E7E7E7E7E9E9E9F1F1F18B8B8B
+          0000007074776A804F99A791C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4575B5C0000008D8D8DCECECECECE
+          CED4D4D4D6D6D6DDDDDDDEDEDEDFDFDFE8E8E8A4A4A4000000575A5CC8D0D4C8
+          D0D46A804F325000A2AF9EC8D0D4C8D0D4C8D0D400003B570DC8D0D4ABB8AC57
+          6F3499A8916A7F4F8698773250003250003250000F19000000006396007AB900
+          7AB9007AB9007AB9006396000000000F18003250003250003250003250003250
+          0041B000377300ABB7ACC8D0D4C8D0D400002F780DC8D0D4A9BEAC4D8A3495B2
+          9162954F85B67731960031960031960039AE00349E00091C0000000086EF6486
+          EF640000000B22003DB90040C30044CE0042C80049DC0049DC0049DC0049DC00
+          49DC00366A00B5BFB9C8D0D400002F780DC8D0D4A9BEAC4D8A3495B29162954F
+          85B67731960031960031960039AE00349E003AB2003DB900030B00030B003DB9
+          003DB9003DB90040C30044CE0042C80049DC0049DC0049DC0049DC0049DC0049
+          DC00346100BEC7C600002F780DC8D0D4A9BEAC4D8A3495B29162954F85B67731
+          960031960031960039AE00349E003AB2003DB9003DB9003DB9003DB9003DB900
+          3DB90040C30044CE0042C80049DC0049DC0049DC0049DC0049DC0049DC003461
+          00BEC7C600002F780DC8D0D4A9BEAC4D8A3495B29162954F85B6773196003196
+          0031960039AE00349E003AB2003DB9003DB9003DB9003DB9003DB9003DB90040
+          C30044CE0042C80049DC0049DC0049DC0049DC0049DC00366A00B5BFB9C8D0D4
+          00003B570DC8D0D4ABB8AC576F3499A8916A7F4F869877325000325000325000
+          3250003250003250003250003250003250003250003250003250003250003250
+          0032500032500032500032500041B000377300ABB7ACC8D0D4C8D0D40000C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D46A804F325000A2AF9EC8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D46A804F99A791C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D40000C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0
+          D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8
+          D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4C8D0D4
+          0000}
+      end
+      object BtnExit: TBitBtn
+        Tag = 1
+        Left = 677
+        Top = 5
+        Width = 120
+        Height = 37
+        Caption = #51333#47308
+        Font.Charset = HANGEUL_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -12
+        Font.Name = #46027#50880
+        Font.Style = [fsBold]
+        ParentFont = False
+        TabOrder = 1
+        OnClick = bbCommClick
+        Glyph.Data = {
+          9A0B0000424D9A0B00000000000036000000280000001B0000001B0000000100
+          200000000000640B000012170000121700000000000000000000CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00BCBCBC0096969600A8A8A800C8C8
+          C800C2C2C2008D8D8D00A7A7A700CCCCCC00BCBCBC0091919100A9A9A900CBCB
+          CB00999999001A1A1A000000000095959500BFBFBF008E8E8E00A9A9A900CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00C7C7C700B0B0B000B5B5
+          B500CCCCCC00AAAAAA008D8D8D00BEBEBE00CCCCCC00ACACAC0090909000BABA
+          BA00CCCCCC00AAAAAA00909090008989890079791A00F1F1000054541000AEAE
+          AE00C8C8C800A9A9A90095959500BBBBBB00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00C2C2C2009D9D9D009F9F9F00C3C3C300C9C9C900949494009999
+          9900CBCBCB00C3C3C300989898009F9F9F00C7C7C700C2C2C200767676007070
+          1100F1F10000A7A700002F2F1A0098989800CCCCCC00BEBEBE0098989800A6A6
+          A600C6C6C600CCCCCC00BEBEBE008C8C8C00ACACAC00CCCCCC00B4B4B4009090
+          9000B4B4B400CACACA00BABABA008B8B8B00B1B1B100CCCCCC00B4B4B4008F8F
+          8F00B3B3B3009999990079791A00F1F10000B4B400007D7D010034342D008F8F
+          8F00B3B3B300CCCCCC00ADADAD008C8C8C00BDBDBD00CCCCCC00C7C7C700A6A6
+          A60097979700BDBDBD00CCCCCC009F9F9F0091919100C6C6C600C8C8C800A1A1
+          A10097979700C1C1C100C8C8C800A0A0A0006666660070701100F1F10000B4B4
+          000097970000646400000F0F0F00575757009C9C9C00C2C2C200CCCCCC00CCCC
+          CC00BFBFBF00A1A1A100CCCCCC00BCBCBC0096969600A8A8A800C8C8C800C2C2
+          C2008D8D8D00A7A7A700CCCCCC00BCBCBC0091919100A9A9A900CBCBCB009999
+          990079791A00F1F10000B4B4000099990000909000004B4B0000000000002A2A
+          2A0074747400B0B0B000CACACA00A2A2A2000000000000000000000000000000
+          000000000000000000000000000000000000000000001A1A1A0098989800CCCC
+          CC00AAAAAA00909090008989890079791A00F1F10000B4B40000999900009999
+          00008787000036360000000000000000000000000000A0A0A000CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00C7C7C700B7B7
+          B70055555500323232005B5B5B00838383008D8D8D00616161006E6E0F00F1F1
+          0000B4B4000099990000999900008787000051511B0067676700A6A6A600C6C6
+          C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00AFAFAF003333330080808000444444006565650088888800888888008888
+          88006666660070701100F1F10000B4B400009999000099990000878700005151
+          1B0067676700A6A6A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00AFAFAF001010100037373700444444006565
+          65008888880088888800888888006666660070701100F1F10000B4B400009999
+          0000999900008787000051511B0067676700A6A6A600C6C6C600CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00AFAFAF003838
+          1000515100001111110065656500888888008888880088888800666666007070
+          1100F1F10000B4B4000099990000999900008787000051511B0067676700A6A6
+          A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00AFAFAF0038381000909000004A4A110065656500888888008888
+          8800888888006666660070701100F1F10000A7A7000017170000333300008787
+          000051511B0067676700A6A6A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00BCBCBC00969696008888880088888800747474004D4D0B00CECE00008585
+          000044441E007474740088888800888888006666660070701100F1F100004E4E
+          0B005C5C5A00393905008787000051511B0067676700A6A6A600C6C6C600CCCC
+          CC00CCCCCC00CCCCCC00C2C2C2009D9D9D008888880088888800888888007474
+          74004D4D0B00F9F90000BFBF00007575000045452F007F7F7F00888888006666
+          660070701100F1F1000058581400ACACAA003E3E0A008787000051511B006767
+          6700A6A6A600C6C6C600CCCCCC00CCCCCC00BDBDBD005C5C5C00000000000000
+          000000000000000000000000000042420000FEFE0000F1F10000B2B200006363
+          00004C4C4300878787006666660070701100F1F10000A7A70000171700003333
+          00008787000051511B0067676700A6A6A600C6C6C600CCCCCC00C7C7C7008787
+          7C00525200009999000099990000999900009999000099990000B3B30000FEFE
+          0000FFFF0000E7E70000A7A7000054540700575757006666660070701100F1F1
+          0000B4B4000099990000999900008787000051511B0067676700A6A6A600C6C6
+          C600CCCCCC00C7C7C7008E8E7C008A8A0000FFFF0E00FFFF3200FFFF3F00FFFF
+          3F00FFFF3F00FFFF3F00FFFF4200FFFF5E00FFFF4000E4E40900929201004B4B
+          23004E4E4E0070701100F1F10000B4B400009999000099990000878700005151
+          1B0067676700A6A6A600C6C6C600CCCCCC00CCCCCC00BDBDBD005C5C5C000000
+          00000000000000000000000000000000000042420000FEFE6900FFFF6000E7E7
+          0000717100004C4C4300878787006666660070701100F1F10000B4B400009999
+          0000999900008787000051511B0067676700A6A6A600C6C6C600CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00AFAFAF005353
+          1000FEFE0000F1F100008F8F000045452F007F7F7F0088888800666666007070
+          1100F1F10000B4B4000099990000999900008787000051511B0067676700A6A6
+          A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00AFAFAF0053531000F9F90000ABAB000044441E00747474008888
+          8800888888006666660070701100F1F10000B4B4000099990000999900008787
+          000051511B0067676700A6A6A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00AFAFAF0053531000C6C600004A4A
+          1100656565008888880088888800888888006666660070701100F1F10000B4B4
+          000099990000999900008787000051511B0067676700A6A6A600C6C6C600CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00AFAF
+          AF00383810005151000011111100656565008888880088888800888888008888
+          8800545454008D8D0700F6F60000A7A70000999900008787000051511B006767
+          6700A6A6A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00AFAFAF0010101000545454005E5E5E00656565008888
+          88008888880088888800888888008888880040404000BABA0000EBEB00009D9D
+          00008787000051511B0067676700A6A6A600C6C6C600CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00C1C1
+          C1005E5E5E006565650088888800888888008888880088888800888888008888
+          880038382400D8D80000DCDC00008787000051511B0067676700A6A6A600C6C6
+          C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00C1C1C1005E5E5E006565650088888800888888008888
+          88008888880088888800888888007C7C7C0042421300EEEE0000B9B900005151
+          1B0067676700A6A6A600C6C6C600CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCC
+          CC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00CCCCCC00C3C3C300757575006565
+          6500777777007777770077777700777777007777770077777700777777006B6B
+          6A0060603500A3A3330077774A0097979700C7C7C700CCCCCC00CCCCCC00}
+      end
+    end
+  end
+  object sbInfo: TStatusBar
+    Left = 0
+    Top = 522
+    Width = 792
+    Height = 20
+    Panels = <
+      item
+        Alignment = taCenter
+        Width = 200
+      end
+      item
+        Alignment = taCenter
+        Width = 200
+      end
+      item
+        Alignment = taCenter
+        Width = 50
+      end>
+    SimplePanel = False
+  end
+  object tmrConnectCheck: TTimer
+    Enabled = False
+    Interval = 20
+    OnTimer = tmrConnectCheckTimer
+    Left = 160
+    Top = 488
+  end
+  object tmrStatusRead: TTimer
+    Enabled = False
+    Interval = 200
+    OnTimer = tmrStatusReadTimer
+    Left = 128
+    Top = 488
+  end
+  object qryInfo: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 224
+    Top = 487
+  end
+  object qrySearch: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM TM_CURRENT')
+    Left = 384
+    Top = 488
+  end
+  object qryUpdate: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 256
+    Top = 488
+  end
+  object tmrTimeOutCheck: TTimer
+    Enabled = False
+    Interval = 3000
+    OnTimer = tmrTimeOutCheckTimer
+    Left = 192
+    Top = 488
+  end
+  object SCSocket11: TClientSocket
+    Tag = 11
+    Active = False
+    ClientType = ctNonBlocking
+    Port = 5001
+    OnConnecting = SCSocket11Connecting
+    OnConnect = SCSocket11Connect
+    OnDisconnect = SCSocket11Disconnect
+    OnRead = SCSocket11Read
+    OnError = SCSocket11Error
+    Left = 3
+    Top = 488
+  end
+  object SCSocket12: TClientSocket
+    Tag = 12
+    Active = False
+    Address = '127.0.0.1'
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnecting = SCSocket11Connecting
+    OnConnect = SCSocket11Connect
+    OnDisconnect = SCSocket11Disconnect
+    OnRead = SCSocket11Read
+    OnError = SCSocket11Error
+    Left = 32
+    Top = 488
+  end
+  object SCSocket13: TClientSocket
+    Tag = 13
+    Active = False
+    Address = '127.0.0.1'
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnecting = SCSocket11Connecting
+    OnConnect = SCSocket11Connect
+    OnDisconnect = SCSocket11Disconnect
+    OnRead = SCSocket11Read
+    OnError = SCSocket11Error
+    Left = 61
+    Top = 488
+  end
+  object SCSocket14: TClientSocket
+    Tag = 14
+    Active = False
+    Address = '127.0.0.1'
+    ClientType = ctNonBlocking
+    Port = 0
+    OnConnecting = SCSocket11Connecting
+    OnConnect = SCSocket11Connect
+    OnDisconnect = SCSocket11Disconnect
+    OnRead = SCSocket11Read
+    OnError = SCSocket11Error
+    Left = 91
+    Top = 488
+  end
+  object QryDelete: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 288
+    Top = 488
+  end
+  object qrySCIO: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 320
+    Top = 488
+  end
+  object qryFN_SCIO: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 352
+    Top = 488
+  end
+  object qryError: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM TM_CURRENT')
+    Left = 416
+    Top = 488
+  end
+  object qrySCStatUdt: TADOQuery
+    Connection = MainDm.MainDatabase
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      'SELECT * FROM TM_CURRENT')
+    Left = 448
+    Top = 488
+  end
+end

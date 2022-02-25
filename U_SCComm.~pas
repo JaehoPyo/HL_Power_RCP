@@ -1,0 +1,4187 @@
+unit U_SCComm;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  StrUtils, Dialogs, h_MainLib, h_ReferLib, d_MainDm, DB, ADODB, ExtCtrls, CPort, ComCtrls, StdCtrls, Buttons,
+  CPortCtl, Inifiles, ScktComp, Grids, RXShell, Menus, RxMenus, CheckLst, FileLib ;
+
+
+type
+  TfrmSCComm = class(TForm)
+    pcStatus: TPageControl;
+    tsCommLog: TTabSheet;
+    CommLog: TMemo;
+    Panel3: TPanel;
+    Panel6: TPanel;
+    pnl_Error: TPanel;
+    sbInfo: TStatusBar;
+    tmrConnectCheck: TTimer;
+    tmrStatusRead: TTimer;
+    qryInfo: TADOQuery;
+    qrySearch: TADOQuery;
+    qryUpdate: TADOQuery;
+    tmrTimeOutCheck: TTimer;
+    TabSheet8: TTabSheet;
+    pcScStatus: TPageControl;
+    TabSheet9: TTabSheet;
+    TabSheet13: TTabSheet;
+    TabSheet14: TTabSheet;
+    CBLog: TCheckBox;
+    gb_SC_COMM: TGroupBox;
+    SCSocket11: TClientSocket;
+    SCSocket12: TClientSocket;
+    SCSocket13: TClientSocket;
+    SCSocket14: TClientSocket;
+    QryDelete: TADOQuery;
+    qrySCIO: TADOQuery;
+    qryFN_SCIO: TADOQuery;
+    TabSheet7: TTabSheet;
+    RadioGroupComm: TRadioGroup;
+    ListBoxOrder: TListBox;
+    PnlCon11: TPanel;
+    ShpCon11: TShape;
+    lblCon11: TLabel;
+    ShpCon12: TShape;
+    lblCon12: TLabel;
+    PnlCon13: TPanel;
+    ShpCon13: TShape;
+    lblCon13: TLabel;
+    PnlCon14: TPanel;
+    ShpCon14: TShape;
+    lblCon14: TLabel;
+    bbComm: TBitBtn;
+    BtnExit: TBitBtn;
+    PnlCon12: TPanel;
+    Panel15: TPanel;
+    GroupBox31: TGroupBox;
+    Label49: TLabel;
+    Label50: TLabel;
+    Label51: TLabel;
+    Label52: TLabel;
+    Label53: TLabel;
+    Label48: TLabel;
+    Label139: TLabel;
+    Label140: TLabel;
+    Edt_Bank11: TEdit;
+    Edt_Bay11: TEdit;
+    Edt_IOStnNo11: TEdit;
+    Edt_Fork11: TEdit;
+    Edt_Level11: TEdit;
+    Edt_ErrorClear11: TEdit;
+    Edt_InterLoc11: TEdit;
+    Edt_JobDelete11: TEdit;
+    RG_JobType11: TRadioGroup;
+    Edt_Status11: TLabeledEdit;
+    GroupBox12: TGroupBox;
+    Label55: TLabel;
+    Label56: TLabel;
+    Label57: TLabel;
+    Label58: TLabel;
+    Label59: TLabel;
+    Label60: TLabel;
+    Label61: TLabel;
+    Label62: TLabel;
+    Label63: TLabel;
+    Label64: TLabel;
+    Label65: TLabel;
+    Label66: TLabel;
+    Label67: TLabel;
+    Lbl_Phase11: TLabel;
+    Label69: TLabel;
+    Label70: TLabel;
+    Label133: TLabel;
+    Label134: TLabel;
+    Label135: TLabel;
+    Label141: TLabel;
+    Edt_Phase11: TEdit;
+    Edt_CurrBay11: TEdit;
+    Edt_CurrLevel11: TEdit;
+    Edt_ModeSWSCT11: TEdit;
+    Edt_OrdMode11: TEdit;
+    Edt_RetryBit11: TEdit;
+    Edt_JobComplete11: TEdit;
+    Edt_AErrHigh11: TEdit;
+    Edt_ErrorCode11: TEdit;
+    Edt_AErrLow11: TEdit;
+    Edt_ModeSWSCC11: TEdit;
+    Edt_ForkStatusFR11: TEdit;
+    Edt_ForKStockFR11: TEdit;
+    Edt_PowerBit11: TEdit;
+    pnlSCC_Comm11: TPanel;
+    pnlEmgStop11: TPanel;
+    Edt_SCPOSOK11: TEdit;
+    Edt_SCWorking11: TEdit;
+    Edt_POS_X_OK11: TEdit;
+    Edt_POS_Y_OK11: TEdit;
+    Edt_AErrCode11: TEdit;
+    Panel1: TPanel;
+    GroupBox8: TGroupBox;
+    Label122: TLabel;
+    Label123: TLabel;
+    Label124: TLabel;
+    Label125: TLabel;
+    Label126: TLabel;
+    EdtSTS_SMC11: TEdit;
+    EdtSTS_X11: TEdit;
+    EdtSTS_Y11: TEdit;
+    EdtSTS_Z111: TEdit;
+    EdtSTS_Z211: TEdit;
+    GroupBox7: TGroupBox;
+    Label119: TLabel;
+    Label120: TLabel;
+    Label121: TLabel;
+    EdtACK_Status11: TEdit;
+    Ack_Lugg_Hi11: TEdit;
+    Ack_Lugg_Lo11: TEdit;
+    Panel2: TPanel;
+    Panel4: TPanel;
+    Panel5: TPanel;
+    GroupBox1: TGroupBox;
+    Label1: TLabel;
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Label7: TLabel;
+    Label8: TLabel;
+    Label9: TLabel;
+    Edt_Bank12: TEdit;
+    Edt_Bay12: TEdit;
+    Edt_IOStnNo12: TEdit;
+    Edt_Fork12: TEdit;
+    Edt_Level12: TEdit;
+    Edt_ErrorClear12: TEdit;
+    Edt_InterLoc12: TEdit;
+    Edt_JobDelete12: TEdit;
+    RG_JobType12: TRadioGroup;
+    Edt_Status12: TLabeledEdit;
+    Panel7: TPanel;
+    GroupBox2: TGroupBox;
+    Label10: TLabel;
+    Label11: TLabel;
+    Label12: TLabel;
+    Label13: TLabel;
+    Label14: TLabel;
+    Label16: TLabel;
+    Label17: TLabel;
+    Label18: TLabel;
+    Edt_Bank13: TEdit;
+    Edt_Bay13: TEdit;
+    Edt_IOStnNo13: TEdit;
+    Edt_Fork13: TEdit;
+    Edt_Level13: TEdit;
+    Edt_ErrorClear13: TEdit;
+    Edt_InterLoc13: TEdit;
+    Edt_JobDelete13: TEdit;
+    RG_JobType13: TRadioGroup;
+    Edt_Status13: TLabeledEdit;
+    Panel8: TPanel;
+    GroupBox3: TGroupBox;
+    Label19: TLabel;
+    Label20: TLabel;
+    Label21: TLabel;
+    Label22: TLabel;
+    Label23: TLabel;
+    Label25: TLabel;
+    Label26: TLabel;
+    Label27: TLabel;
+    Edt_Bank14: TEdit;
+    Edt_Bay14: TEdit;
+    Edt_IOStnNo14: TEdit;
+    Edt_Fork14: TEdit;
+    Edt_Level14: TEdit;
+    Edt_ErrorClear14: TEdit;
+    Edt_InterLoc14: TEdit;
+    Edt_JobDelete14: TEdit;
+    RG_JobType14: TRadioGroup;
+    Edt_Status14: TLabeledEdit;
+    Panel9: TPanel;
+    GroupBox4: TGroupBox;
+    Label28: TLabel;
+    Label29: TLabel;
+    Label30: TLabel;
+    Label31: TLabel;
+    Label32: TLabel;
+    Label33: TLabel;
+    Label34: TLabel;
+    Label35: TLabel;
+    Label36: TLabel;
+    Label37: TLabel;
+    Label38: TLabel;
+    Label39: TLabel;
+    Label40: TLabel;
+    Lbl_Phase12: TLabel;
+    Label42: TLabel;
+    Label43: TLabel;
+    Label44: TLabel;
+    Label45: TLabel;
+    Label46: TLabel;
+    Label47: TLabel;
+    Edt_Phase12: TEdit;
+    Edt_CurrBay12: TEdit;
+    Edt_CurrLevel12: TEdit;
+    Edt_ModeSWSCT12: TEdit;
+    Edt_OrdMode12: TEdit;
+    Edt_RetryBit12: TEdit;
+    Edt_JobComplete12: TEdit;
+    Edt_AErrHigh12: TEdit;
+    Edt_ErrorCode12: TEdit;
+    Edt_AErrLow12: TEdit;
+    Edt_ModeSWSCC12: TEdit;
+    Edt_ForkStatusFR12: TEdit;
+    Edt_ForKStockFR12: TEdit;
+    Edt_PowerBit12: TEdit;
+    pnlSCC_Comm12: TPanel;
+    pnlEmgStop12: TPanel;
+    Edt_SCPOSOK12: TEdit;
+    Edt_SCWorking12: TEdit;
+    Edt_POS_X_OK12: TEdit;
+    Edt_POS_Y_OK12: TEdit;
+    Edt_AErrCode12: TEdit;
+    Panel12: TPanel;
+    GroupBox5: TGroupBox;
+    Label68: TLabel;
+    Label71: TLabel;
+    Label72: TLabel;
+    Label73: TLabel;
+    Label74: TLabel;
+    Label75: TLabel;
+    Label76: TLabel;
+    Label77: TLabel;
+    Label78: TLabel;
+    Label79: TLabel;
+    Label80: TLabel;
+    Label81: TLabel;
+    Label82: TLabel;
+    Lbl_Phase13: TLabel;
+    Label84: TLabel;
+    Label85: TLabel;
+    Label86: TLabel;
+    Label87: TLabel;
+    Label88: TLabel;
+    Label89: TLabel;
+    Edt_Phase13: TEdit;
+    Edt_CurrBay13: TEdit;
+    Edt_CurrLevel13: TEdit;
+    Edt_ModeSWSCT13: TEdit;
+    Edt_OrdMode13: TEdit;
+    Edt_RetryBit13: TEdit;
+    Edt_JobComplete13: TEdit;
+    Edt_AErrHigh13: TEdit;
+    Edt_ErrorCode13: TEdit;
+    Edt_AErrLow13: TEdit;
+    Edt_ModeSWSCC13: TEdit;
+    Edt_ForkStatusFR13: TEdit;
+    Edt_ForKStockFR13: TEdit;
+    Edt_PowerBit13: TEdit;
+    pnlSCC_Comm13: TPanel;
+    pnlEmgStop13: TPanel;
+    Edt_SCPOSOK13: TEdit;
+    Edt_SCWorking13: TEdit;
+    Edt_POS_X_OK13: TEdit;
+    Edt_POS_Y_OK13: TEdit;
+    Edt_AErrCode13: TEdit;
+    Panel16: TPanel;
+    GroupBox6: TGroupBox;
+    Label90: TLabel;
+    Label91: TLabel;
+    Label92: TLabel;
+    Label93: TLabel;
+    Label94: TLabel;
+    Label95: TLabel;
+    Label96: TLabel;
+    Label97: TLabel;
+    Label98: TLabel;
+    Label99: TLabel;
+    Label100: TLabel;
+    Label101: TLabel;
+    Label102: TLabel;
+    Lbl_Phase14: TLabel;
+    Label104: TLabel;
+    Label105: TLabel;
+    Label106: TLabel;
+    Label107: TLabel;
+    Label108: TLabel;
+    Label109: TLabel;
+    Edt_Phase14: TEdit;
+    Edt_CurrBay14: TEdit;
+    Edt_CurrLevel14: TEdit;
+    Edt_ModeSWSCT14: TEdit;
+    Edt_OrdMode14: TEdit;
+    Edt_RetryBit14: TEdit;
+    Edt_JobComplete14: TEdit;
+    Edt_AErrHigh14: TEdit;
+    Edt_ErrorCode14: TEdit;
+    Edt_AErrLow14: TEdit;
+    Edt_ModeSWSCC14: TEdit;
+    Edt_ForkStatusFR14: TEdit;
+    Edt_ForKStockFR14: TEdit;
+    Edt_PowerBit14: TEdit;
+    pnlSCC_Comm14: TPanel;
+    pnlEmgStop14: TPanel;
+    Edt_SCPOSOK14: TEdit;
+    Edt_SCWorking14: TEdit;
+    Edt_POS_X_OK14: TEdit;
+    Edt_POS_Y_OK14: TEdit;
+    Edt_AErrCode14: TEdit;
+    Panel19: TPanel;
+    GroupBox9: TGroupBox;
+    Label110: TLabel;
+    Label111: TLabel;
+    Label112: TLabel;
+    Label113: TLabel;
+    Label114: TLabel;
+    EdtSTS_SMC12: TEdit;
+    EdtSTS_X12: TEdit;
+    EdtSTS_Y12: TEdit;
+    EdtSTS_Z112: TEdit;
+    EdtSTS_Z212: TEdit;
+    Panel20: TPanel;
+    GroupBox10: TGroupBox;
+    Label115: TLabel;
+    Label116: TLabel;
+    Label117: TLabel;
+    EdtACK_Status12: TEdit;
+    Ack_Lugg_Hi12: TEdit;
+    Ack_Lugg_Lo12: TEdit;
+    Panel21: TPanel;
+    GroupBox11: TGroupBox;
+    Label118: TLabel;
+    Label127: TLabel;
+    Label128: TLabel;
+    Label129: TLabel;
+    Label130: TLabel;
+    EdtSTS_SMC13: TEdit;
+    EdtSTS_X13: TEdit;
+    EdtSTS_Y13: TEdit;
+    EdtSTS_Z113: TEdit;
+    EdtSTS_Z213: TEdit;
+    Panel22: TPanel;
+    GroupBox13: TGroupBox;
+    Label131: TLabel;
+    Label132: TLabel;
+    Label136: TLabel;
+    EdtACK_Status13: TEdit;
+    Ack_Lugg_Hi13: TEdit;
+    Ack_Lugg_Lo13: TEdit;
+    Panel23: TPanel;
+    GroupBox14: TGroupBox;
+    Label137: TLabel;
+    Label138: TLabel;
+    Label142: TLabel;
+    Label143: TLabel;
+    Label144: TLabel;
+    EdtSTS_SMC14: TEdit;
+    EdtSTS_X14: TEdit;
+    EdtSTS_Y14: TEdit;
+    EdtSTS_Z114: TEdit;
+    EdtSTS_Z214: TEdit;
+    Panel24: TPanel;
+    GroupBox15: TGroupBox;
+    Label145: TLabel;
+    Label146: TLabel;
+    Label147: TLabel;
+    EdtACK_Status14: TEdit;
+    Ack_Lugg_Hi14: TEdit;
+    Ack_Lugg_Lo14: TEdit;
+    qryError: TADOQuery;
+    qrySCStatUdt: TADOQuery;
+    
+    procedure FormCreate(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
+
+
+    //==============================================================================
+    // User Define Event :
+    //==============================================================================
+    procedure bbCommClick(Sender: TObject);
+    procedure tmrTimeOutCheckTimer(Sender: TObject);
+    procedure tmrStatusReadTimer(Sender: TObject);
+    procedure tmrConnectCheckTimer(Sender: TObject);
+    // SC SCT 통신관련 Event Procedure -----------------------------------------
+    procedure SCSocket11Connect(Sender: TObject;  Socket: TCustomWinSocket);
+    procedure SCSocket11Connecting(Sender: TObject; Socket: TCustomWinSocket);
+    procedure SCSocket11Disconnect(Sender: TObject; Socket: TCustomWinSocket);
+    procedure SCSocket11Error(Sender: TObject; Socket: TCustomWinSocket;
+      ErrorEvent: TErrorEvent; var ErrorCode: Integer);
+    procedure SCSocket11Read(Sender: TObject; Socket: TCustomWinSocket);
+    //--------------------------------------------------------------------------
+
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+    procedure Init_Local_Variable ;
+    procedure Socket_End_Process ;
+
+    procedure LogWriteCheck(WriteStr : String);
+    procedure ErrorLogWrite(WriteStr : String);
+    procedure DisplayLog(SC_NO:Integer;Msg, SR_Type: String; Len:Integer);
+    function  GetLogData(SC_No:Integer;Buff_Data: array of Char; Len: Integer):String;
+
+    procedure SCCRWrite(SC_NO, str : string);
+    procedure DoubleZeroOrder(ID_NO, Job_Type : String); // 이중입고 / 공출고 처리
+    procedure SC_ControlProcess(SC_NO:Integer);  // SC 상태 및 작업 처리
+
+    function  fn_SCIO_Exist (SC_NO:Integer):Boolean; // 해당 SC호기에 Data가 있는지 확인
+    function  fn_SCIO_ReLoad(SC_NO:Integer):Boolean; // TT_SCIO Data를 가지고 SC_JOB에 등록
+    function  fn_SCIO_Insert(SC_No:Integer):Boolean; // SC_JOB Data를 가지고 TT_SCIO Table에 Insert
+    function  fn_SCIO_Update(SC_No:Integer):Boolean; // SCIO 작업 상태 변경등..
+
+    function  OrderDelete(SC_No:Integer):Boolean;
+    function  OrderUpdate(SC_No:Integer;FName,FValue:String):Boolean;                  overload ;
+    function  OrderUpdate(SC_No:Integer;FName1,FValue1,FName2,FValue2:String):Boolean; overload ;
+    function  Get_OrderValue(SC_No: Integer; FName : String): String;
+    function  Get_SC_JOB(SC_NO:Integer;JFlag:TSCJobMode;CV_NO:String):Boolean ;
+    procedure Chk_SC_JOB(SC_NO:Integer);
+    function  Get_Status_Msg(src:TScStatus):String ;
+    function  fn_Get_SCUSED(SC_No:Integer):Boolean ;
+    //--------------------------------------------------------------------------
+    // SCT 5000 통신관련 추가
+    //--------------------------------------------------------------------------
+    procedure SCRC_Clear(SC_NO:Integer) ;
+    procedure SC_JOBClear(SC_NO:Integer) ;
+
+    Procedure SCTWrite(SC_NO:Integer);
+    Function  DataSend(SC_NO:Integer;Msg_Type:String) : Integer;
+    procedure AddTxMsgNo(SC_No:integer) ;
+    procedure SetMessage(SC_NO:Integer;MsgType:String);
+    procedure CommRecvData(SC_NO:Integer;Comm_Packet:TComm_Packet);
+    Function  Get_PLC_InterLoc(SC_NO:Integer) : String ;
+    procedure SetReceiveStatusData(SC_NO:Integer;Comm_Packet:TComm_Packet);
+    procedure ListBoxDisplay(xListBox : TListBox; Msg : String);
+    Function  GetPhaseMsg( PhaseNo : String) : String;
+
+    procedure SC_JOBDisplayClear(SC_NO:Integer);
+    procedure SCRC_Copy(SC_NO:Integer) ;
+    procedure SendAckMessage(SC_No:Integer; Comm_Packet:TComm_Packet);
+    procedure Delete_ORDER(LUGG, REG_TIME: String);
+    //--------------------------------------------------------------------------
+    // CV TRACK DATA 처리 관련
+    function  CargoExist(Buff_ID : Integer) : boolean;
+    function  GetTrackValue(FName:String;BuffNo:integer): String;
+    procedure SCRC_Update(SC_No:Integer); // SC 상태 데이터 DB 저장.
+    //--------------------------------------------------------------------------
+    // 설비 Error 처리 관련 ( RGV, SC 공통 사용 예정 )
+    procedure Set_Mach_Error(SC_NO:Integer; ErrorCode:String) ;
+    function  Get_SCSETINFO(SC_NO:Integer; GetField:String):Boolean ;
+    function  Set_SCSETINFO(SC_NO:Integer; SetField, SetValue:String):Boolean ;
+    //--------------------------------------------------------------------------
+    // RCP Error 처리 비트 초기화
+    procedure Set_SCSETINFO_Clear(SC_NO:Integer) ;
+    //--------------------------------------------------------------------------
+    procedure SCJOBSTATUSUpdate(LUGG, REG_TIME, Status: String);
+    procedure SCNOWSTATUSUpdate(SC_NO:Integer; Status: String);
+
+  end;
+
+var
+  frmSCComm: TfrmSCComm;
+
+  xMCNo         : integer ;   // 통신할 SC 호기
+  Comm_Interval,              // 통신 주기
+  MaxCheckCount : Integer ;   // 최대 컨넥트 체크 회수.
+
+  LogWriteFlag : Boolean = True;
+
+  CV      : TCV; // CV 정보
+  CV_OLD  : TCV;
+
+  PLC_COMM_OBJ  : Array[START_SCNO..End_SCNO] of TPLC_COMM_OBJ ; // 11~14 : SC 각 호기
+  CONTROL_FLAG  : Array[START_SCNO..End_SCNO] of TCONTROL_FLAG ; // 프로그램 제어변수
+  Before_FLAG   : Array[START_SCNO..End_SCNO] of TCONTROL_FLAG ; // 이전 전송 Flag
+
+
+  Job_Flag  : Array[START_SCNO..End_SCNO] of TSCJobMode ; // 작업 Flag (입출고 우선순위 관련)
+  iTxMsgNo  : Array[START_SCNO..End_SCNO] of Integer ; // 전송 Message 번호
+  iRxMsgNo  : Array[START_SCNO..End_SCNO] of Integer ; // 전송 Message 번호
+  SC_MSG    : Array[START_SCNO..End_SCNO] of TSC_MSG ; // 전송 Message 구조체
+  SC_JOB    : Array[START_SCNO..End_SCNO] of TSC_JOB ; // 각 호기별 SC 작업
+
+  SC_STAT   : Array[START_SCNO..End_SCNO] of TScStatus ; // SC 작업 체크 상태
+  SC_STAT_B : Array[START_SCNO..End_SCNO] of TScStatus ; // SC 상태 체크 상태 Old
+
+  DBSCRC    : Array[START_SCNO..End_SCNO] of TSCRC   ; // 각 호기별 SC 상태(DB용)
+  DBSCRC_B  : Array[START_SCNO..End_SCNO] of TSCRC   ; // 각 호기별 SC 이전 상태
+
+  // Data 통신용 Buffer
+  SendBuf   : Array[START_SCNO..End_SCNO, 1..1024] of Char;
+  SendCnt   : Array[START_SCNO..End_SCNO]          of Integer;
+  RAllBuf   : Array[START_SCNO..End_SCNO, 1..1024] of Char;
+  RAllCnt   : Array[START_SCNO..End_SCNO]          of Integer;
+
+  CV_READY  : Array[START_SCNO..End_SCNO] of TCVReady ; // CV Station Ready 상태
+  RCP_ORDER : Array[START_SCNO..End_SCNO] of TSts_RCP;
+implementation
+
+{$R *.dfm}
+
+//==============================================================================
+// FormCreate
+//==============================================================================
+procedure TfrmSCComm.FormCreate(Sender: TObject);
+var
+  sTitle : String;
+begin
+  sTitle := IniRead(INI_PATH,'Program', 'Caption', 'Stand Alone MFC For CKD Machine Tools SCC') + ' Ver. 1.0';
+
+  if  Findwindow(Nil, pchar(sTitle)) <> 0 then
+  begin
+    Close;
+    ExitProcess( 0 ); // 자신 프로그램을 죽이는 함수
+  end;
+
+  (Sender as TForm).Caption := sTitle ;
+  sbInfo.Panels[2].Text := FormatDatetime('YYYY/MM/DD HH:MM:SS', Now());
+
+  if DBConnection then sbInfo.Panels[0].Text := 'Database 연결 성공'
+  else                 sbInfo.Panels[0].Text := 'Database 연결 실패' ;
+
+  xMCNo := 10;
+  pcStatus.ActivePageIndex := 0 ; 
+  Init_Local_Variable;
+end;
+
+//==============================================================================
+// FormClose
+//==============================================================================
+procedure TfrmSCComm.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if MainDm.MainDatabase.Connected then MainDm.MainDatabase.Close ;
+end;
+
+//==============================================================================
+// Init_Local_Variable
+//==============================================================================
+procedure TfrmSCComm.Init_Local_Variable;
+  function fn_Get_SCConnInfo(SC_No:Integer; var SC_IP, SC_PORT:String):Boolean ;
+  var
+    StrSQL : String ;
+  begin
+    try
+      StrSQL := ' Select IP, PORT   ' +
+                '   from TC_CONTROL ' +
+                '  where MACH_No =  ' + IntToStr(SC_No) ;
+      with qryInfo do
+      begin
+        Close ;
+        SQL.Text := StrSQL ;
+        Open ;
+        if not ( Bof and Eof ) then
+        begin
+          SC_IP   := FieldByName('IP'  ).AsString ;
+          SC_PORT := FieldByName('PORT').AsString ;
+          Result := True ;
+        end else
+        begin
+          Result := False ;        
+        end;
+      end;
+    except
+    end;
+  end;
+var
+  i : integer ;
+  IP_ADDR, PORT_NO, StrLog : String ;
+begin
+  try
+    Comm_Interval := StrToIntDef(IniRead(INI_PATH, 'COMSET', 'Comm_Interval', '100'), 100 );
+    MaxCheckCount := StrToIntDef(IniRead(INI_PATH, 'COMSET', 'MaxCheckCount', '5'  ),   5 );
+
+    //------------------------------------------------------------------------
+    // SC 통신용 Client Socket Component 설정
+    //------------------------------------------------------------------------
+    for i := START_SCNO to End_SCNO do
+    begin
+      IP_ADDR := '';
+      PORT_NO := '' ;
+      if fn_Get_SCConnInfo( i, IP_ADDR, PORT_NO ) then
+      begin
+        // 통신 실패시 처리할 Check Info
+        PLC_COMM_OBJ[i].Comm_Check_Info.Check_Status := False ;
+        PLC_COMM_OBJ[i].Comm_Check_Info.Check_Count  := 0 ;
+
+        with TClientSocket(FindComponent('SCSocket' + IntToStr(i))) do
+        begin
+          Address := IP_ADDR ;
+          Port    := StrToIntDef(PORT_NO, 1281) ;
+        end;
+      end;
+    end;
+
+    for i := START_SCNO to End_SCNO do
+    begin
+      SendCnt[i] := 0;
+      RAllCnt[i] := 0;
+      FillChar(SendBuf[i], SizeOf(SendBuf[i]), chr($00));
+      FillChar(RAllBuf[i], SizeOf(RAllBuf[i]), chr($00));
+
+      SC_STAT[i]  := START ;
+      Job_Flag[i] := None ;
+      CONTROL_FLAG[i] := ComStart ; // ( ComStart, TxP, TxA, TxU )
+    end;
+
+    SCRC_Clear(0);  // SC 상태 구조체 Clear (0 이면 전체 Clear 아니면 해당호기 Clear)
+    SC_JOBClear(0); // SC 작업 구조체 Clear (0 이면 전체 Clear 아니면 해당호기 Clear)
+
+    // 프로그램 기동시 SCIO 작업이 있었으면 해당 작업을 Load 함.
+    for i := START_SCNO to END_SCNO do
+    begin
+      if fn_SCIO_Exist(i) then
+      begin
+        StrLog := 'SC['+ IntToStr(i) + '] 실행중인 작업 검색됨. ' ;
+        DisplayLog(i, StrLog, 'N', Length(StrLog)) ;
+        if fn_SCIO_ReLoad(i) then
+        begin
+          StrLog := 'SC['+ IntToStr(i) + '] 진행중 작업 재등록 ' +
+                    ' 작업번호 :[' + SC_JOB[i].ID_ORDLUGG + '], ' +
+                    ' 등록일자 :[' + SC_JOB[i].ID_ORDDATE + '], ' +
+                    ' 등록시간 :[' + SC_JOB[i].ID_ORDTIME + '], ' +
+                    ' 작업유형 :[' + SC_JOB[i].IO_TYPE    + ']  ' ;
+          DisplayLog(i, StrLog, 'N', Length(StrLog)) ;
+          // 검색된 작업에 따라 SC_STAT[i] 를 변경함.
+          SC_STAT[i] := RETRY_REQ ;
+        end else
+        begin
+          StrLog := 'SC['+ IntToStr(i) + '] 진행중인 작업 등록 실패. ' ;
+          DisplayLog(i, StrLog, 'N', Length(StrLog)) ;
+        end ;
+      end;
+    end;
+  except
+    On E : Exception do
+    begin
+
+    end;
+  end;
+end;
+
+//==============================================================================
+// bbCommClick
+//==============================================================================
+procedure TfrmSCComm.bbCommClick(Sender: TObject);
+var
+  i : integer ;
+begin
+  case ( Sender as TBitBtn ).Tag of
+    0 : // 통신시작&통신중지
+    begin
+      if ( Sender as TBitBtn ).Caption = '통신시작' then
+      begin
+        ( Sender as TBitBtn ).Caption := '통신중지' ;
+        FillChar(CV_OLD.Read  , sizeof(CV_OLD.Read), '0');
+        FillChar(CV.Read      , sizeof(CV.Read)    , '0');
+        FillChar(CV.Write     , sizeof(CV.Write)   , '0');
+        tmrConnectCheck.Enabled := True;
+        tmrTimeOutCheck.Enabled := True;
+        for i := START_SCNO to END_SCNO do
+        begin
+          CONTROL_FLAG[i] := ComStart ;
+        end;
+        xMCNo := 10;
+      end else
+      begin
+        ( Sender as TBitBtn ).Caption := '통신시작' ;
+        FillChar(CV_OLD.Read  , sizeof(CV_OLD.Read)  , '0');
+        FillChar(CV.Write     , sizeof(CV.Write)     , '0');
+        tmrStatusRead.Enabled := False;
+        Socket_End_Process ;
+      end;
+    end;
+
+    1 : // 종료
+    begin
+      Close ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// Socket_End_Process
+//==============================================================================
+procedure TfrmSCComm.Socket_End_Process;
+var
+  i : integer ;
+begin
+  try
+    tmrTimeOutCheck.Enabled := False ;
+    tmrConnectCheck.Enabled := False ;
+    for i := START_SCNO to END_SCNO do
+    begin
+      if TClientSocket(FindComponent('SCSocket' + IntToStr(i))).Active then
+         TClientSocket(FindComponent('SCSocket' + IntToStr(i))).Close ; // Active := False ;
+    end;
+  except
+  end;
+end;
+
+//==============================================================================
+// tmrConnectCheckTimer
+//==============================================================================
+procedure TfrmSCComm.tmrConnectCheckTimer(Sender: TObject);
+var
+  i : integer;
+begin
+  try
+    for i := START_SCNO to END_SCNO do
+    begin
+      if ( not TClientSocket(FindComponent('SCSocket' + IntToStr(i))).Active ) and// 통신이 연결 되어있지 않은 상태
+         ( not PLC_COMM_OBJ[i].Comm_Check_Info.Check_Status) then // 통신연결을 다시 해도 되는 상태
+      begin
+        TClientSocket(FindComponent('SCSocket' + IntToStr(i))).Active := True ;
+        PLC_COMM_OBJ[i].Comm_Check_Info.Check_Status := True ;
+        tmrStatusRead.Enabled := False;
+        if not tmrTimeOutCheck.Enabled then tmrTimeOutCheck.Enabled := True ;
+      end;
+    end;
+    tmrConnectCheck.Enabled := False ;
+    tmrStatusRead.Enabled := True;
+  except
+  end;
+end;
+
+//==============================================================================
+// tmrTimeOutCheckTimer
+//==============================================================================
+procedure TfrmSCComm.tmrTimeOutCheckTimer(Sender: TObject);
+var
+  i : integer ;
+  Self_Check : Boolean ;
+begin
+  try
+    ( Sender as TTimer ).Enabled := False ;
+    Self_Check := False ;
+    for i := Low(PLC_COMM_OBJ) to High(PLC_COMM_OBJ) do
+    begin
+      if PLC_COMM_OBJ[i].Comm_Check_Info.Check_Status then
+      begin
+        inc(PLC_COMM_OBJ[i].Comm_Check_Info.Check_Count);
+        if PLC_COMM_OBJ[i].Comm_Check_Info.Check_Count >= MaxCheckCount then
+        begin
+          PLC_COMM_OBJ[i].Comm_Check_Info.Check_Status := False ;
+          PLC_COMM_OBJ[i].Comm_Check_Info.Check_Count  := 0 ;
+          tmrConnectCheck.Enabled := True ;
+        end else Self_Check := True ;
+      end;
+    end;
+    ( Sender as TTimer ).Enabled := Self_Check ;
+  except
+  end;
+end;
+
+//==============================================================================
+// tmrStatusReadTimer
+//==============================================================================
+procedure TfrmSCComm.tmrStatusReadTimer(Sender: TObject);
+begin
+  tmrStatusRead.Enabled := False;
+
+  //-------------------------------------------
+  // 다음에 통신할 호기를 변경한다.
+  //-------------------------------------------
+  Case xMCNo of
+    10..13 : inc(xMCNo) ;
+    else   xMCNo := 11 ;
+  end;
+
+  if RadioGroupComm.ItemIndex = 1 then
+  begin
+    tmrStatusRead.Enabled := True;
+    Exit;
+  end;
+
+  tmrTimeOutCheck.Enabled := True ;
+
+  try
+    // -----------------------------------------
+    // 스태커 크레인의 상태를 요청 및 지시한다.
+    // -----------------------------------------
+    if ( TClientSocket(FindComponent('SCSocket' + IntToStr(xMCNo))).Active ) then// 통신이 연결 되어있는 상태
+    begin
+      SC_ControlProcess(xMCNo) ;
+
+      Before_FLAG[xMCNo] := CONTROL_FLAG[xMCNo] ;
+      if CONTROL_FLAG[xMCNo] = ComStart then
+         CONTROL_FLAG[xMCNo] := TxP ;
+
+      SCTWrite(xMCNo);
+    end;
+  finally
+  end;
+  tmrStatusRead.Enabled := True;
+end;
+
+//==============================================================================
+// User Define Event : PLC_OBJ.ClientSocket Connect
+//==============================================================================
+procedure TfrmSCComm.SCSocket11Connect(Sender: TObject; Socket: TCustomWinSocket);
+var
+  Idx :Integer ;
+  StrLog  : String ;
+begin
+  try
+    Idx := (Sender as TClientSocket).Tag ;
+    StrLog := 'SC Socket'+ IntToStr(Idx) + ' Socket Connect ' ;
+    TShape(Self.FindComponent('ShpCon' + IntToStr(Idx))).Brush.Color := clLime;
+    DisplayLog(Idx, StrLog, 'N', Length(StrLog)) ;
+  except
+    On E:Exception do
+    begin
+      DisplayLog(Idx, ' Error : proc SCSocket1Connect[SC'+
+                  IntToStr(Idx) + '], [' + E.Message + ']', 'E', 0 ) ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// User Define Event : SCSocket.ClientSocket Connecting
+//==============================================================================
+procedure TfrmSCComm.SCSocket11Connecting(Sender: TObject;
+  Socket: TCustomWinSocket);
+var
+  Idx : Integer ;
+  StrLog  : String ;
+begin
+  try
+    Idx := (Sender as TClientSocket).Tag ;
+    StrLog := 'SC Socket'+ IntToStr(Idx) + ' Socket Connecting ' ;
+    DisplayLog(Idx, StrLog, 'N', Length(StrLog)) ;
+  except
+    On E:Exception do
+    begin
+      DisplayLog(Idx,  ' Error : proc SCSocket Connecting['+
+                  IntToStr(Idx) + '], [' + E.Message + ']', 'E', 0 ) ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// User Define Event : PLC_OBJ.ClientSocket Disconnect
+//==============================================================================
+procedure TfrmSCComm.SCSocket11Disconnect(Sender: TObject;
+  Socket: TCustomWinSocket);
+var
+  Idx : Integer ;
+  StrLog  : String ;
+begin
+  try
+    Idx := (Sender as TClientSocket).Tag ;
+    StrLog := 'SC Socket'+ IntToStr(Idx) + ' Socket Disconnect ' ;
+    TShape(Self.FindComponent('ShpCon' + IntToStr(Idx))).Brush.Color := clGray;
+    DisplayLog(Idx, StrLog, 'N', Length(StrLog)) ;
+    //------------------------------------------------------------
+    if TClientSocket(FindComponent('SCSocket' + IntToStr(idx))).Active then
+         TClientSocket(FindComponent('SCSocket' + IntToStr(idx))).Close ; // Disconnect 되면 Socket 닫음.
+    if bbComm.Caption = '통신중지'  then
+       tmrTimeOutCheck.Enabled := True ; // 통신 Check 해서 재연결 시도 ?
+    //------------------------------------------------------------
+  except
+    On E:Exception do
+    begin
+      DisplayLog(Idx,  ' Error : proc SCSocket Disconnect['+
+                  IntToStr(Idx) + '], [' + E.Message + ']', 'E', 0 ) ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// User Define Event : NE_OBJ.ClientSocket Error
+//==============================================================================
+procedure TfrmSCComm.SCSocket11Error(Sender: TObject;
+  Socket: TCustomWinSocket; ErrorEvent: TErrorEvent;
+  var ErrorCode: Integer);
+var
+  Idx : Integer ;
+  StrLog  : String ;
+begin
+  try
+    Idx := (Sender as TClientSocket).Tag ;
+    TShape(Self.FindComponent('ShpCon' + IntToStr(Idx))).Brush.Color := clRed;
+    StrLog := 'SC Socket'+ IntToStr(Idx) + ' Socket Error ' ;
+    ErrorCode := 0 ;
+    DisplayLog(Idx, StrLog, 'N', Length(StrLog)) ;
+    //------------------------------------------------------------
+    if TClientSocket(FindComponent('SCSocket' + IntToStr(idx))).Active then
+         TClientSocket(FindComponent('SCSocket' + IntToStr(idx))).Close ; // Disconnect 되면 Socket 닫음.
+    if bbComm.Caption = '통신중지'  then
+       tmrTimeOutCheck.Enabled := True ; // 통신 Check 해서 재연결 시도 ?
+    //------------------------------------------------------------    
+  except
+    On E:Exception do
+    begin
+      DisplayLog(Idx,  ' Error : proc SCSocket Error['+
+                  IntToStr(Idx) +  '], [' + E.Message + ']', 'E', 0 ) ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// SCSocketRead Event
+//==============================================================================
+procedure TfrmSCComm.SCSocket11Read(Sender: TObject;
+  Socket: TCustomWinSocket);
+var
+  Str, StrLog :String;
+  RecvBuf :  array[1..1024] of Char;
+  SC_No, RecvCnt :  Integer;
+  TempAllBuf : array [11..14,1..1024] of Char;
+  i, TempAllCnt, All_Size, Start_Pos : Array [11..14] of Integer;
+  Whole_Packet : Array [11..14] of TComm_Packet ;
+begin
+  SC_No := (Sender as TClientSocket).Tag ;
+  FillChar(RecvBuf, SizeOf(RecvBuf), chr($00));
+  RecvCnt := Socket.ReceiveBuf(RecvBuf, SizeOf(RecvBuf));
+  Str := Copy(RecvBuf, 1, RecvCnt);
+
+  // Receive Log 추가
+  StrLog := 'RECV SC'+IntToStr(SC_No)+'[' + IntToStr(RecvCnt) + ']:[' + GetLogData(SC_No, RecvBuf, RecvCnt) + ']' ;
+  DisplayLog(SC_No, StrLog, 'R', Length(StrLog)) ;
+
+  StrMove( @RAllBuf[SC_No, RAllCnt[SC_No]+1], PChar( Copy(RecvBuf,1,RecvCnt) ), RecvCnt );
+  RAllCnt[SC_No] := RAllCnt[SC_No] + RecvCnt;
+
+  if tmrTimeOutCheck.Enabled then
+         tmrTimeOutCheck.Enabled  := False ; // Data 받으면 TimeOut Check Off
+
+  i[SC_No] := 1 ;
+  Start_Pos[SC_No] := 1 ;
+  All_Size[SC_No] := 0 ;
+
+  FillChar( Whole_Packet[SC_No].Buff, SizeOf(Whole_Packet[SC_No].Buff), chr($00) );
+  Whole_Packet[SC_No].Size := 0 ;
+
+  while i[SC_No] <= RAllCnt[SC_No] do
+  begin
+    inc(All_Size[SC_No]) ;
+    if (RAllBuf[SC_No,i[SC_No]] = CR ) then // Whole Packet Receive
+    begin
+      StrMove(@Whole_Packet[SC_No].Buff, @RAllBuf[SC_No,Start_Pos[SC_No]], All_Size[SC_No] ) ;
+      Whole_Packet[SC_No].Size := All_Size[SC_No] ;
+
+      if Whole_Packet[SC_No].Buff[5] <> ':' then
+           iRxMsgNo[SC_No] := StrToInt(Whole_Packet[SC_No].Buff[5]) // Recv Message-No Get
+      else iRxMsgNo[SC_No] := 1 ;
+
+      Sleep(100) ; // Ack 송신시 통신 지연시간 100 msec 추가.
+      SendAckMessage(SC_No,Whole_Packet[SC_No]) ; // Receive에 대한 ACK Message를 보낸다.
+      //--------------------------------------------------------------------------
+      CommRecvData(SC_No,Whole_Packet[SC_No]); // 수신 데이터 처리 후
+      //--------------------------------------------------------------------------
+
+      if CONTROL_FLAG[SC_No] = TxU then  // SC 작업 지시이면
+         CONTROL_FLAG[SC_No] := TxP ;    // Polling Mode로 변경
+      //------------------------
+      // RAllBuff Rebuild Start
+      //------------------------
+
+      // Remain RAllBuff Data Copy
+      TempAllCnt[SC_No] := RAllCnt[SC_No] - All_Size[SC_No] ;
+      StrMove(@TempAllBuf[SC_No], @RAllBuf[SC_No,All_Size[SC_No]+1], TempAllCnt[SC_No] ) ;
+
+      // RAllBuff Clear
+      FillChar( RAllBuf[SC_No], SizeOf(RAllBuf[SC_No]), chr($00) );
+
+      // Temp Data Copy
+      StrMove(@RAllBuf[SC_No], @TempAllBuf[SC_No], TempAllCnt[SC_No] ) ;
+      RAllCnt[SC_No] := TempAllCnt[SC_No];
+
+      i[SC_No] := 0 ;
+      All_Size[SC_No] := 0 ;
+      
+      //------------------------
+      // RAllBuff Rebuild End
+      //------------------------
+      FillChar( Whole_Packet[SC_No].Buff, SizeOf(Whole_Packet[SC_No].Buff), chr($00) );
+      Whole_Packet[SC_No].Size := 0 ;
+    end;
+    Inc(i[SC_No]) ;
+  end;
+end;
+
+//==============================================================================
+// SC Control Process
+//==============================================================================
+procedure TfrmSCComm.SC_ControlProcess(SC_NO:Integer);
+var
+  Str, StrLog : String ;
+  ErrorCode, ErrHigh, ErrLow, tCV_NO: String ;
+begin
+
+  TLabeledEdit(FindComponent('Edt_Status' + IntToStr(SC_NO))).Text := '   ' + Get_Status_Msg(SC_STAT[SC_NO]) ;
+
+  // ===========================================================================
+  // 작업 처리 상태를 확인 후 Flag Update 및 기타 작업을 처리한다.
+  // ===========================================================================
+  case SC_STAT[SC_NO] of
+    //--------------------------------------------------------------------------
+    // START : MFC_SC 프로그램이 최초 기동된 상태
+    //--------------------------------------------------------------------------
+    START   :
+    begin
+      SC_STAT[SC_NO] := STANDBY ;  // SC 작업 대기 상태로 만든다.
+      CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+      // TT_SCRC Data 처리
+      DBSCRC[SC_NO].SCRC_CYCLE := '0' ;
+      SCRC_Update(SC_NO) ;
+    end;
+    //--------------------------------------------------------------------------
+    // STANDBY : SC 상태 데이터를 보고, 작업 지시 가능이면 READY1 으로 만든다.
+    //--------------------------------------------------------------------------
+    STANDBY :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'STANDBY') ; // SC 현재 상태 업데이트[STANDBY]
+
+      if (SC_JOB[SC_NO].SC_STEP = 'C') and  // 작업 cancel 이고
+         (SC_JOB[SC_NO].RECV_A  = 'Y') then // Ack 받음.
+      begin
+        Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status) ;
+        if (StrToInt('$'+Str) = 3 ) then
+        begin // SCT에 작업이 정상 삭제됨
+          Delete_ORDER(SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
+          SC_JOBClear(SC_NO) ; // 다른 작업을 지시 할 수 있도록 Job data Clear ;
+        end;
+      end;
+
+{      if (SC_JOB[SC_NO].HOME_BACK = '1') and  // 홈 복귀이고
+         (SC_JOB[SC_NO].RECV_A  = 'Y') then // Ack 받음.
+      begin
+        SC_JOB[SC_NO].HOME_BACK := '0';
+      end;}
+
+      // 작업 지시 조건 Check 후 지시 가능이면 상태를 READY1 으로 변경함.
+      // 지시가능 조건 : SCC자동, SCT자동, 통신에러無, 비상정지아님
+      //               , 에러無, 작업중아님, PowerBit On아님
+      if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode  = '1') and  // SCC자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode  = '1') and  // SCT자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm  = '0') and  // 통신에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop  = '0') and  // 비상정지아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Err  = '0') and  // 에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run  = '0') and  // 작업중아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '0') then // PowerBit On아님
+      begin // SC에 작업을 지시 할 수 있는 상태이면...
+        SC_STAT[SC_NO] := READY1 ; // SC Loading 작업 준비 상태로 만든다.
+      end;
+      CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+      // TT_SCRC Data 처리
+      DBSCRC[SC_NO].SCRC_CYCLE := '0' ;
+      SCRC_Update(SC_NO) ;
+    end;
+    //--------------------------------------------------------------------------
+    // READY1 : 작업이 있는지 검색해서 작업이 있으면 SC_JOB Data를 등록 한다.
+    //--------------------------------------------------------------------------
+    READY1  :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'READY1') ; // SC 현재 상태 업데이트[READY1]
+
+      SC_JOBDisplayClear(SC_NO) ;
+
+      if (Get_SCSETINFO(SC_No, 'HOME_BACK')) then
+      begin // 홈복귀 요청
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TC_SCSETINFO HOME_BACK On ' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+
+        if Set_SCSETINFO(SC_No, 'HOME_BACK', '0') then
+        begin // 홈복귀 요청 정보 Reset 했으면
+          //Set_Mach_Error(SC_NO, '0') ;  // Error 관련 정보 Clear 하고
+          SC_STAT[SC_NO] := HOME_BACK ; // 홈복귀 할수 있게 단계를 변경
+        end;
+      end else // 작업 지시 가능 상태 다시 Check.
+      if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode  = '1') and  // SCC자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode  = '1') and  // SCT자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm  = '0') and  // 통신에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop  = '0') and  // 비상정지아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Err  = '0') and  // 에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run  = '0') and  // 작업중아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '0') then // PowerBit On아님
+      begin // SC에 작업을 지시 할 수 있는 상태이면...
+        // 작업을 찾아 지시 가능한 작업 이 있으면 SC_JOB[SC_NO] 구성 후 U-Msg 송신
+        if (SC_JOB[SC_NO].ID_ORDLUGG = '') and // 작업 없고
+           (SC_JOB[SC_NO].ID_REGTIME = '') and
+           fn_Get_SCUSED(SC_NO) then // 사용정의 사용가능이면
+        begin // 진행중인 작업 없음.
+          if      Job_Flag[SC_NO] = None       then Job_Flag[SC_NO] := StoreIn
+          else if Job_Flag[SC_NO] = StoreIn    then Job_Flag[SC_NO] := StoreOut
+          else if Job_Flag[SC_NO] = StoreOut   then Job_Flag[SC_NO] := RackToRack
+          else if Job_Flag[SC_NO] = RackToRack then Job_Flag[SC_NO] := StoreIn ;
+
+          if (( CV_READY[SC_NO].InReady  = '1' ) and (Job_Flag[SC_NO] = StoreIn )) OR
+             (( CV_READY[SC_NO].OutReady = '1' ) and (Job_Flag[SC_NO] = StoreOut)) OR
+             (Job_Flag[SC_NO] = RackToRack) then
+          begin // 각 조건에 맞는 Statin Ready 에 플레그가 정상이면.
+            if Get_SC_JOB(SC_NO, Job_Flag[SC_NO], tCV_NO) then // 작업을 검색. ( SC_JOB, TT_SCIO Insert 처리 )
+            begin
+              CONTROL_FLAG[SC_NO] := TxU  ; // 작업이 있으면 Update Job Msg 송신
+              SC_JOB[SC_NO].RECV_A := 'N' ; // Flag Reset
+              SC_STAT[SC_NO] := DATA1 ;     // SC Loading 작업 지시중이라는 상태로 만든다.
+              
+              // JobStatus 1 -> 2로 변경, NowStatus 1 -> 2로 변경 -- 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+              OrderUpdate(SC_NO, 'JobStatus', '2', 'NowStatus', '2' ) ;
+
+              // TT_SCRC Data 처리
+              DBSCRC[SC_NO].SCRC_CYCLE := '1' ;
+              SCRC_Update(SC_NO) ;
+            end else
+            begin
+              CONTROL_FLAG[SC_NO] := TxP ; // 작업이 없으면 Polling Msg 송신
+            end;
+          end else
+          begin
+            CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          end;
+        end;
+      end else
+      begin // SC에 작업을 지시 할 수 없는 상태이면...
+        SC_STAT[SC_NO] := STANDBY ;  // SC 작업 대기 상태로 만든다.
+        CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // DATA1 : U-Message를 구성 및 전송한다.
+    //--------------------------------------------------------------------------
+    DATA1   :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'DATA1') ; // SC 현재 상태 업데이트[DATA1]
+
+      // 2015.08.26 ljs add -> RCP 에러처리 (재기동, 작업취소, 홈이동)비트 살아있으면 초기화 (TC_SCSETINFO 테이블)
+      Set_SCSETINFO_Clear(SC_NO) ;
+
+      // SC 작업등록 상태에 따라 ORDER1 상태로 만든다.
+      if SC_JOB[SC_NO].RECV_A = 'Y' then
+      begin // U-Message Send 후 A-Message Recvive 상태.
+        Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status) ;
+        if (StrToInt('$'+Str) = 0 ) then
+        begin // SCT에 작업이 정상 등록
+          SC_STAT[SC_NO] := ORDER1 ;   // SC 가 Loading 작업중이라는 상태로 만든다.
+
+          // JobStatus 2 -> 3로 변경, NowStatus 2 -> 3로 변경 -- 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+          OrderUpdate(SC_NO, 'JobStatus', '3', 'NowStatus', '3' ) ;
+
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '2' ;
+          SCRC_Update(SC_NO) ;
+        end else
+        if (StrToInt('$'+Str) = 8 ) then
+        begin // SCT에 작업 DATA 이상이라고 보고 하면.
+          SC_STAT[SC_NO] := DATAERR ;  // SC 가 에러중이라는 상태로 만든다.
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '6' ;
+          SCRC_Update(SC_NO) ;
+        end;
+        SC_JOB[SC_NO].RECV_A := 'N' ;    // A-Message Recvive Flag Reset
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // ORDER1 : SC 작업 완료 상태 및 에러 상태를 체크 한다.
+    //--------------------------------------------------------------------------
+    ORDER1  :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'ORDER1') ; // SC 현재 상태 업데이트[ORDER1]
+
+      // 2015.08.26 ljs add -> RCP 에러처리 (재기동, 작업취소, 홈이동)비트 살아있으면 초기화 (TC_SCSETINFO 테이블)
+      Set_SCSETINFO_Clear(SC_NO) ;
+
+      // SC Loading 작업 완료 여부를 Check 한다.
+      if SC_JOB[SC_NO].RECV_A = 'Y' then
+      begin // U-Message Send 후 A-Message Recvive 상태.
+        Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status) ;
+        if (StrToInt('$'+Str) = 1 ) then
+        begin // Loading 작업 정상 완료
+          SC_STAT[SC_NO] := RESET1 ;   // SC 가 Loading 작업완료 라는 상태로 만든다.
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '3' ; // 화물재하.(Loading 완료)
+          SCRC_Update(SC_NO) ;
+        end else
+        if (StrToInt('$'+Str) = 2 ) then
+        begin // Loading 작업이 이상 종료됨(에러)
+          SC_STAT[SC_NO] := ERR1 ;     // SC 가 Loading 작업 에러 라는 상태로 만든다.
+
+          ErrHigh := CharToHexaChar(SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_High ) ;
+          ErrLow  := CharToHexaChar(SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_Low  ) ;
+          ErrorCode := IntToStr(StrToInt('$' + ErrHigh + ErrLow)) ;
+
+          // 종근당 관련 추가
+          Set_Mach_Error(SC_NO, ErrorCode) ;
+
+          // 공출고 에러 여부 Check. -------------------------------------------
+          // '0B' '00' -> '11' '00' -> '1100' : 공출고
+          if ErrorCode = '1100' then
+          begin
+            // 공출고 처리 Logic 추가 : 종근당 상위 WMS 에서 처리.
+          end;
+
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '5' ; // 작업 에러발생
+          DBSCRC[SC_NO].SCRC_ERROR := '1' ; // SC 에러상태 ( 0: 정상, 1: 에러 )
+          SCRC_Update(SC_NO) ;
+        end;
+        SC_JOB[SC_NO].RECV_A := 'N' ;    // A-Message Recvive Flag Reset
+      end;
+
+      //----------------------------------------------------------
+      // 작업 수행도중 Order가 삭제되어 SCIO Data 가 없어졌을경우
+      //----------------------------------------------------------      
+      if not fn_SCIO_Exist(SC_NO) then
+      begin // 작업 수행중 SCIO 데이터 없어짐.
+        // 작업 Clear 하고 다음 작업 수행할 수 있도록 변경
+        SC_JOBClear(SC_NO) ;
+        SC_STAT[SC_NO] := STANDBY ;
+        CONTROL_FLAG[SC_NO] := TxP ;
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // RESET1 : Loading에 대한 작업 중간 완료 처리 및 DATA2 단계를 진행한다.
+    //--------------------------------------------------------------------------
+    RESET1  :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'RESET1') ; // SC 현재 상태 업데이트[RESET1]
+
+      // SC_JOB 상태 변경 및 DB 처리
+      if (SC_JOB[SC_NO].SC_STEP = 'L') then
+      begin
+
+        // 출고 로딩 완료이면 Cell 상태 변경함. 출고예약 -> 공셀
+        // 종근당 : 셀상태 변경 안함. ( 재고 관리는 WMS 에서만 )
+
+        // 작업 내용 변경(Loading -> UnLoading) 하여 Update Job Msg 송신
+        if fn_SCIO_Update(SC_NO) then // 1. SC_JOB 상태변경 & 2. SCIO Data 변경
+        begin
+          CONTROL_FLAG[SC_NO]  := TxU ; // 3. U-Message 전송
+          SC_JOB[SC_NO].RECV_A := 'N' ; // Flag Reset
+          SC_STAT[SC_NO] := DATA2 ;     // SC Unloading 작업 지시중이라는 상태로 만든다.
+
+          // NowMC 5:SC Loading -> 6:SC UnLoading 으로 변경
+          // NowStatus 3 -> 2로 변경 -- 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+          OrderUpdate(SC_NO, 'NowMC', '6', 'NowStatus', '2' ) ;
+
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '1' ; // 작업 지시
+          SCRC_Update(SC_NO) ;
+        end;
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // DATA2 : SC 작업등록 상태에 따라 ORDER2 상태로 만든다.
+    //--------------------------------------------------------------------------
+    DATA2   :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'DATA2') ; // SC 현재 상태 업데이트[DATA2]
+
+      // 2015.08.26 ljs add -> RCP 에러처리 (재기동, 작업취소, 홈이동)비트 살아있으면 초기화 (TC_SCSETINFO 테이블)
+      Set_SCSETINFO_Clear(SC_NO) ;
+
+      // SC 작업등록 상태에 따라 ORDER1 상태로 만든다.
+      if SC_JOB[SC_NO].RECV_A = 'Y' then
+      begin // U-Message Send 후 A-Message Recvive 상태.
+        Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status) ;
+        if (StrToInt('$'+Str) = 0 ) then
+        begin // SCT에 작업이 정상 등록 되면
+          SC_STAT[SC_NO] := ORDER2 ;   // SC 가 작업중이라는 상태로 만든다.
+
+          // NowStatus 2 -> 3로 변경 -- 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+          OrderUpdate(SC_NO, 'NowStatus', '3' ) ;
+
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '3' ;
+          SCRC_Update(SC_NO) ;
+        end else
+        if (StrToInt('$'+Str) = 8 ) then
+        begin // SCT에 작업 DATA 이상이라고 보고 하면.
+          SC_STAT[SC_NO] := DATAERR ;  // SC 가 에러중이라는 상태로 만든다.
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '6' ;
+          SCRC_Update(SC_NO) ;
+        end;
+        SC_JOB[SC_NO].RECV_A := 'N' ;    // A-Message Recvive Flag Reset
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // ORDER2 : SC Unloading 작업 완료 상태 및 에러 상태를 체크 한다.
+    //--------------------------------------------------------------------------
+    ORDER2  :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'ORDER2') ; // SC 현재 상태 업데이트[ORDER2]
+
+      // 2015.08.26 ljs add -> RCP 에러처리 (재기동, 작업취소, 홈이동)비트 살아있으면 초기화 (TC_SCSETINFO 테이블)
+      Set_SCSETINFO_Clear(SC_NO) ;
+
+      // SC UnLoading 작업 완료 여부를 Check 한다.
+      if SC_JOB[SC_NO].RECV_A = 'Y' then
+      begin // U-Message Send 후 A-Message Recvive 상태.
+        Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status) ;
+        if (StrToInt('$'+Str) = 1 ) then
+        begin // Loading 작업 정상 완료
+          SC_STAT[SC_NO] := RESET2 ;   // SC 가 Loading 작업완료 라는 상태로 만든다.
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '4' ; // 작업 완료.(UnLoading 완료)
+          SCRC_Update(SC_NO) ;
+        end else
+        if (StrToInt('$'+Str) = 2 ) then
+        begin // UnLoading 작업이 이상 종료됨(에러)
+          SC_STAT[SC_NO] := ERR2 ;     // SC 가 UnLoading 작업에러 라는 상태로 만든다.
+
+          ErrHigh := CharToHexaChar(SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_High ) ;
+          ErrLow  := CharToHexaChar(SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_Low  ) ;
+          ErrorCode := IntToStr(StrToInt('$' + ErrHigh + ErrLow)) ;
+
+//          ErrorCode := IntToStr(StrToInt('$' + ErrHigh )) +
+//                       IntToStr(StrToInt('$' + ErrLow  )) ;
+
+          // 종근당 관련 추가
+          Set_Mach_Error(SC_NO, ErrorCode) ;
+
+          // 이중입고 에러 여부 Check. -----------------------------------------
+          // '0B' '00' -> '11' '00' -> '1100' : 공출고
+          if ( StrToIntDef(ErrorCode, 0) >= 1210 ) and
+             ( StrToIntDef(ErrorCode, 0) <= 1380 ) then
+          begin
+            // 이중입고 처리 Logic 추가 : WMS 에서 'B'-Command 로 처리.   
+          end;
+
+          CONTROL_FLAG[SC_NO] := TxP ; // 기본 통신 Mode Polling Msg 송신
+          // TT_SCRC Data 처리
+          DBSCRC[SC_NO].SCRC_CYCLE := '5' ; // 화물재하.(Loading 완료)
+          DBSCRC[SC_NO].SCRC_ERROR := '1' ; // SC 에러상태 ( 0: 정상, 1: 에러 )
+          SCRC_Update(SC_NO) ;
+        end;
+        SC_JOB[SC_NO].RECV_A := 'N' ;    // A-Message Recvive Flag Reset
+      end;
+      //----------------------------------------------------------
+      // 작업 수행도중 Order가 삭제되어 SCIO Data 가 없어졌을경우
+      //----------------------------------------------------------      
+      if not fn_SCIO_Exist(SC_NO) then
+      begin // 작업 수행중 SCIO 데이터 없어짐.
+        // 작업 Clear 하고 다음 작업 수행할 수 있도록 변경
+        SC_JOBClear(SC_NO) ;
+        SC_STAT[SC_NO] := STANDBY ;
+        CONTROL_FLAG[SC_NO] := TxP ;
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // RESET2 : UnLoading에 대한 최종 작업 완료 처리한다.
+    //--------------------------------------------------------------------------
+    RESET2  :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'RESET2') ; // SC 현재 상태 업데이트[RESET2]
+
+      if SC_JOB[SC_NO].SC_STEP = 'U' then
+      begin // UnLoading ( 최종 완료 처리 )
+        // 종근당 Cell 상태 처리 안함. WMS 담당.
+        if OrderDelete(SC_NO) then // 작업 완료 처리. 
+        begin
+          SC_JOBClear(SC_NO) ;
+          // 다른 작업을 지시 할 수 있도록 상태 Flag 변경.
+          SC_STAT[SC_NO] := STANDBY ;
+        end;
+        CONTROL_FLAG[SC_NO] := TxP ;
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    // ERR1 : Loading, UnLoading 단계에서의 에러처리 진행한다.
+    //        (재기동 요구시 재기동 실시)
+    //--------------------------------------------------------------------------
+    ERR1, ERR2 :
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'ERR') ; // SC 현재 상태 업데이트[ERR]
+
+      // 설비 재기동 요구이거나 RCP, WMS 에서 재기동 요구면 재기동 실시
+      if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Retry_Req = '1') or
+         (Get_SCSETINFO(SC_No, 'RETRY')) then
+      begin
+        if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Retry_Req = '1') then
+            StrLog := '<<< SC['+ IntToStr(SC_No) + '] Sts_X.Retry_Req On ' +
+                      'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                      'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> '
+        else
+            StrLog := '<<< SC['+ IntToStr(SC_No) + '] TC_SCSETINFO RETRY On ' +
+                      'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                      'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+
+        // 2015.08.21 ljs add RCP 모니터링에서 재 작업 시 P-MSG의 에러클리어 값 설정
+        if Get_SCSETINFO(SC_No, 'RETRY') then RCP_ORDER[SC_NO].RETRY_REQ := '1';
+
+        if Set_SCSETINFO(SC_No, 'RETRY', '0') then
+        begin // 재기동 정보 Reset 했으면
+
+          Set_Mach_Error(SC_NO, '0') ; // Error 관련 정보 Clear 하고
+          SC_STAT[SC_NO] := RETRY_REQ ; // 재작업을 실행 할수 있도록 단계를 변경.
+          // 재기동시 위치 값 변경여부는 ???
+          // Order 위치 Check 해서 다르면 SCIO 위치 변경 하고 SC_JOB[SC_NO]. Position 변경하면 자동으로 됨.
+          Chk_SC_JOB(SC_NO);
+        end;
+      end else
+      if (Get_SCSETINFO(SC_No, 'JOB_CANCEL')) then   // 작업 취소 요청이나
+      begin
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TC_SCSETINFO JOB_CANCEL On ' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+
+        // 2015.08.21 ljs add RCP 모니터링에서 작업취소 시 P-MSG의 에러클리어 값 설정
+        RCP_ORDER[SC_NO].JOB_CANCEL := '1';
+
+        if Set_SCSETINFO(SC_No, 'JOB_CANCEL', '0') then
+        begin // 작업 취소 요청 정보 Reset 했으면
+          Set_Mach_Error(SC_NO, '0') ; // Error 관련 정보 Clear 하고
+          SC_STAT[SC_NO] := CANCEL_REQ ; // 작업 삭제할수있게 단계를 변경.
+        end;
+      end else
+      if (Get_SCSETINFO(SC_No, 'JOB_COMPLETE')) then // 작업 완료 요청이면
+      begin
+
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TC_SCSETINFO JOB_COMPLETE On ' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+
+        if Set_SCSETINFO(SC_No, 'JOB_COMPLETE', '0') then
+        begin // 작업완료 정보 Reset 했으면
+          Set_Mach_Error(SC_NO, '0') ; // Error 관련 정보 Clear 하고
+          // 해당 작업 단계 완료 처리 하도록 하고
+          SC_STAT[SC_NO] := CANCEL_REQ ; // 작업 삭제할수있게 단계를 변경.
+
+          // SC_JOB 상태 변경 및 DB 처리
+          if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Cargo_Exist = '1') and // 화물 있고
+             (SC_JOB[SC_NO].SC_STEP = 'L') then // Loading 단계 였으면
+          begin // Loading -> Unloading 으로 상태 변경.
+            // 작업 내용 변경(Loading -> UnLoading) 하여 Update Job Msg 송신
+            if fn_SCIO_Update(SC_NO) then // 1. SC_JOB 상태변경 & 2. SCIO Data 변경
+            begin
+              CONTROL_FLAG[SC_NO]  := TxU ; // 3. U-Message 전송
+              SC_JOB[SC_NO].RECV_A := 'N' ; // Flag Reset
+              SC_STAT[SC_NO] := DATA2 ;     // SC Unloading 작업 지시중이라는 상태로 만든다.
+
+              // NowMC 5:SC Loading -> 6:SC UnLoading 으로 변경
+              // NowStatus 3 -> 2로 변경 -- 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+              OrderUpdate(SC_NO, 'NowMC', '6', 'NowStatus', '2' ) ;
+
+              // TT_SCRC Data 처리
+              DBSCRC[SC_NO].SCRC_CYCLE := '1' ; // 작업 지시
+              SCRC_Update(SC_NO) ;
+            end;
+          end else
+          if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Cargo_Exist = '0') and // 화물 없고
+             (SC_JOB[SC_NO].SC_STEP = 'U') then // Unloading 단계 였으면
+          begin // UnLoading ( 최종 완료 처리 )
+            // 종근당 Cell 상태 처리 안함. WMS 담당.
+            if OrderDelete(SC_NO) then // 작업 완료 처리.
+            begin
+              // 다른 작업을 지시 할 수 있도록 상태 Flag 변경 은 Cancel_Req 에서 처리.
+            end;
+          end;
+        end;
+      end else
+      if (Get_SCSETINFO(SC_No, 'HOME_BACK')) then   // 홈복귀 요청
+      begin
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TC_SCSETINFO HOME_BACK On ' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+
+        // 2015.08.21 ljs add RCP 모니터링에서 홈복귀 시 P-MSG의 에러클리어 값 설정
+        RCP_ORDER[SC_NO].HOME_BACK := '1';
+
+        if Set_SCSETINFO(SC_No, 'HOME_BACK', '0') then
+        begin // 홈복귀 요청 정보 Reset 했으면
+          Set_Mach_Error(SC_NO, '0') ;  // Error 관련 정보 Clear 하고
+          SC_STAT[SC_NO] := HOME_BACK ; // 홈복귀 할수 있게 단계를 변경
+        end;
+      end;
+
+      //----------------------------------------------------------
+      // 작업 수행도중 Order가 삭제되어 SCIO Data 가 없어졌을경우
+      //----------------------------------------------------------      
+      if not fn_SCIO_Exist(SC_NO) then
+      begin // 작업 수행중 SCIO 데이터 없어짐.
+        // 작업 Clear 하고 다음 작업 수행할 수 있도록 변경
+        SC_JOBClear(SC_NO) ;
+        SC_STAT[SC_NO] := STANDBY ;
+        CONTROL_FLAG[SC_NO] := TxP ;
+      end;
+
+    end;
+    //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    DATAERR : // 작업지시 데이터 이상 에러 발생. ( CANCEL 신호를 기다려 작업을 취소함. )
+    begin
+    end;
+    //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    RETRY_REQ  : // 재기동 처리 실시. (등록되어있는 작업을 다시 전송함)
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'RETRY_REQ') ; // SC 현재 상태 업데이트[RETRY_REQ]
+
+      if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode  = '1') and  // SCC자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode  = '1') and  // SCT자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm  = '0') and  // 통신에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop  = '0') and  // 비상정지아님
+//         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Err  = '0') and  // 에러無 : 에러중이여도 재기동 할 수 있게
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run  = '0') and  // 작업중아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '0') then // PowerBit On아님
+      begin
+        if SC_JOB[SC_NO].SC_STEP = 'L' then
+        begin
+          SC_STAT[SC_NO] := ORDER1 ;     // SC Loading 작업 지시중이라는 상태로 만든다.
+        end else
+        if SC_JOB[SC_NO].SC_STEP = 'U' then
+        begin
+          SC_STAT[SC_NO] := ORDER2 ;     // SC Loading 작업 지시중이라는 상태로 만든다.
+        end ;
+
+        CONTROL_FLAG[SC_NO] := TxU ;  // 작업이 있으면 Update Job Msg 송신
+        SC_JOB[SC_NO].RECV_A := 'N' ; // Flag Reset
+
+        // TT_SCRC Data 처리
+        DBSCRC[SC_NO].SCRC_CYCLE := '1' ;
+        SCRC_Update(SC_NO) ;
+      end;
+    end;
+    //--------------------------------------------------------------------------
+    //--------------------------------------------------------------------------
+    CANCEL_REQ : // 작업 삭제 처리를 진행한다.
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'CANCEL_REQ') ; // SC 현재 상태 업데이트[CANCEL_REQ]
+
+      if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode  = '1') and  // SCC자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode  = '1') and  // SCT자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm  = '0') and  // 통신에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop  = '0') and  // 비상정지아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '0') then // PowerBit On아님
+      begin
+        SC_JOB[SC_NO].SC_STEP := 'C' ; // SC 작업 취소중이라는 상태로 만든다.
+        CONTROL_FLAG[SC_NO]  := TxU ;  // 작업이 있으면 Update Job Msg 송신
+        SC_JOB[SC_NO].RECV_A := 'N' ;  // Flag Reset
+        SC_STAT[SC_NO] := STANDBY ;    // Stanby 에서 Ack 받으면 Job Clear ;
+      end;
+    end;
+    HOME_BACK : // 작업 삭제 처리를 진행한다.
+    begin
+      SCNOWSTATUSUpdate(SC_NO,'HOME_BACK') ; // SC 현재 상태 업데이트[HOME_BACK]
+
+      if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode  = '1') and  // SCC자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode  = '1') and  // SCT자동
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm  = '0') and  // 통신에러無
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop  = '0') and  // 비상정지아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run  = '0') and  // 작업중아님
+         (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '0') then // PowerBit On아님
+      begin
+        SC_JOB[SC_NO].HOME_BACK := '1' ; // SC 홈복귀라는 상태로 만든다.
+        CONTROL_FLAG[SC_NO]  := TxU ;  // 작업이 있으면 Update Job Msg 송신
+        SC_JOB[SC_NO].RECV_A := 'N' ;  // Flag Reset
+        SC_STAT[SC_NO] := STANDBY ;    // Stanby 에서 Ack 받으면
+      end;
+    end;
+  end;
+  TLabeledEdit(FindComponent('Edt_Status' + IntToStr(SC_NO))).Text := '   ' + Get_Status_Msg(SC_STAT[SC_NO]) ;
+end;
+
+
+//==============================================================================
+// SCCR Insert or Update    // 2015
+//==============================================================================
+procedure TfrmSCComm.SCCRWrite(SC_NO, str : string);
+var
+  aStrSQL : String;
+  aStrChValue : Array[ 1..13, 0..1 ] of String;
+  i, j  : integer;
+begin
+  j := 1;
+  for i := 1 to 13 do
+  begin
+    aStrChValue[i, 0] := 'CH' + LPad(IntToStr(i), 2);
+    aStrChValue[i, 1] := copy(str, j, 4);
+    inc(j, 4)
+  end;
+
+  with qryInfo do
+  begin
+    Close;
+    SQL.Text := 'SELECT * FROM TBSC WHERE SC_NO = ' +QuotedStr(SC_NO);
+    Open;
+    If RecordCount = 0 then
+    Begin
+      aStrSQL := 'INSERT INTO TBSC ( SC_NO, SC_DT,  ';
+      For i := 1 to 13 do
+      Begin
+        aStrSQL := aStrSQL + aStrChValue[i, 0];
+        if i < High(aStrChValue) then aStrSQL := aStrSQL + ', ' ;
+      End;
+      aStrSQL :=  aStrSQL + ' ) VALUES ( ''0'', ''1'', sysdate, ' ;
+      For i := 0 to High(aStrChValue) do
+      Begin
+        aStrSQL := aStrSQL + '''' + aStrChValue[i, 1] + '''';
+        If      i < High(aStrChValue) Then aStrSQL := aStrSQL + ', '
+        Else if i = High(aStrChValue) Then aStrSQL := aStrSQL + ') ';
+      End;
+    End Else
+    Begin
+      aStrSQL := ' UPDATE TBSC SET SC_DT = SysDate, ';
+      For i := 1 to High(aStrChValue) do
+      Begin
+        aStrSQL :=  aStrSQL + aStrChValue[i, 0] + ' = ''' + aStrChValue[i, 1] + ''' ';
+        if      i < High(aStrChValue) then aStrSQL := aStrSQL + ', '
+        else if i = High(aStrChValue) Then aStrSQL := aStrSQL ;
+      End;
+      aStrSQL := aStrSQL + ' WHERE SC_NO =  '+ QuotedStr(SC_NO);
+    End;
+    try
+      Close;
+      SQL.Text :=  aStrSQL;
+      ExecSQL;
+    except
+      on E: Exception do
+      begin
+        close ;
+        ErrorLogWrite( 'SCRWrite function: ' +
+                       ', SQL : ' + aStrSQL );
+      end;
+    end;
+  end;
+end;
+
+//==============================================================================
+// procedure OrderDelete : TT_SCIO 삭제., TT_ORDER Data 값 변경
+//==============================================================================
+function TfrmSCComm.OrderDelete(SC_No:Integer):Boolean;
+var
+  StrLog, UpdateSQL, SCIOSQL, StrJob, DSTSITE1 : string;
+  ExecNo, SQL_Step : Integer;
+begin
+  Result := False ;
+
+  if      SC_JOB[SC_No].IO_TYPE = 'I' then StrJob := '입고 작업이 '
+  else if SC_JOB[SC_No].IO_TYPE = 'O' then StrJob := '출고 작업이 '
+  else if SC_JOB[SC_No].IO_TYPE = 'M' then StrJob := 'Rack To Rack 이동 작업이 ' ;
+
+  if (SC_JOB[SC_No].IO_TYPE = 'I') or    // 입고 작업 완료
+     (SC_JOB[SC_No].IO_TYPE = 'M') then  // RackToRack 작업 완료
+  begin // 입고 작업 완료 일때만 Order 삭제는 WMS JOBSTATUS = '7' 보고 후 삭제됨.
+
+    // Step 1. TT_ORDER 상태 Update
+    UpdateSQL := ' Update TT_ORDER ' +
+                 '    Set JOBSTATUS = ''7''   ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료, 7:WNS 보고
+                 '      , NOWSTATUS = ''4''   ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+                 '      , ETC = ''' + StrJob + ' 최종 완료'' ' +
+                 '  Where LUGG = '''  + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                 '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME + ''' ' ;
+
+    // Step 2. TT_SCIO Data Delete
+    SCIOSQL   := ' Delete from TT_SCIO ' +
+                 '  Where ID_NO = ''' + IntToStr(SC_No) + ''' ' +
+                 '    and ID_ORDINDEX = '   + SC_JOB[SC_No].ID_ORDLUGG +
+                 '    and ID_ORDDATE  = ''' + SC_JOB[SC_No].ID_ORDDATE + ''' ' +
+                 '    and ID_ORDTIME  = ''' + SC_JOB[SC_No].ID_ORDTIME + ''' ' ;
+
+  end else
+  begin // 출고 작업 완료 ( Order 상태 변경-완료만, SCIO 삭제, Track Data 생성 )
+
+    DSTSITE1 := Get_OrderValue(SC_No, 'DSTSITE1') ; // 최종 목적지를 가져와서 출고대 번호와 같으면 최종 완료 처리
+
+    if OT_track_no[SC_No] = StrToIntDef(DSTSITE1, 0) then  // Array[11..14] of Integer = (750, 754, 758, 762) ;
+    begin // 최종완료 처리
+      // Step 1. TT_ORDER 상태 Update
+      UpdateSQL := ' Update TT_ORDER ' +
+                   '    Set JOBSTATUS = ''7''   ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료, 7:WNS 보고
+                   '      , NOWSTATUS = ''4''   ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+                   '      , CVCURR = ''' + SC_JOB[SC_No].UNLOAD_LEVEL + ''' ' + // 현재 출고해놓은 CV Site-No
+                   '      , ETC = ''' + StrJob + ' 최종 완료'' ' +
+                   '  Where LUGG = '''  + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                   '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME + ''' ' ;
+    end else
+    begin // 중간완료 처리
+      // Step 1. TT_ORDER 상태 Update
+      UpdateSQL := ' Update TT_ORDER ' +
+                   '    Set NOWSTATUS = ''4''   ' +   // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+                   '      , CVCURR = ''' + SC_JOB[SC_No].UNLOAD_LEVEL + ''' ' + // 현재 출고해놓은 CV Site-No
+                   '      , ETC = ''' + StrJob + ' S/C단계 완료'' ' +
+                   '  Where LUGG = '''  + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                   '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME + ''' ' ;
+    end;
+
+    // Step 2. TT_SCIO Data Delete
+    SCIOSQL   := ' Delete from TT_SCIO ' +
+                 '  Where ID_NO = ''' + IntToStr(SC_No) + ''' ' +
+                 '    and ID_ORDINDEX = '   + SC_JOB[SC_No].ID_ORDLUGG +
+                 '    and ID_ORDDATE  = ''' + SC_JOB[SC_No].ID_ORDDATE  + ''' ' +
+                 '    and ID_ORDTIME  = ''' + SC_JOB[SC_No].ID_ORDTIME  + ''' ' ;
+  end;
+
+  try
+    with qrySCIO do
+    begin
+      Close;
+      SQL.Clear;
+
+      if not MainDM.MainDatabase.InTransaction then
+         MainDM.MainDatabase.BeginTrans ;
+
+      SQL.Text := UpdateSQL ;
+      ExecNo   := ExecSQL ;
+      if ExecNo > 0 then
+      begin // TT_ORDER 상태 Update 성공
+        SQL_Step := 2 ;
+        SQL.Text := SCIOSQL ;
+        ExecNo   := ExecSQL ;
+        if ExecNo > 0 then
+        begin // TT_SCIO Delete 성공
+          Result := True ;
+          MainDM.MainDatabase.CommitTrans ;
+          StrLog := '<<< SC['+ IntToStr(SC_No) + '] 작업 완료 처리 성공: ' +
+                    'SQL Step [' + IntToStr(SQL_Step) + '],' +
+                    'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                    'ORD_TIME [' + SC_JOB[SC_No].ID_ORDDATE + SC_JOB[SC_No].ID_ORDTIME + '] >>> ' ;
+          DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+        end else
+        begin // TT_SCIO Delete 실패
+          MainDM.MainDatabase.RollbackTrans ;
+          StrLog := '<<< SC['+ IntToStr(SC_No) + '] 작업 완료 처리 실패(TT_SCIO Delete): ' +
+                    'SQL Step [' + IntToStr(SQL_Step) + '],' +
+                    'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                    'ORD_TIME [' + SC_JOB[SC_No].ID_ORDDATE + SC_JOB[SC_No].ID_ORDTIME + '] >>> ' ;
+          DisplayLog(SC_No, StrLog, 'E', Length(StrLog)) ;
+        end;
+      end else
+      begin // TT_ORDER 상태 Update 실패
+        MainDM.MainDatabase.RollbackTrans ;
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] 작업 완료 처리 실패(TT_ORDER 상태 Update): ' +
+                  'SQL Step [' + IntToStr(SQL_Step) + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_ORDDATE + SC_JOB[SC_No].ID_ORDTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'E', Length(StrLog)) ;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function OrderDelete SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL Step ['  + IntToStr(SQL_Step) + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// procedure OrderUpdate :
+//==============================================================================
+function TfrmSCComm.OrderUpdate(SC_No:Integer; FName, FValue:String):Boolean; 
+var
+  StrSQL, StrLog : string;
+  ExecNo  : Integer;
+begin
+  Result := False ;
+
+  StrSQL := ' Update TT_ORDER ' +
+            '    Set ' + FName + '= ''' + FValue + '''   ' +
+            '  Where LUGG = '   + SC_JOB[SC_No].ID_ORDLUGG +
+            '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME  + ''' ' ;
+  try
+
+    with qryUpdate do
+    begin
+
+      Close;
+      SQL.Text := StrSQL ;
+      ExecNo   := ExecSQL ;
+      if ExecNo > 0 then
+      begin
+        Result := True ;
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TT_ORDER Update 성공 : ' +
+                  'Field Name  [' + FName  + '],' +
+                  'Field Value [' + FValue + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+      end else
+      begin // TT_ORDER 상태 Update 실패
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TT_ORDER Update 실패 : ' +
+                  'Field Name  [' + FName  + '],' +
+                  'Field Value [' + FValue + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function OrderUpdate SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+    end;
+  end;
+end;
+
+function TfrmSCComm.OrderUpdate(SC_No: Integer;
+                    FName1, FValue1, FName2, FValue2: String): Boolean;
+var
+  StrSQL, StrLog : string;
+  ExecNo  : Integer;
+begin
+  Result := False ;
+
+  if (Trim(FName2) = '') and (Trim(FValue2) = '') then
+  begin
+    StrSQL := ' Update TT_ORDER ' +
+              '    Set ' + FName1 + '= ''' + FValue1 + '''   ' +
+              '  Where LUGG = '''   + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+              '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME  + ''' ' ;
+  end else
+  begin
+    StrSQL := ' Update TT_ORDER ' +
+              '    Set ' + FName1 + '= ''' + FValue1 + '''   ' +
+              '      , ' + FName2 + '= ''' + FValue2 + '''   ' +
+              '  Where LUGG = '''   + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+              '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME  + ''' ' ;
+  end;
+  try
+
+    with qryUpdate do
+    begin
+
+      Close;
+      SQL.Text := StrSQL ;
+      ExecNo   := ExecSQL ;
+      if ExecNo > 0 then
+      begin
+        Result := True ;
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TT_ORDER Update 성공 : ' +
+                  'Field Name1  [' + FName1  + '],' +
+                  'Field Value1 [' + FValue1 + '],' +
+                  'Field Name2  [' + FName2  + '],' +
+                  'Field Value2 [' + FValue2 + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+      end else
+      begin // TT_ORDER 상태 Update 실패
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] TT_ORDER Update 실패 : ' +
+                  'Field Name1  [' + FName1  + '],' +
+                  'Field Value1 [' + FValue1 + '],' +
+                  'Field Name2  [' + FName2  + '],' +
+                  'Field Value2 [' + FValue2 + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function OrderUpdate SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+    end;
+  end;
+end;
+
+function TfrmSCComm.Get_OrderValue(SC_No: Integer; FName : String): String;
+var
+  StrSQL, StrResult : string;
+begin
+  StrResult := '' ;
+
+  StrSQL := ' Select ' + Fname + ' as Data From TT_ORDER ' +
+            '  Where LUGG = '''   + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+            '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME  + ''' ' ;
+
+  try
+
+    with qryUpdate do
+    begin
+      Close;
+      SQL.Text := StrSQL ;
+      Open ;
+      if not (Bof and Eof) then
+      begin
+        StrResult := FieldByName('Data').AsString ;
+      end;
+      Result := StrResult ;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function Get_OrderValue SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+    end;
+  end;
+end;
+
+
+//==============================================================================
+// SCTWrite
+//==============================================================================
+procedure TfrmSCComm.SCTWrite(SC_NO:Integer);
+var
+  str, StrHigh, StrLow : String ;
+begin
+  if CONTROL_FLAG[SC_NO] = TxP then
+  begin
+    SetMessage(SC_NO, 'P') ;
+
+    // P-Message Send
+    FillChar(SendBuf[SC_NO], SizeOf(SendBuf[SC_NO]), #0 );
+    AddTxMsgNo(SC_NO) ;
+
+    SendBuf[SC_NO, 1] := LF ;  // LF
+    SendBuf[SC_NO, 2] := '0' ;  // Machine No #1
+    str := Copy(IntToStr(SC_NO), 2, 1) ;
+    StrMove(@SendBuf[SC_NO, 3], Pchar(Str), 1) ; // Machine No #2
+
+    if Before_FLAG[SC_NO] = ComStart then
+         SendBuf[SC_NO, 4] := ':' // Wildcard Send Message No
+    else StrMove(@SendBuf[SC_NO, 4], Pchar(IntToStr(iTxMsgNo[SC_NO])), 1) ; // Send Message No
+
+    SendBuf[SC_NO, 5] := #$50 ; // Message Char(P)
+
+    str := '0000' + // B0 ~ B3
+           SC_MSG[SC_NO].SEND_MSG.TX_P.SYS_CMD.Power_Clear + // Bit4
+           SC_MSG[SC_NO].SEND_MSG.TX_P.SYS_CMD.Open_Door   + // Bit5
+           SC_MSG[SC_NO].SEND_MSG.TX_P.SYS_CMD.Error_Clear + // Bit6
+           SC_MSG[SC_NO].SEND_MSG.TX_P.SYS_CMD.Emg_Stop    ; // Bit7
+
+    str := BinStrToCharStr(ReverseString(Str)) ;
+    StrMove(@SendBuf[SC_NO, 6], Pchar(copy(Str, 1, 1)), 1) ; // System Command (High) Bit 4~7
+    StrMove(@SendBuf[SC_NO, 7], Pchar(copy(Str, 2, 1)), 1) ; // System Command (Low)  Bit 0~3
+
+    SendBuf[SC_NO, 8] := SC_MSG[SC_NO].SEND_MSG.TX_P.Reserved ;    // Reserved    (미사용 0x30) (High)
+    SendBuf[SC_NO, 9] := SC_MSG[SC_NO].SEND_MSG.TX_P.Reserved ;    // Reserved    (미사용 0x30) (Low)
+    SendBuf[SC_NO,10] := SC_MSG[SC_NO].SEND_MSG.TX_P.Reason_Code ; // Reason code (미사용 0x30) (High)
+    SendBuf[SC_NO,11] := SC_MSG[SC_NO].SEND_MSG.TX_P.Reason_Code ; // Reason code (미사용 0x30) (Low)
+    //--------------------------------------------------------------------------
+    // 종근당 : 입출고대 포킹 가능 InterLock 16Bit 에서 8Bit로 변경됨.
+    //--------------------------------------------------------------------------
+    Str := '0' ;
+    StrMove(@SendBuf[SC_NO, 12], Pchar(Str), 1) ;                  // 입고대 입고가능여부 (High)
+    SendBuf[SC_NO,13] := SC_MSG[SC_NO].SEND_MSG.TX_P.IN_InterLoc ; // 입고대 입고가능여부 (Low)
+    Str := '0' ;
+    StrMove(@SendBuf[SC_NO, 14], Pchar(Str), 1) ;                  // 출고대 출고가능여부 (High)
+    SendBuf[SC_NO,15] := SC_MSG[SC_NO].SEND_MSG.TX_P.OT_InterLoc ; // 출고대 출고가능여부 (Low)
+    //--------------------------------------------------------------------------
+    // SendBuf[SC_NO, 12] := SC_MSG[SC_NO].SEND_MSG.TX_P.IN_InterLoc ; // 입고대 입고가능여부 (1Byte)
+    // SendBuf[SC_NO, 13] := SC_MSG[SC_NO].SEND_MSG.TX_P.OT_InterLoc ; // 출고대 출고가능여부 (1Byte)
+
+    // BCC Check
+    Str := GetBCC(SendBuf[SC_NO], 2, 15) ; // LF 제외 하면 Array[2..15] 까지
+    if Length(Str) = 1 then Str:= '0' + Str ;
+
+    StrMove(@SendBuf[SC_NO,16], Pchar(copy(Str, 1, 1)), 1 ) ; // BCC (High)
+    StrMove(@SendBuf[SC_NO,17], Pchar(copy(Str, 2, 1)), 1 ) ; // BCC (Low)
+
+    SendBuf[SC_NO,18] := CR ; // CR
+
+    SendCnt[SC_NO] := 18 ; // Send Byte 수
+
+    DataSend(SC_NO, 'P') ;
+  end else
+  if CONTROL_FLAG[SC_NO] = TxU then
+  begin
+
+    SetMessage(SC_NO, 'U') ;
+
+    // U-Message Send
+    FillChar(SendBuf[SC_NO], SizeOf(SendBuf[SC_NO]), #0 );
+    AddTxMsgNo(SC_NO) ;
+
+    SendBuf[SC_NO, 1] := LF ;  // LF
+    SendBuf[SC_NO, 2] := '0' ;  // Machine No #1
+    str := Copy(IntToStr(SC_NO), 2, 1) ;
+    StrMove(@SendBuf[SC_NO, 3], Pchar(Str), 1) ; // Machine No #2
+    StrMove(@SendBuf[SC_NO, 4], Pchar(IntToStr(iTxMsgNo[SC_NO])), 1) ; // Send Message No
+    SendBuf[SC_NO, 5] := #$55 ; // Message Char(P)
+
+    // 본문 Message 구성 -------------------------------------------------------
+    SendBuf[SC_NO, 6] := '0' ; // LugNo-Hi  (High) → '0'고정
+    SendBuf[SC_NO, 7] := '0' ; //           (Low)  → '0'고정
+
+    SendBuf[SC_NO, 8] := '0' ; // LugNo-Low (High) → '0'고정
+    SendBuf[SC_NO, 9] := '1' ; //           (Low)  → '1'고정
+
+    SendBuf[SC_NO,10] := '0' ; // Fork-No  (High) → '0'고정
+    SendBuf[SC_NO,11] := '1' ; //          (Low)  → '1'고정
+
+    // Bit Command
+    Str := CharToHexaChar(SC_MSG[SC_NO].SEND_MSG.TX_U.Bit_Command) ;
+    StrHigh := Copy(Str, 1, 1) ;
+    StrLow  := Copy(Str, 2, 1) ;
+
+    StrMove(@SendBuf[SC_NO, 12], Pchar(StrHigh), 1) ; // Bit Command : b7 - 작업취소 (High)
+    StrMove(@SendBuf[SC_NO, 13], Pchar(StrLow ), 1) ; //                             (Low)
+
+    // JobKind
+    // 출고 : 랙에서 Loading 12 -> 0x30 0x43, 출고대서 UnLoading 09 -> 0x30 0x39
+    // 입고 : 입고대서 Loading 08 -> 0x30 0x38, 랙에서 UnLoading 13 -> 0x30 0x44
+    Str := CharToHexaChar(SC_MSG[SC_NO].SEND_MSG.TX_U.Job_Kind) ;
+    StrHigh := Copy(Str, 1, 1) ;
+    StrLow  := Copy(Str, 2, 1) ;                                  
+
+    StrMove(@SendBuf[SC_NO, 14], Pchar(StrHigh), 1) ; // JobKind - 작업종류 (High)
+    StrMove(@SendBuf[SC_NO, 15], Pchar(StrLow ), 1) ; //                    (Low)
+
+    // Bank
+    Str := CharToHexaChar(SC_MSG[SC_NO].SEND_MSG.TX_U.Bank ) ;
+    StrHigh := Copy(Str, 1, 1) ;
+    StrLow  := Copy(Str, 2, 1) ;
+
+    StrMove(@SendBuf[SC_NO, 16], Pchar(StrHigh), 1) ; // Bank = 00 set (High)
+    StrMove(@SendBuf[SC_NO, 17], Pchar(StrLow ), 1) ; //               (Low)
+
+    // Bay
+    Str := CharToHexaChar(SC_MSG[SC_NO].SEND_MSG.TX_U.Bay  ) ;
+    StrHigh := Copy(Str, 1, 1) ;
+    StrLow  := Copy(Str, 2, 1) ;
+
+    StrMove(@SendBuf[SC_NO, 18], Pchar(StrHigh), 1) ; // Bay = 00  set (High)
+    StrMove(@SendBuf[SC_NO, 19], Pchar(StrLow ), 1) ; //               (Low)
+
+    // Tier
+    Str := CharToHexaChar(SC_MSG[SC_NO].SEND_MSG.TX_U.Tier  ) ;
+    StrHigh := Copy(Str, 1, 1) ;
+    StrLow  := Copy(Str, 2, 1) ;
+
+    StrMove(@SendBuf[SC_NO, 20], Pchar(StrHigh), 1) ; // Tier = 00 set (High)
+    StrMove(@SendBuf[SC_NO, 21], Pchar(StrLow ), 1) ; //               (Low)
+
+    // Depth ( 0, 1 고정 )
+    SendBuf[SC_NO, 22] := '0' ;                        // Depth = 01 set (High)
+    SendBuf[SC_NO, 23] := '1' ;                        //                (Low)
+
+    // BCC Check
+    Str := GetBCC(SendBuf[SC_NO], 2, 23) ; // LF 제외 하면 Array[2..23] 까지
+    if Length(Str) = 1 then Str:= '0' + Str ;
+
+    StrMove(@SendBuf[SC_NO,24], Pchar(copy(Str, 1, 1)), 1 ) ; // BCC (High)
+    StrMove(@SendBuf[SC_NO,25], Pchar(copy(Str, 2, 1)), 1 ) ; // BCC (Low)
+
+    SendBuf[SC_NO,26] := CR ; // CR
+
+    SendCnt[SC_NO] := 26 ; // Send Byte 수
+
+    DataSend(SC_NO, 'U') ;
+  end;
+end;
+
+//==============================================================================
+// DataSend
+//==============================================================================
+function TfrmSCComm.DataSend(SC_NO:Integer;Msg_Type:String):Integer;
+var
+  Str, StrLog :String;
+  RtnLength : Integer;
+  StrTemp : array[1..1024] of char;
+begin
+
+  try
+    Str := copy(SendBuf[SC_NO], 1, SendCnt[SC_NO]);
+    StrMove(@StrTemp, pChar(copy(str, 1, SendCnt[SC_NO])), SendCnt[SC_NO]);
+
+    // 통신포트에 값을 쓴다.
+    RtnLength :=  TClientSocket(FindComponent('SCSocket' + IntToStr(SC_NO))).Socket.SendBuf(SendBuf[SC_NO], SendCnt[SC_NO]) ;
+    Result := RtnLength;
+
+    // Send Log 추가
+    StrLog := 'SEND SC'+IntToStr(SC_NO)+'[' + IntToStr(SendCnt[SC_NO]) + '](' + Msg_Type + '):[' + GetLogData(SC_No, SendBuf[SC_NO], SendCnt[SC_NO]) + ']' ;
+
+    DisplayLog(SC_NO, StrLog, 'S', Length(StrLog)) ;
+  except
+    result := 0;
+  end;
+end;
+
+//==============================================================================
+// CommRecvData
+//==============================================================================
+procedure TfrmSCComm.CommRecvData(SC_NO:Integer;Comm_Packet:TComm_Packet);
+var
+  tStr, StrLog : String ;
+begin
+  try
+    // Message Type 및 Type 별 Size Check 후 정상이면
+    // 상태정보를 받아서 메모리에 기록한다.
+    tStr := Comm_Packet.Buff[6] ; // Message Type
+
+    if ((tStr = 'A') and (Comm_Packet.Size = 37 )) OR
+       ((tStr = 'S') and (Comm_Packet.Size = 69 )) then
+    begin  // Message 정상
+      StrLog := 'SC' + IntToStr(SC_NO) +
+                ' Receice Message OK ['+ tStr + '],' +
+                ' Length [' + IntToStr(Comm_Packet.Size) + ']' ;
+      DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+
+      SetReceiveStatusData(SC_NO, Comm_Packet);
+    end else
+    begin // Message 이상
+      StrLog := 'SC' + IntToStr(SC_NO) +
+                ' Receice Message NG ['+ tStr + '],' +
+                ' Length [' + IntToStr(Comm_Packet.Size) + ']' ;
+      DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+    end;
+    tmrTimeOutCheck.Enabled := False;
+    tmrStatusRead.Enabled   := True;
+  finally
+
+  end;
+end;
+
+//==============================================================================
+// SetReceiveStatusData
+//==============================================================================
+procedure TfrmSCComm.SetReceiveStatusData(SC_NO:Integer;Comm_Packet:TComm_Packet);
+    //--------------------------------------------------------------------------
+    procedure SaveSCCR(SC_No:Integer;MSG_Type:String;Data:String);
+    var
+      aStrSQL : String;
+      aStrChValue : Array[ 1..45, 0..1 ] of String;
+      i, j, Ch_Start, Ch_End : integer;
+    begin
+      // A - Message : 14 Byte  TT_SCC.CH01 ~ CH14
+      // S - Message : 30 Byte  TT_SCC.CH15 ~ CH45
+      if MSG_Type = 'A' then
+      begin
+        Ch_Start := 01;    Ch_End := 14 ;
+      end else
+      if MSG_Type = 'S' then
+      begin
+        Ch_Start := 15;    Ch_End := 44 ;
+      end;
+      
+      j := 1;
+      for i := Ch_Start to Ch_End do
+      begin
+        aStrChValue[i, 0] := 'CH' + LPad(IntToStr(i), 2);
+        aStrChValue[i, 1] := copy(Data, j, 8);
+        inc(j, 8)
+      end;
+
+      with qryUpdate do
+      begin
+        Close;
+        SQL.Text := ' SELECT * FROM TT_SCC ' +
+                    '  WHERE SC_NO = ' +QuotedStr(IntToStr(SC_No)) +
+                    '    AND SC_SR = ''R'' ' ;
+        Open;
+        If RecordCount = 0 then
+        Begin
+          aStrSQL := 'INSERT INTO TT_SCC ( SC_NO, SC_SR, SC_DT,  ';
+          For i := Ch_Start to Ch_End do
+          Begin
+            aStrSQL := aStrSQL + aStrChValue[i, 0];
+            if i < Ch_End then aStrSQL := aStrSQL + ', ' ;
+          End;
+          aStrSQL :=  aStrSQL + ' ) VALUES ( ''' + IntToStr(SC_No)+ ''', ''R'', sysdate, ' ;
+          For i := Ch_Start to Ch_End do
+          Begin
+            aStrSQL := aStrSQL + '''' + aStrChValue[i, 1] + '''';
+            If      i < Ch_End Then aStrSQL := aStrSQL + ', '
+            Else if i = Ch_End Then aStrSQL := aStrSQL + ') ';
+          End;
+        End Else
+        Begin
+          aStrSQL := ' UPDATE TT_SCC SET SC_DT = SysDate, ';
+          For i := Ch_Start to Ch_End do
+          Begin
+            aStrSQL :=  aStrSQL + aStrChValue[i, 0] + ' = ''' + aStrChValue[i, 1] + ''' ';
+            if      i < Ch_End then aStrSQL := aStrSQL + ', '
+            else if i = Ch_End Then aStrSQL := aStrSQL ;
+          End;
+          aStrSQL := aStrSQL +
+                    ' WHERE SC_NO = '+ QuotedStr(IntToStr(SC_NO)) +
+                    '   AND SC_SR = ''R'' ' ;
+        End;
+        try
+          Close;
+          SQL.Text :=  aStrSQL;
+          ExecSQL;
+        except
+          on E: Exception do
+          begin
+            close ;
+            ErrorLogWrite( 'SaveSCCR function: ' +
+                           ', SQL : ' + aStrSQL );
+          end;
+        end;
+      end;
+    end;
+    //--------------------------------------------------------------------------
+var
+  i, j : integer;
+  Str, StrTemp : String;
+  Err1, Err2, Err3, Err4,
+  StrMerge : String ;
+  RecvCharS : Array[1..30] of Char ; // 2Byte -> 1Byte Merge Data Array... ( S Message 용)
+  RecvCharA : Array[1..14] of Char ; // 2Byte -> 1Byte Merge Data Array... ( A Message 용)
+
+  RecvDataS : Array[1..30, 1..8] of Char ; // Recvive Bit Data Array... ( S Message 용)
+  RecvDataA : Array[1..14, 1..8] of Char ; // Recvive Bit Data Array... ( A Message 용)
+begin
+
+  // **********************************************
+  // 수신한 데이터를 분석 A, S 받았을때 처리수순
+  // 1. BCC를 체크
+  // bBCC = getBCC(rBuff, 1, this.recvCnt - 3);   // BCC1, BCC2, CR은 제외한다.
+  // if ((bBCC[0] != rBuff[recvCnt - 3]) || (bBCC[1] != rBuff[recvCnt - 2]))
+
+  if CharToHexaChar(Comm_Packet.Buff[5]) = '3A' then // ':' = 0x3A : 초기 데이터
+  begin
+//    iRxMsgNo[SC_No] := iTxMsgNo[SC_No] ;
+  end;
+
+  Str := Comm_Packet.Buff[6] ; // Message Type
+  StrMerge := '' ;
+
+  if (Str = 'A') and (Comm_Packet.Size = 37 ) then // A-Message(Acknowledge) : Send/Receive
+  begin
+    SC_JOB[SC_NO].RECV_A := 'Y' ; // A-Message Recvive Flag
+    // 2byte Data -> 1Byte Data Merge 실시
+    j := 7 ;
+    for i := Low(RecvCharA) to High(RecvCharA) do
+    begin
+      Str := Comm_Packet.Buff[j] + Comm_Packet.Buff[j+1];
+      if Trim(Str) <> '' then
+           RecvCharA[i] := Chr(StrToInt('$'+Str))
+      else RecvCharA[i] := Chr(00) ;
+      // RecvCharA[i] := ASCII2ToChar(RAllBuf[SC_NO, j], RAllBuf[SC_NO, j+1]) ;
+      Inc(j, 2) ;
+    end;
+    
+    for i := Low(RecvDataA) to high(RecvDataA) do
+    begin
+      Str := CharToHexaChar(RecvCharA[i]) ;
+      if not( i in [1..8] ) then // Bit Array Struct 사용 부분.
+           Str := ReverseString(CharStrToBinStr(Str)) // Hex -> Bin 으로 저장.
+      else Str := CharStrToBinStr(Str) ; // Byte 사용하는 부분은 Reverse 안함.
+//      Str := ReverseString(CharStrToBinStr(Str)); // Hex -> Bin 으로 저장.
+      StrMove(@RecvDataA[i], PChar(Str), 8 ) ;
+           StrMerge := StrMerge + Str ; // DB Data Updae 용
+
+      // A-Message(Status) Data Save To SCRead Struct Data...
+      case i of
+        1 : SC_MSG[SC_NO].RECV_MSG.RX_A.Lugg_High    := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // Lugg number High
+        2 : SC_MSG[SC_NO].RECV_MSG.RX_A.Lugg_Low     := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // Lugg number Low
+        3 : SC_MSG[SC_NO].RECV_MSG.RX_A.BYTE_1       := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // Always 1 ?
+        4 : SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status   := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // ACK 상태
+        5 : SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_High := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // Error Code High ( Ack_Status 가 2일때만 유효 )
+        6 : SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_Low  := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // Error Code Low ( Ack_Status 가 2일때만 유효 )
+        7 : SC_MSG[SC_NO].RECV_MSG.RX_A.Rpt_X_Pos    := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // 작업 보고시의 X 위치
+        8 : SC_MSG[SC_NO].RECV_MSG.RX_A.Rpt_Y_Pos    := Chr(StrToInt('$' + BinStrToCharStr(Str))) ; // 작업 보고시의 Y 위치
+        // 이하 RCP 미사용 ?? 
+        9 : SC_MSG[SC_NO].RECV_MSG.RX_A.Param_2 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       10 : SC_MSG[SC_NO].RECV_MSG.RX_A.Param_3 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       11 : SC_MSG[SC_NO].RECV_MSG.RX_A.Param_4 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       12 : SC_MSG[SC_NO].RECV_MSG.RX_A.Param_5 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       13 : SC_MSG[SC_NO].RECV_MSG.RX_A.Param_6 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       14 : SC_MSG[SC_NO].RECV_MSG.RX_A.Param_7 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+      end;
+    end;
+
+    SaveSCCR(SC_NO, 'A', StrMerge ) ;
+
+    //---------------------------------------------
+    // 데이터 화면 표시
+    //---------------------------------------------
+                          
+    // 3. SC_ControlProcess에서 완료처리 진행
+
+    TEdit(FindComponent('EdtACK_Status' + IntToStr(SC_NO))).Text := '' ;
+
+    // RECV_MSG.RX_S.Bay : 주행 현재위치
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Lugg_High) ;
+    TEdit(FindComponent('Ack_Lugg_Hi' + IntToStr(SC_NO))).Text   := 'H'+Str+':'+IntToStr(StrToInt('$'+Str)) ;
+
+    // RECV_MSG.RX_S.Bay : 주행 현재위치
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Lugg_Low) ;
+    TEdit(FindComponent('Ack_Lugg_Lo' + IntToStr(SC_NO))).Text   := 'H'+Str+':'+IntToStr(StrToInt('$'+Str)) ;
+
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.Ack_Status) ;
+    case StrToInt('$'+Str) of
+      0 : StrTemp := '작업이 정상 등록됨' ;
+      1 : StrTemp := '작업이 정상 완료됨' ;
+      2 : StrTemp := '작업이상종료' ;
+      3 : StrTemp := '작업이 삭제되었음' ;
+      4 : StrTemp := '같은 작업이 진행중' ;
+      5 : StrTemp := '수동상태' ;
+      6 : StrTemp := '다른작업이 진행중' ;
+      8 : StrTemp := '데이터 이상' ;
+    end;
+    TEdit(FindComponent('EdtACK_Status' + IntToStr(SC_NO))).Text := StrTemp ;
+
+    // 작업 완료는 A-Message 에서 처리
+    if StrToInt('$'+Str) = 1 then
+         TEdit(FindComponent('Edt_JobComplete' + IntToStr(SC_NO))).Text  :=  '작업정상완료'  // 작업완료
+    else TEdit(FindComponent('Edt_JobComplete' + IntToStr(SC_NO))).Text  :=  '' ;
+
+    // A-Message Error Code : <ACK>0227A00010102 04CE 050700000000000077<CR*>
+    // (주의) S-Message랑 A-Message랑 High, Low 가 다름. 
+    // 04CE => 1230 : "X26 센서에 의한 이중입고" 이런식임.. hex 04, D 04
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_High) ;
+    Err1:= Str ; // Error High
+    TEdit(FindComponent('Edt_AErrHigh' + IntToStr(SC_NO))).Text := 'H'+Str+':'+IntToStr(StrToInt('$'+Str)) ;
+
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_A.ErrCode_High) ;
+    Err2:= Str ; // Error Low
+    TEdit(FindComponent('Edt_AErrLow'  + IntToStr(SC_NO))).Text := 'H'+Str+':'+IntToStr(StrToInt('$'+Str)) ;
+
+    Err3 := Err1 + Err2 ;                  // Error High + Error Low : HEX
+    Err4 := IntToStr(StrToInt('$'+Err3)) ; // Error High + Error Low : DEC
+    TEdit(FindComponent('Edt_AErrCode' + IntToStr(SC_NO))).Text := 'H'+Err3+':'+Err4 ;
+    
+  end else
+  if (Str = 'S') and (Comm_Packet.Size = 69 ) then // S-Message(Status) : Receive
+  begin
+    // 2byte Data -> 1Byte Data Merge 실시
+    j := 7 ;
+    for i := Low(RecvCharS) to High(RecvCharS) do
+    begin
+      Str := Comm_Packet.Buff[j] + Comm_Packet.Buff[j+1];
+      RecvCharS[i] := Chr(StrToInt('$'+Str)) ;
+      // RecvCharS[i] := ASCII2ToChar(RAllBuf[SC_NO, j], RAllBuf[SC_NO, j+1]) ;
+      Inc(j, 2) ;
+    end;
+
+    for i := Low(RecvDataS) to high(RecvDataS) do
+    begin
+      Str := CharToHexaChar(RecvCharS[i]) ;
+      if i in [1..5] then // Bit Array Struct 사용 부분.
+           Str := ReverseString(CharStrToBinStr(Str)) // Hex -> Bin 으로 저장.
+      else Str := CharStrToBinStr(Str) ; // Byte 사용하는 부분은 Reverse 안함. 
+      StrMove(@RecvDataS[i], PChar(Str), 8 ) ;
+      StrMerge := StrMerge + Str ; // DB Data Updae 용
+                                
+      // S-Message(Status) Data Save To SCRead Struct Data...
+      case i of
+        1 : StrMove(@SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.ALL, PChar(Str), 8 ) ; // Sts_SMC
+        2 : StrMove(@SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.ALL,   PChar(Str), 8 ) ; // Sts_X
+        3 : StrMove(@SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.ALL,   PChar(Str), 8 ) ; // Sts_Y
+        4 : StrMove(@SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.ALL,  PChar(Str), 8 ) ; // Sts_Z1
+        5 : StrMove(@SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.ALL,  PChar(Str), 8 ) ; // Sts_Z2
+        6 : SC_MSG[SC_NO].RECV_MSG.RX_S.Bay   := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+        7 : SC_MSG[SC_NO].RECV_MSG.RX_S.Tier  := Chr(StrToInt('$' + BinStrToCharStr('0' + Copy(Str, 2, 7)))) ;
+        8 : SC_MSG[SC_NO].RECV_MSG.RX_S.Phase := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+        9 : SC_MSG[SC_NO].RECV_MSG.RX_S.ErrCode_Hi  := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       10 : SC_MSG[SC_NO].RECV_MSG.RX_S.ErrCode_Lo  := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       11 : SC_MSG[SC_NO].RECV_MSG.RX_S.Analog_XZ   := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       12 : SC_MSG[SC_NO].RECV_MSG.RX_S.Encoder_Hi1 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       13 : SC_MSG[SC_NO].RECV_MSG.RX_S.Encoder_Md1 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       14 : SC_MSG[SC_NO].RECV_MSG.RX_S.Encoder_Lo1 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       15 : SC_MSG[SC_NO].RECV_MSG.RX_S.Analog_YZ   := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       16 : SC_MSG[SC_NO].RECV_MSG.RX_S.Encoder_Hi2 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       17 : SC_MSG[SC_NO].RECV_MSG.RX_S.Encoder_Md2 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       18 : SC_MSG[SC_NO].RECV_MSG.RX_S.Encoder_Lo2 := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       19..22 : SC_MSG[SC_NO].RECV_MSG.RX_S.Output[i-19] := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+       23..30 : SC_MSG[SC_NO].RECV_MSG.RX_S.Input [i-32] := Chr(StrToInt('$' + BinStrToCharStr(Str))) ;
+      end;
+    end;
+
+    SaveSCCR(SC_NO, 'S', StrMerge ) ;
+
+    //---------------------------------------------
+    // 화면에 데이터 표시 및 TT_SCRC 용 구조체 저장
+    //---------------------------------------------
+    Str := 'B0[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode  + ']' +
+           'B1[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode  + ']' +
+           'B2[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm  + ']' +
+           'B3[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop  + ']' +
+           'B4[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Err  + ']' +
+           'B5[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.POS_OK    + ']' +
+           'B6[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run  + ']' +
+           'B7[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit + ']'  ;
+    TEdit(self.FindComponent('EdtSTS_SMC' + IntToStr(SC_NO))).Text := Str ;
+
+    Str := 'B0[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Home_Pos_X  + ']' +
+           'B1[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Limit_X     + ']' +
+           'B2[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.HP_High_Cut + ']' +
+           'B3[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.OP_High_Cut + ']' +
+           'B4[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.POS_On_Zone + ']' +
+           'B5[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.POS_X_OK    + ']' +
+           'B6[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Middle_Cut  + ']' +
+           'B7[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Retry_Req   + ']'  ;
+    TEdit(self.FindComponent('EdtSTS_X' + IntToStr(SC_NO))).Text := Str ;
+
+    Str := 'B0[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Home_Pos_Y  + ']' +
+           'B1[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Limit_Y     + ']' +
+           'B2[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.STN_UP_Pos  + ']' +
+           'B3[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.STN_DN_Pos  + ']' +
+           'B4[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Rack_UP_Pos + ']' +
+           'B5[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Rack_DN_Pos + ']' +
+           'B6[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Reserved    + ']' +
+           'B7[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.POS_Y_OK    + ']'  ;
+    TEdit(self.FindComponent('EdtSTS_Y' + IntToStr(SC_NO))).Text := Str ;
+
+    Str := 'B0[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Cargo_Exist  + ']' +
+           'B1[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Cargo_Error  + ']' +
+           'B2[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.LRack_Cargo  + ']' +
+           'B3[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.RRack_Cargo  + ']' +
+           'B4[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Left    + ']' +
+           'B5[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Right   + ']' +
+           'B6[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End     + ']' +
+           'B7[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center  + ']'  ;
+    TEdit(self.FindComponent('EdtSTS_Z1' + IntToStr(SC_NO))).Text := Str ;
+
+    Str := 'B0[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.Reserved1    + ']' +
+           'B1[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.Reserved2    + ']' +
+           'B2[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.LRack_Cargo2 + ']' +
+           'B3[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.RRack_Cargo2 + ']' +
+           'B4[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.Fork_Left2   + ']' +
+           'B5[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.Fork_Right2  + ']' +
+           'B6[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.Fork_End2    + ']' +
+           'B7[' + SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z2.Fork_Center2 + ']'  ;
+    TEdit(self.FindComponent('EdtSTS_Z2' + IntToStr(SC_NO))).Text := Str ;
+
+    //--------------------------------------------------------------------------
+    // SC Status Data 화면(한글) 표시
+    //--------------------------------------------------------------------------
+
+    // DBSCRC Data Back-Up
+    SCRC_Copy(SC_NO) ; 
+
+    DBSCRC[SC_NO].SCRC_FK       := '1' ; // 작업 포크 : Default Value
+    DBSCRC[SC_NO].SCRC_RUNNING  := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run ; // 동작 상태
+    DBSCRC[SC_NO].SCRC_SCCREADY := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode ; // 기상반 자동
+    DBSCRC[SC_NO].SCRC_SCTREADY := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode ; // 지상반 자동
+    DBSCRC[SC_NO].SCRC_ERROR    := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Err ; // SC 에러상태
+    DBSCRC[SC_NO].SCRC_ONOFF    := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit; // Power Bit 관련
+    // 포크 상태( 0 : 포크중심, 1 : 좌출중, 2 : 좌끝, 3 : 우출중, 4 : 우끝 )
+    // 다른 사이트는 센터, 좌중, 우중 3개가 같이들어오는데 종근당은 센터 신호만 들어옴.
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center = '1') then //
+    begin
+      DBSCRC[SC_NO].SCRC_FK_STS  := '0' ;
+    end else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Left = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End  = '0') then
+    begin
+      DBSCRC[SC_NO].SCRC_FK_STS  := '1' ;
+    end else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Left = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End  = '1') then
+    begin
+      DBSCRC[SC_NO].SCRC_FK_STS  := '2' ;
+    end else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Right = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End   = '0') then
+    begin
+      DBSCRC[SC_NO].SCRC_FK_STS  := '3' ;
+    end else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Right = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End   = '1') then
+    begin
+      DBSCRC[SC_NO].SCRC_FK_STS  := '4' ;
+    end else DBSCRC[SC_NO].SCRC_FK_STS  := '5' ;
+
+    DBSCRC[SC_NO].SCRC_STOCK := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Cargo_Exist ; // Fork 내 화물 유무
+
+    // RECV_MSG.RX_S.Sts_SMC ---------------------------------------------------
+    Str := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Mode ; // Sts_SMC.B0 - SCC Mode (1:자동, 0:수동)
+    TEdit(FindComponent('Edt_ModeSWSCC' + IntToStr(SC_NO))).Text := Auto_Text[StrToInt(Str)];
+    TEdit(FindComponent('Edt_ModeSWSCC' + IntToStr(SC_NO))).Color := Auto_BColor[StrToInt(Str)];
+    TEdit(FindComponent('Edt_ModeSWSCC' + IntToStr(SC_NO))).Font.Color := Auto_FColor[StrToInt(Str)];
+
+    Str := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCT_Mode ; // Sts_SMC.B1 - SCT Mode (1:자동, 0:수동)
+    TEdit(FindComponent('Edt_ModeSWSCT' + IntToStr(SC_NO))).Text := Auto_Text[StrToInt(Str)];
+    TEdit(FindComponent('Edt_ModeSWSCT' + IntToStr(SC_NO))).Color := Auto_BColor[StrToInt(Str)];
+    TEdit(FindComponent('Edt_ModeSWSCT' + IntToStr(SC_NO))).Font.Color := Auto_FColor[StrToInt(Str)];
+
+    // Sts_SMC.B2 - SCC 와의 통신상태 (1:통신에러)
+    Str := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.SCC_Comm ;
+    TPanel(self.FindComponent('pnlSCC_Comm' + IntToStr(SC_NO))).Caption := Comm_Text[StrToInt(Str)];
+    TPanel(self.FindComponent('pnlSCC_Comm' + IntToStr(SC_NO))).Color   := Comm_BColor[StrToInt(Str)];
+    TPanel(self.FindComponent('pnlSCC_Comm' + IntToStr(SC_NO))).Font.Color := Comm_FColor[StrToInt(Str)];
+
+    // Sts_SMC.B3 - 비상정지
+    Str := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.EMG_Stop ;
+    TPanel(self.FindComponent('pnlEmgStop' + IntToStr(SC_NO))).Caption := EMG_Text[StrToInt(Str)];
+    TPanel(self.FindComponent('pnlEmgStop' + IntToStr(SC_NO))).Color   := EMG_BColor[StrToInt(Str)];
+    TPanel(self.FindComponent('pnlEmgStop' + IntToStr(SC_NO))).Font.Color := EMG_FColor[StrToInt(Str)];
+
+     if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Err = '0') then // Sts_SMC.B4 - Error 상태임
+     begin // 해당 Edit Box 의 Color 및 Font Color 변경 시킴. 
+       TEdit(FindComponent('Edt_ErrorCode' + IntToStr(SC_NO))).Color := clWhite ;
+       TEdit(FindComponent('Edt_ErrorCode' + IntToStr(SC_NO))).Font.Color := clBlack ;
+     end else
+     begin
+       TEdit(FindComponent('Edt_ErrorCode' + IntToStr(SC_NO))).Color := clRed ;
+       TEdit(FindComponent('Edt_ErrorCode' + IntToStr(SC_NO))).Font.Color := clWhite ;
+     end;
+
+    // Sts_SMC.B5 - 위치 파악됨.
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.POS_OK = '0') then
+         TEdit(self.FindComponent('Edt_SCPOSOK' + IntToStr(SC_NO))).Text := 'NG'
+    else TEdit(self.FindComponent('Edt_SCPOSOK' + IntToStr(SC_NO))).Text := 'OK' ;
+
+    // Sts_SMC.B6 - 작업 중
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Mach_Run = '0') then
+         TEdit(self.FindComponent('Edt_SCWorking' + IntToStr(SC_NO))).Text := '대기중'
+    else TEdit(self.FindComponent('Edt_SCWorking' + IntToStr(SC_NO))).Text := '작업중' ;
+
+    // Sts_SMC.B7 - 전원 Off/On Bit
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '0') then
+         TEdit(FindComponent('Edt_PowerBit' + IntToStr(SC_NO))).Text := 'Off'
+    else TEdit(FindComponent('Edt_PowerBit' + IntToStr(SC_NO))).Text := 'On' ;
+
+    // RECV_MSG.RX_S.Sts_X -----------------------------------------------------
+    if      (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Home_Pos_X = '1') then
+         TEdit(FindComponent('Edt_POS_X_OK' + IntToStr(SC_NO))).Text := '주행 홈'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Limit_X = '1') then
+         TEdit(FindComponent('Edt_POS_X_OK' + IntToStr(SC_NO))).Text := '한계점 On'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.POS_On_Zone = '1') then
+         TEdit(FindComponent('Edt_POS_X_OK' + IntToStr(SC_NO))).Text := 'Zone 위'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.POS_X_OK = '1') then
+         TEdit(FindComponent('Edt_POS_X_OK' + IntToStr(SC_NO))).Text := 'X 정위치'
+    else TEdit(FindComponent('Edt_POS_X_OK' + IntToStr(SC_NO))).Text := '' ;
+
+    TEdit(FindComponent('Edt_RetryBit' + IntToStr(SC_NO))).Text
+       := SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_X.Retry_Req ;  // 재기동요구
+
+    // RECV_MSG.RX_S.Sts_Y -----------------------------------------------------
+    if      (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Home_Pos_Y = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := '승강 홈'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Limit_Y = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := '한계점 On'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.STN_UP_Pos = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := 'STN 승강상'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.STN_DN_Pos = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := 'STN 승강하'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Rack_UP_Pos = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := 'Rack 승강상'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.Rack_DN_Pos = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := 'Rack 승강하'
+    else if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Y.POS_Y_OK = '1') then
+         TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := '승강 위치파악'
+    else TEdit(FindComponent('Edt_POS_Y_OK' + IntToStr(SC_NO))).Text := '' ;
+
+    // RECV_MSG.RX_S.Sts_Z1 -----------------------------------------------------
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center = '1') then
+         TEdit(FindComponent('Edt_ForkStatusFR' + IntToStr(SC_NO))).Text := '중심'
+    else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Left   = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End    = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center = '0')then
+         TEdit(FindComponent('Edt_ForkStatusFR' + IntToStr(SC_NO))).Text := '좌끝'
+    else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Left   = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End    = '0') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center = '0')then
+         TEdit(FindComponent('Edt_ForkStatusFR' + IntToStr(SC_NO))).Text := '좌출중'
+    else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Right  = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End    = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center = '0')then
+         TEdit(FindComponent('Edt_ForkStatusFR' + IntToStr(SC_NO))).Text := '우끝'
+    else
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Right  = '1') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_End    = '0') and
+       (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Fork_Center = '0')then
+         TEdit(FindComponent('Edt_ForkStatusFR' + IntToStr(SC_NO))).Text := '우출중'
+    else TEdit(FindComponent('Edt_ForkStatusFR' + IntToStr(SC_NO))).Text := '??' ;
+
+    if (SC_MSG[SC_NO].RECV_MSG.RX_S.Sts_Z1.Cargo_Exist = '0') then // 화물유무 기준포크
+         TEdit(FindComponent('Edt_ForKStockFR' + IntToStr(SC_NO))).Text  := 'X'
+    else TEdit(FindComponent('Edt_ForKStockFR' + IntToStr(SC_NO))).Text  := 'O' ;
+
+    // RECV_MSG.RX_S.Bay : 주행 현재위치
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_S.Bay) ;
+    TEdit(FindComponent('Edt_CurrBay' + IntToStr(SC_NO))).Text   := 'H'+Str+':'+IntToStr(StrToInt('$'+Str)) ;
+    DBSCRC[SC_NO].SCRC_BAYPOS    := Str ; // SC 위치
+
+    // RECV_MSG.RX_S.Tier : 승강현재위치 : Bit7은 Door Open 상태를 나타내므로 제외 시킴.
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_S.Tier);
+    TEdit(FindComponent('Edt_CurrLevel' + IntToStr(SC_NO))).Text := Str ;
+    DBSCRC[SC_NO].SCRC_LVLPOS    := Str ; // SC 위치
+
+    // RECV_MSG.RX_S.Phase : Phase 현재 SC 동작
+    Str := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_S.Phase) ;
+    TEdit(FindComponent('Edt_Phase' + IntToStr(SC_NO))).Text   := Str ;
+    TEdit(FindComponent('Lbl_Phase' + IntToStr(SC_NO))).Text   := GetPhaseMsg(Str);
+    DBSCRC[SC_NO].SCRC_PHASE     := Str ; // 작업 PHASE
+
+    // S-Message Error Code : <ACK>0216S733490BDB0058700 CE04 00018E6200 .... 7D<CR*>
+    // (주의) S-Message랑 A-Message랑 High, Low 가 다름.
+    // CE04 -> Swap 04CE => 1230 : "X26 센서에 의한 이중입고" 이런식임..
+
+    // RECV_MSG.RX_S.ErrCode_Hi, RECV_MSG.RX_S.ErrCode_Lo
+    Err2 := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_S.ErrCode_Hi) ;
+    Err1 := HexaToChar(SC_MSG[SC_NO].RECV_MSG.RX_S.ErrCode_Lo) ;
+    Err3 := Err1 + Err2 ;
+    Err4 := IntToStr(StrToInt('$' + Err3)) ;
+    TEdit(FindComponent('Edt_ErrorCode' + IntToStr(SC_NO))).Text
+       := 'H:' + Err3 + ', D:' + Err4 ; // 원격 작업중 발생한 에러코드
+    DBSCRC[SC_NO].SCRC_ERRCODE   := Err4 ; // 에러 코드
+
+    SCRC_Update(SC_NO) ; // TT_SCRC Staus Update
+
+  end;
+end;
+
+//==============================================================================
+// GetPhaseMsg
+//==============================================================================
+function TfrmSCComm.GetPhaseMsg(PhaseNo: String): String;
+var
+  Str : String ;
+  i  : Integer;
+begin
+  result := PhaseNo;
+
+  Str := LPad( PhaseNo, 2) ;
+  For i := Low(SCPhase) to High(SCPhase) do
+  begin
+    if SCPhase[i,1] = Str then
+    begin
+      Str := Str +':'+ SCPhase[i,2];
+      break ;
+    end;
+  end;
+  result := Str;
+end;
+
+//==============================================================================
+// SetMessage
+//==============================================================================
+procedure TfrmSCComm.SetMessage(SC_NO: Integer; MsgType: String);
+var
+  tStr, CV_InterLoc : String ;
+  StrHigh, StrLow, StrBank, StrBay, StrLevel  : String ;
+begin
+  if MsgType = 'P' then
+  begin
+    // System Command 구성 Start -----------------------------------------------
+    // Sts_SMC.B7 - Power Bit On : 혹시 SC 가 전원이 OFF -> ON 이면
+    // U-Msg 를 통해 이전에 작업을 주었던것을 찾아 다시 지시 해야할지 ??
+    if (SC_MSG[SC_No].RECV_MSG.RX_S.Sts_SMC.Power_Bit = '1') then
+         SC_MSG[SC_No].SEND_MSG.TX_P.SYS_CMD.Power_Clear := '1'
+    else SC_MSG[SC_No].SEND_MSG.TX_P.SYS_CMD.Power_Clear := '0' ;
+
+    SC_MSG[SC_No].SEND_MSG.TX_P.SYS_CMD.Open_Door   := '0' ;
+
+    // 에러상태이고 작업자요청(해제/재기동/삭제)이 있을 경우 에러 해제시킴
+    if (SC_MSG[SC_No].RECV_MSG.RX_S.Sts_SMC.Mach_Err = '1') and   // Sts_SMC.B4 - Error 상태임
+       ((SC_MSG[SC_No].RECV_MSG.RX_S.Sts_X.Retry_Req  = '1') or   // Sts_X.B7 - 재기동 요구 (설비에서 재기동)
+        (RCP_ORDER[SC_NO].Retry_Req  = '1') or                    // RCP에서 재기동
+        (RCP_ORDER[SC_NO].JOB_CANCEL = '1') or                    // RCP에서 작업취소
+        (RCP_ORDER[SC_NO].HOME_BACK  = '1')) then                 // RCP에서 홈 복귀
+    begin
+      SC_MSG[SC_No].SEND_MSG.TX_P.SYS_CMD.Error_Clear := '1';     // 에러클리어 비트 살림.
+      if RCP_ORDER[SC_NO].Retry_Req  = '1' then RCP_ORDER[SC_NO].Retry_Req  := '0'; // RCP 재기동 비트 초기화
+      if RCP_ORDER[SC_NO].JOB_CANCEL = '1' then RCP_ORDER[SC_NO].JOB_CANCEL := '0'; // RCP 작업취소 비트 초기화
+      if RCP_ORDER[SC_NO].HOME_BACK  = '1' then RCP_ORDER[SC_NO].HOME_BACK  := '0'; // RCP 홈이동 비트 초기화
+    end else SC_MSG[SC_No].SEND_MSG.TX_P.SYS_CMD.Error_Clear := '0' ;
+
+    SC_MSG[SC_No].SEND_MSG.TX_P.SYS_CMD.Emg_Stop    := '0' ;
+    // System Command 구성 End -------------------------------------------------
+
+    SC_MSG[SC_No].SEND_MSG.TX_P.Reserved    := '0' ;
+    SC_MSG[SC_No].SEND_MSG.TX_P.Reason_Code := '0' ;
+
+
+    // IN Out Station InterLoc Setting
+    CV_InterLoc := Get_PLC_InterLoc(SC_NO) ;
+
+    // CV_InterLoc 구조체에 데이터 추가.
+    StrMove(@CV_READY[11].InReady, Pchar(Copy(CV_InterLoc, 1, 1)), 1) ;
+    StrMove(@CV_READY[12].InReady, Pchar(Copy(CV_InterLoc, 2, 1)), 1) ;
+    StrMove(@CV_READY[13].InReady, Pchar(Copy(CV_InterLoc, 3, 1)), 1) ;
+    StrMove(@CV_READY[14].InReady, Pchar(Copy(CV_InterLoc, 4, 1)), 1) ;
+
+    StrMove(@CV_READY[11].OutReady, Pchar(Copy(CV_InterLoc, 5, 1)), 1) ;
+    StrMove(@CV_READY[12].OutReady, Pchar(Copy(CV_InterLoc, 6, 1)), 1) ;
+    StrMove(@CV_READY[13].OutReady, Pchar(Copy(CV_InterLoc, 7, 1)), 1) ;
+    StrMove(@CV_READY[14].OutReady, Pchar(Copy(CV_InterLoc, 8, 1)), 1) ;
+
+    case SC_No -10 of //입고대 인터록
+      1 : tStr :=  '000'+ Copy(CV_InterLoc, 1, 1) ;  // Station[749]
+      2 : tStr :=  '000'+ Copy(CV_InterLoc, 2, 1) ;  // Station[753]
+      3 : tStr :=  '000'+ Copy(CV_InterLoc, 3, 1) ;  // Station[757]
+      4 : tStr :=  '000'+ Copy(CV_InterLoc, 4, 1) ;  // Station[761]
+    end;
+
+    StrMove(@SC_MSG[SC_No].SEND_MSG.TX_P.IN_InterLoc, PChar(BinStrToCharStr(tStr)), 1) ;
+
+    case SC_No -10 of //출고대 인터록
+      1 : tStr :=  '000'+ Copy(CV_InterLoc, 5, 1) ;  // Station[750]
+      2 : tStr :=  '000'+ Copy(CV_InterLoc, 6, 1) ;  // Station[754]
+      3 : tStr :=  '000'+ Copy(CV_InterLoc, 7, 1) ;  // Station[758]
+      4 : tStr :=  '000'+ Copy(CV_InterLoc, 8, 1) ;  // Station[762]
+    end;
+    StrMove(@SC_MSG[SC_No].SEND_MSG.TX_P.OT_InterLoc, PChar(BinStrToCharStr(tStr)), 1) ;
+
+  end else
+  //----------------------------------------------------------------------------
+  // 작업 데이터(SC_JOB[xMCNo])를 가지고 메세지 구조체(SC_MSG[xMCNo].SEND_MSG.TX_U) Data 입력
+  // 화면에 전송 데이터 값 표시.
+  //----------------------------------------------------------------------------
+  if MsgType = 'U' then
+  begin
+    if SC_JOB[SC_NO].HOME_BACK = '0' then // 홈이동이 아닐경우에만 작업번호 사용(Lugg)
+    begin
+      tStr := IntToHex(StrToInt(SC_JOB[SC_No].ID_ORDLUGG), 4) ;
+      StrHigh := Copy(tStr, 1, 2) ;
+      StrLow  := Copy(tStr, 3, 2) ;
+      SC_MSG[SC_No].SEND_MSG.TX_U.Lugg_No_Hi := Chr(StrToInt('$'+StrHigh)) ;   // [1] Lugg number Hi
+      SC_MSG[SC_No].SEND_MSG.TX_U.Lugg_No_Lo := Chr(StrToInt('$'+StrLow )) ;   // [2] Lugg number Lo
+    end;
+
+    SC_MSG[SC_No].SEND_MSG.TX_U.Fork_No     := '1' ;     // [3] Fork number : Always 1
+    if SC_JOB[SC_NO].SC_STEP = 'C'  then         // [4] Bit Command : b7 = 1 작업취소
+         SC_MSG[SC_No].SEND_MSG.TX_U.Bit_Command := Chr(128)
+    else SC_MSG[SC_No].SEND_MSG.TX_U.Bit_Command := Chr(0) ;
+
+    // [5] Job Kind (6 : 백 홈,  8 : 입고대에서 loading,  9 : 출고대에서 unloading,
+    //               12 : 랙에서 loading    , 13 : 랙에서 unloading)
+    if SC_JOB[SC_NO].HOME_BACK = '1' then
+    begin
+      SC_MSG[SC_No].SEND_MSG.TX_U.Job_Kind := Chr(6) ;
+      TRadioGroup(self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := 4 ;
+    end else
+    if (SC_JOB[SC_No].IO_TYPE = 'I') and (SC_JOB[SC_No].SC_STEP = 'L') then
+    begin
+      SC_MSG[SC_No].SEND_MSG.TX_U.Job_Kind := Chr(8) ;
+      TRadioGroup(self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := 0 ;
+    end else
+    if ((SC_JOB[SC_No].IO_TYPE = 'O') or (SC_JOB[SC_No].IO_TYPE = 'M')) and (SC_JOB[SC_No].SC_STEP = 'L') then
+    begin
+      SC_MSG[SC_No].SEND_MSG.TX_U.Job_Kind := Chr(12) ;
+      TRadioGroup(self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := 1 ;
+    end else
+    if ((SC_JOB[SC_No].IO_TYPE = 'I') or (SC_JOB[SC_No].IO_TYPE = 'M')) and (SC_JOB[SC_No].SC_STEP = 'U') then
+    begin
+      SC_MSG[SC_No].SEND_MSG.TX_U.Job_Kind := Chr(13) ;
+      TRadioGroup(self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := 2 ;
+    end else
+    if (SC_JOB[SC_No].IO_TYPE = 'O') and (SC_JOB[SC_No].SC_STEP = 'U') then
+    begin
+      SC_MSG[SC_No].SEND_MSG.TX_U.Job_Kind := Chr(9) ;
+      TRadioGroup(self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := 3 ;
+    end else
+    begin // 기타 지시 없음.
+      SC_MSG[SC_No].SEND_MSG.TX_U.Job_Kind := Chr(0) ;
+      TRadioGroup(self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := -1 ;
+    end;
+
+    // 작업 위치 정보 Bank - Bay - Tier
+    // 입고대 Loading, 출고대 UnLoading 시 컨베어 Site-No 를< Bay(Station High), Tier(Station Low)> 넣는다.
+    // 입출고대 정보는 해당 위치의 CV 번호를 넘김다. <LF>044U0001010009000065019B<CR>
+    if SC_JOB[SC_NO].HOME_BACK = '1' then
+    begin
+      // 홈복귀 요청
+      StrBank  := '0'  ;
+      StrBay   := '000'   ;
+      StrLevel := '00' ;
+
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bank  := Chr(00) ;
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bay   := Chr(00) ;
+      SC_MSG[SC_No].SEND_MSG.TX_U.Tier  := Chr(00) ;
+    end else
+    if ((SC_JOB[SC_No].IO_TYPE = 'I') and (SC_JOB[SC_No].SC_STEP = 'L')) then   // 입고 Load, 출고 UnLoad
+    begin
+      // For Infrmation Display
+      StrBank  := SC_Job[SC_No].LOAD_BANK  ;
+      StrBay   := SC_Job[SC_No].LOAD_BAY   ;
+      StrLevel := SC_Job[SC_No].LOAD_LEVEL ; // + '(0x' + IntToHex(StrToInt(SC_Job[SC_No].LOAD_LEVEL), 4) + ')' ;
+
+      tStr := IntToHex(StrToInt(StrLevel) -600, 4) ;
+      StrHigh := Copy(tStr, 1, 2) ;
+      StrLow  := Copy(tStr, 3, 2) ;
+
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bank  := Chr(00) ; // [6] Bank  Bank 좌우 열을 나타낸다. (1-24)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bay   := Chr(StrToInt('$'+StrHigh)) ;   // [7] Bay  (Site Hi) Bay 번지를 나타낸다. (1-127)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Tier  := Chr(StrToInt('$'+StrLow )) ;   // [8] Tier (Site Lo) Tier 단 또는 사이트 번호(Low)을 나타낸다.
+    end else
+    if ((SC_JOB[SC_No].IO_TYPE = 'O') and (SC_JOB[SC_No].SC_STEP = 'U')) then // 출고대 번호 지정.
+    begin
+      // U/I Display
+      StrBank  := SC_Job[SC_No].UNLOAD_BANK  ;
+      StrBay   := SC_Job[SC_No].UNLOAD_BAY   ;
+      StrLevel := SC_Job[SC_No].UNLOAD_LEVEL ; // + '(0x' + IntToHex(StrToInt(SC_Job[SC_No].UNLOAD_LEVEL), 4) + ')' ;
+
+      tStr := IntToHex(StrToInt(StrLevel) -600, 4) ;
+      StrHigh := Copy(tStr, 1, 2) ;
+      StrLow  := Copy(tStr, 3, 2) ;
+
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bank  := Chr(00) ; // [6] Bank  Bank 좌우 열을 나타낸다. (1-24)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bay   := Chr(StrToInt('$'+StrHigh)) ;   // [7] Bay  (Site Hi) Bay 번지를 나타낸다. (1-127)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Tier  := Chr(StrToInt('$'+StrLow )) ;   // [8] Tier (Site Lo) Tier 단 또는 사이트 번호(Low)을 나타낸다.
+    end else
+    if (((SC_JOB[SC_No].IO_TYPE = 'I') or (SC_JOB[SC_No].IO_TYPE = 'M')) and (SC_JOB[SC_No].SC_STEP = 'U')) then
+    begin // 입고, RackToRack UnLoad Rack 번지 지정.
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bank := Chr(StrToInt(SC_Job[SC_No].UNLOAD_BANK )) ; // [6] Bank  Bank 좌우 열을 나타낸다. (1-24)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bay  := Chr(StrToInt(SC_Job[SC_No].UNLOAD_BAY  )) ; // [7] Bay  (Site Hi) Bay 번지를 나타낸다. (1-127)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Tier := Chr(StrToInt(SC_Job[SC_No].UNLOAD_LEVEL)) ; // [8] Tier (Site Lo) Tier 단을 나타낸다. (1-63)
+      // For Infrmation Display
+      StrBank  := SC_Job[SC_No].UNLOAD_BANK  ;
+      StrBay   := SC_Job[SC_No].UNLOAD_BAY   ;
+      StrLevel := SC_Job[SC_No].UNLOAD_LEVEL ;
+    end else
+    if (((SC_JOB[SC_No].IO_TYPE = 'O') or (SC_JOB[SC_No].IO_TYPE = 'M')) and (SC_JOB[SC_No].SC_STEP = 'L')) then
+    begin // 출고, RackToRack Load Rack 번지 지정.             // YEH CHECK Trim 나중에 Table 변경하고 제거
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bank := Chr(StrToInt(Trim(SC_Job[SC_No].LOAD_BANK ))) ; // [6] Bank  Bank 좌우 열을 나타낸다. (1-24)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Bay  := Chr(StrToInt(Trim(SC_Job[SC_No].LOAD_BAY  ))) ; // [7] Bay  (Site Hi) Bay 번지를 나타낸다. (1-127)
+      SC_MSG[SC_No].SEND_MSG.TX_U.Tier := Chr(StrToInt(Trim(SC_Job[SC_No].LOAD_LEVEL))) ; // [8] Tier (Site Lo) Tier 단을 나타낸다. (1-63)
+      // For Infrmation Display
+      StrBank  := SC_Job[SC_No].LOAD_BANK  ;
+      StrBay   := SC_Job[SC_No].LOAD_BAY   ;
+      StrLevel := SC_Job[SC_No].LOAD_LEVEL ;
+    end;
+
+    SC_MSG[SC_No].SEND_MSG.TX_U.Depth := Chr(01) ; // [9] Depth  스태커에서 가까운 쪽이 1, 먼쪽이 4. (1-4) : 종근당 사용안함 : Bank 번호로 Reach 판단. 
+
+    // Bank, Bay, Tier 정보 표시
+    TEdit(self.FindComponent('Edt_Bank'  + IntToStr(SC_No))).Text := StrBank  ;
+    TEdit(self.FindComponent('Edt_BaY'   + IntToStr(SC_No))).Text := StrBay   ;
+    TEdit(self.FindComponent('Edt_Level' + IntToStr(SC_No))).Text := StrLevel ;
+
+    if SC_JOB[SC_NO].HOME_BACK = '1' then SC_JOB[SC_NO].HOME_BACK := '0';
+  end;
+end;
+
+//==============================================================================
+// SC_JOBDisplayClear
+//==============================================================================
+procedure TfrmSCComm.SC_JOBDisplayClear(SC_NO: Integer);
+begin
+  TRadioGroup(Self.FindComponent('RG_JobType' + IntToStr(SC_No))).ItemIndex := -1 ;
+  // Bank, Bay, Tier 정보 표시 Clear
+  TEdit(Self.FindComponent('Edt_Bank'  + IntToStr(SC_No))).Text := ''  ;
+  TEdit(Self.FindComponent('Edt_BaY'   + IntToStr(SC_No))).Text := ''   ;
+  TEdit(Self.FindComponent('Edt_Level' + IntToStr(SC_No))).Text := '' ;
+end;
+
+//==============================================================================
+// function Get_SC_JOB : TT_ORDER 작업을 찾아 있으면 SC_JOB 구조체 넣고 True 반환
+//------------------------------------------------------------------------------
+// ORD_STATUS => 작업 상태( 'R' : 작업대기중, 'I': 입고중, 'O' : 출고중,
+//                          'M' : CV 이동중 , 'W' : Picking 대기중, 'S' : Station 대기중 )
+// ORD_TYPE   => 작업 유형( 'AO':전수 출고, 'PI': Picking 입고, 'PO':Picking 출고 )
+// ORD_POSMC  => 설비 위치( 'CV', 'SC' )
+// ORD_POSNO  => 현재 위치(SC No, CV No)
+//==============================================================================
+function TfrmSCComm.Get_SC_JOB(SC_NO:Integer; JFlag:TSCJobMode; CV_NO:String): Boolean;
+var
+  StrSQL, StrLog, JobLog, IO_Gubun : String ;
+begin
+  Result := False ;
+
+  if JFlag = StoreIn then
+  begin // 입고작업 검색
+    IO_Gubun := 'I' ;
+    StrSQL  := ' Select * from TT_ORDER   ' +
+               '  Where JobD  = ''1''     ' + // 입고 작업
+               // CV 이동완료 해서 입고대에 와있거나
+               '    and ( ( NOWMC = ''1'' and NowStatus = ''4'') OR ' +  // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+               // 입고대에서 입고 작업을 받은 Order를 검색함.
+               '          ( NOWMC = ''5'' and NowStatus = ''1'') ) ' +  // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+               '    and DSTSITE1  = ''' + FormatFloat('000', xMCNo) + '''  ' + // End   호기
+               '    and CVCurr = ''' + IntToStr(IN_track_no[xMCNo]) + ''' ' + // 현재 위치가 입고대 위치
+               '  order by JOBINSERT, REG_TIME, LUGG ' ;
+  end else
+  if JFlag = StoreOut then
+  begin // 출고작업 검색
+    IO_Gubun := 'O' ;
+    StrSQL  := ' Select * from TT_ORDER   ' +
+               '  Where NOWMC = ''5''     ' + // SC Loading
+               '    and JobD  = ''2''     ' + // 출고 작업
+               '    and JOBSTATUS = ''1'' ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료, 7:WMS 보고
+               '    and NOWSTATUS = ''1'' ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+               '    and SRCSITE1  = ''' + FormatFloat('000', xMCNo) + ''' ' + // Start 호기
+               '  order by JOBINSERT, REG_TIME, LUGG ' ;
+
+  end else
+  if JFlag = RackToRack then
+  begin // Rack To Rack 작업 검색
+    IO_Gubun := 'M' ;
+    StrSQL  := ' Select * from TT_ORDER   ' +
+               '  Where NOWMC = ''5''     ' + // SC Loading
+               '    and JobD  = ''7''     ' + // RackToRack 작업
+               '    and JOBSTATUS = ''1'' ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료, 7:WMS 보고
+               '    and NOWSTATUS = ''1'' ' + // 0:Claer, 1:등록,  2:지시, 3:진행중, 4:완료
+               '    and SRCSITE1  = ''' + FormatFloat('000', xMCNo) + ''' ' + // Start 호기
+               '    and DSTSITE1  = ''' + FormatFloat('000', xMCNo) + ''' ' + // End   호기
+               '  order by JOBINSERT, REG_TIME, LUGG ' ;
+  end;
+
+  try
+    with qryInfo do
+    begin
+      Close;
+
+      SQL.Text := StrSQL ;
+      Open;
+      if not (Bof and Eof) then
+      begin
+        SC_JOB[xMCNo].ID_ORDLUGG := FieldByName('LUGG').AsString ; // 작업 번호
+        SC_JOB[xMCNo].ID_REGTIME := FieldByName('REG_TIME' ).AsString ; // 작업 생성 일시
+        SC_JOB[xMCNo].ID_ORDDATE := Copy(SC_JOB[xMCNo].ID_REGTIME, 1, 8) ; // 작업 생성 일자
+        SC_JOB[xMCNo].ID_ORDTIME := Copy(SC_JOB[xMCNo].ID_REGTIME, 9, 6) ; // 작업 생성 시간
+        SC_JOB[xMCNo].IO_TYPE    := IO_Gubun ; // 입출고 유형
+
+        if JFlag = StoreIn then
+        begin // 입고작업
+          SC_JOB[xMCNo].ID_FROM       := '' ; // 현재 구간 시작 CV No (입고시엔 사용안함)
+          SC_JOB[xMCNo].ID_TO         := '' ; // 현재 구간 도착 CV No (입고시엔 사용안함)
+
+          SC_JOB[xMCNo].LOAD_BANK     := '0'  ;  // 적재(열:1)
+          SC_JOB[xMCNo].LOAD_BAY      := '00' ;  // 적재(연:2)
+          SC_JOB[xMCNo].LOAD_LEVEL    := IntToStr(IN_track_no[xMCNo]) ;  // 적재(단) - 컨베어 번호 사용
+          SC_JOB[xMCNo].UNLOAD_BANK   := Trim(FieldByName('DSTAISLE1').AsString) ;  // 하역(열)
+          SC_JOB[xMCNo].UNLOAD_BAY    := Trim(FieldByName('DSTBAY1'  ).AsString) ;  // 하역(연)
+          SC_JOB[xMCNo].UNLOAD_LEVEL  := Trim(FieldByName('DSTLEVEL1').AsString) ;  // 하역(단)
+
+          JobLog := '입고등록:STN[1:'+SC_JOB[xMCNo].LOAD_LEVEL+']->' +
+                     SC_JOB[xMCNo].UNLOAD_BANK  + '-' +
+                     SC_JOB[xMCNo].UNLOAD_BAY   + '-' +
+                     SC_JOB[xMCNo].UNLOAD_LEVEL ;
+        end else
+        if JFlag = StoreOut then
+        begin // 출고작업
+          SC_JOB[xMCNo].ID_FROM       := IntToStr(OT_track_no[xMCNo]  ) ; // 현재 구간 시작 CV No : 종근당 사용안함
+          SC_JOB[xMCNo].ID_TO         := IntToStr(OT_track_no[xMCNo]+1) ; // 현재 구간 도착 CV No : 종근당 사용안함
+
+          SC_JOB[xMCNo].LOAD_BANK     := Trim(FieldByName('SRCAISLE1').AsString) ;  // 적재(열)
+          SC_JOB[xMCNo].LOAD_BAY      := Trim(FieldByName('SRCBAY1'  ).AsString) ;  // 적재(연)
+          SC_JOB[xMCNo].LOAD_LEVEL    := Trim(FieldByName('SRCLEVEL1').AsString) ;  // 적재(단)
+          SC_JOB[xMCNo].UNLOAD_BANK   := '0'  ;  // 하역(열:1)
+          SC_JOB[xMCNo].UNLOAD_BAY    := '00' ;  // 하역(연:2)
+          SC_JOB[xMCNo].UNLOAD_LEVEL  := IntToStr(OT_track_no[xMCNo]) ;  // 하역(단) - 컨베어 번호 사용
+          JobLog := '출고등록:' +
+                     SC_JOB[xMCNo].LOAD_BANK  + '-' +
+                     SC_JOB[xMCNo].LOAD_BAY   + '-' +
+                     SC_JOB[xMCNo].LOAD_LEVEL + '-> STN[1'+IntToStr(OT_track_no[xMCNo])+']' ;
+        end else
+        if JFlag = RackToRack then
+        begin // Rack To Rack
+
+          SC_JOB[xMCNo].ID_FROM       := '' ; // 현재 구간 시작 CV No (입고시엔 사용안함)
+          SC_JOB[xMCNo].ID_TO         := '' ; // 현재 구간 도착 CV No (입고시엔 사용안함)
+
+          SC_JOB[xMCNo].LOAD_BANK     := Trim(FieldByName('SRCAISLE1').AsString) ;  // 적재(열)
+          SC_JOB[xMCNo].LOAD_BAY      := Trim(FieldByName('SRCBAY1'  ).AsString) ;  // 적재(연)
+          SC_JOB[xMCNo].LOAD_LEVEL    := Trim(FieldByName('SRCLEVEL1').AsString) ;  // 적재(단)
+
+          SC_JOB[xMCNo].UNLOAD_BANK   := Trim(FieldByName('DSTAISLE1').AsString) ;  // 하역(열)
+          SC_JOB[xMCNo].UNLOAD_BAY    := Trim(FieldByName('DSTBAY1'  ).AsString) ;  // 하역(연)
+          SC_JOB[xMCNo].UNLOAD_LEVEL  := Trim(FieldByName('DSTLEVEL1').AsString) ;  // 하역(단)
+
+          JobLog := 'RackToRack 작업등록:' +
+                     SC_JOB[xMCNo].LOAD_BANK    + '-' +
+                     SC_JOB[xMCNo].LOAD_BAY     + '-' +
+                     SC_JOB[xMCNo].LOAD_LEVEL   + '->'+
+                     SC_JOB[xMCNo].UNLOAD_BANK  + '-' +
+                     SC_JOB[xMCNo].UNLOAD_BAY   + '-' +
+                     SC_JOB[xMCNo].UNLOAD_LEVEL ;
+        end;
+
+        SC_STAT[xMCNo]        := DATA1 ;   // SC 상태   ORD_STATUS
+        SC_JOB[xMCNo].SC_STEP := 'L'   ;   // 작업 단계 (L:Loading, U:UnLoading)
+
+        if fn_SCIO_Insert(xMCNo) then
+        begin
+          StrLog := 'SC['+ IntToStr(xMCNo) + '] ' + JobLog ;
+          ListBoxDisplay(  ListBoxOrder, JobLog );
+          DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+          Result := True ;
+        end else
+        begin
+          StrLog := 'SC['+ IntToStr(xMCNo) + '] SCIO 등록 실패' ;
+          DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+          SC_JOBClear(xMCNo) ; // SCIO 작업 등록 실패시 Log 처리 후 작업 Clear
+        end;
+      end;
+      Close ;
+    End;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function Get_SC_JOB, '+
+                     'Error[' + E.Message + '], ' +
+                     'ORD_IDX  [' + SC_JOB[xMCNo].ID_ORDLUGG + '], ' +
+                     'ORD_DATE [' + SC_JOB[xMCNo].ID_ORDDATE + '], ' +
+                     'ORD_TIME [' + SC_JOB[xMCNo].ID_ORDTIME + '], ' +
+                     'SQL [' + StrSQL + ']' );
+      if qryInfo.Active then
+         qryInfo.Close ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// function SCIO_Insert : SC_JOB Data를 가지고 TT_SCIO Table에 Insert
+//==============================================================================
+function TfrmSCComm.fn_SCIO_Insert(SC_No: Integer): Boolean;
+var
+  StrSQL, StrLog : String ;
+  ExecNo : Integer ;
+begin
+  Result := False ;
+
+  StrSQL  := ' Insert Into TT_SCIO ' +
+             '  ( ID_NO, ID_ORDINDEX, ID_ORDDATE, ID_ORDTIME  ' +
+             '  , IO_TYPE, LOAD_BANK, LOAD_BAY, LOAD_LEVEL, UNLOAD_BANK ' +
+             '  , UNLOAD_BAY, UNLOAD_LEVEL, SC_STATUS, CR_DATE, SC_STEP ) ' +
+             ' Values ( ' +
+             '''' + IntToStr(Sc_No) + ''', ''' + SC_JOB[SC_No].ID_ORDLUGG + ''', ' +
+             '''' + SC_JOB[SC_No].ID_ORDDATE + ''', ' +
+             '''' + SC_JOB[SC_No].ID_ORDTIME + ''', ' +
+             '''' + SC_JOB[SC_No].IO_TYPE    + ''', ' +
+             '''' + SC_JOB[SC_No].LOAD_BANK  + ''', ' +
+             '''' + SC_JOB[SC_No].LOAD_BAY   + ''', ' +
+             '''' + SC_JOB[SC_No].LOAD_LEVEL + ''', ' +
+             '''' + SC_JOB[SC_No].UNLOAD_BANK  + ''', ' +
+             '''' + SC_JOB[SC_No].UNLOAD_BAY   + ''', ' +
+             '''' + SC_JOB[SC_No].UNLOAD_LEVEL + ''', ' +
+             '''지시대기'', sysdate, ''L'' ) ' ;
+
+  try
+    with qryInfo do
+    begin
+      Close;
+
+      SQL.Text := StrSQL ;
+      ExecNo := ExecSQL ;
+      if ExecNo > 0 then
+      begin // 입력 처리 완료
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] SCIO 작업 등록 : ' +
+                  'ORD_IDX  [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_DATE [' + SC_JOB[SC_No].ID_ORDDATE + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_ORDTIME + '] >>> ' ;
+        DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+        Result := True ;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function fn_SCIO_Insert: '+
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+      if qryInfo.Active then
+         qryInfo.Close ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// function SCIO_Update : SC_JOB Data 변경 후 TT_SCIO Table Update
+// 입고 작업의 경우 Loading 완료 시 Track Data도 삭제한다.
+//==============================================================================
+function TfrmSCComm.fn_SCIO_Update(SC_No: Integer): Boolean;
+var
+  ExecNo : Integer ;
+  StrSQL, StrLog : String ;
+begin
+  Result := False ;
+
+  SC_STAT[SC_No]        := DATA2 ;   // SC 상태   ORD_STATUS
+  SC_JOB[SC_No].SC_STEP := 'U'   ;   // 작업 단계 (L:Loading, U:UnLoading)
+  SC_JOB[SC_No].RECV_A  := 'N'   ;   // A-Message 수신 상태(Y/N)
+
+  StrSQL  := ' Update TT_SCIO ' +
+             '    Set SC_STATUS = ''지시대기'' ' +    // SC 상태
+             '      , SC_STEP   = ''U'' ' +           // 작업 단계
+             '  where ID_NO = ''' + IntToStr(SC_No) + ''' ' +
+             '    and ID_ORDINDEX = '   + SC_JOB[SC_No].ID_ORDLUGG +
+             '    and ID_ORDDATE  = ''' + SC_JOB[SC_No].ID_ORDDATE + ''' ' +
+             '    and ID_ORDTIME  = ''' + SC_JOB[SC_No].ID_ORDTIME + ''' ' ;
+
+  try
+    with qrySCIO do
+    begin
+      Close;
+
+      SQL.Text := StrSQL ;
+      ExecNo := ExecSQL;
+      if ExecNo > 0 then
+      begin
+        StrLog := 'SC['+ IntToStr(SC_No) + '] Job TT_SCIO Update 성공 : Loading -> UnLoading ' ;
+        DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+        Result := True ;
+      end else
+      begin
+        StrLog := 'SC['+ IntToStr(SC_No) + '] Job TT_SCIO Update 실패 : Loading -> UnLoading ' ;
+        DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+      end;
+    End;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function fn_SCIO_Update, '+
+                     'Error[' + E.Message + '], ' +
+                     'ORD_IDX  [' + SC_JOB[SC_No].ID_ORDLUGG + '], ' +
+                     'ORD_DATE [' + SC_JOB[SC_No].ID_ORDDATE + '], ' +
+                     'ORD_TIME [' + SC_JOB[SC_No].ID_ORDTIME + '], ' +
+                     'SQL [' + StrSQL + ']' );
+      if qrySCIO.Active then
+         qrySCIO.Close ;
+    end;
+  end;
+end;
+
+//==============================================================================
+// SCRC_Update
+//==============================================================================
+procedure TfrmSCComm.SCRC_Update(SC_No:Integer);
+var
+  StrSQL : String;
+begin
+  try
+    if Trim(DBSCRC[SC_NO].SCRC_FK) = '' then Exit ; // 초기화된 DBSCRC 구조체가 Update 되지 않기 위해 추가.
+    StrSQL := ' Update TT_SCRC ' +
+              '    Set SCRC_FK       = ''' + DBSCRC[SC_NO].SCRC_FK       + ''' ' + // 작업 포크
+              '      , SCRC_CYCLE    = ''' + DBSCRC[SC_NO].SCRC_CYCLE    + ''' ' + // 작업 Cycle
+              '      , SCRC_PHASE    = ''' + DBSCRC[SC_NO].SCRC_PHASE    + ''' ' + // 작업 PHASE
+              '      , SCRC_ONOFF    = ''' + DBSCRC[SC_NO].SCRC_ONOFF    + ''' ' + // Power Bit 관련
+              '      , SCRC_RUNNING  = ''' + DBSCRC[SC_NO].SCRC_RUNNING  + ''' ' + // 동작 상태
+              '      , SCRC_SCCREADY = ''' + DBSCRC[SC_NO].SCRC_SCCREADY + ''' ' + // 기상반 자동
+              '      , SCRC_SCTREADY = ''' + DBSCRC[SC_NO].SCRC_SCTREADY + ''' ' + // 지상반 자동
+              '      , SCRC_FK_STS   = ''' + DBSCRC[SC_NO].SCRC_FK_STS   + ''' ' + // 포크 상태
+              '      , SCRC_STOCK    = ''' + DBSCRC[SC_NO].SCRC_STOCK    + ''' ' + // Fork 내 화물 유무
+              '      , SCRC_BAYPOS   = ''' + DBSCRC[SC_NO].SCRC_BAYPOS   + ''' ' + // SC 위치 (연)
+              '      , SCRC_LVLPOS   = ''' + DBSCRC[SC_NO].SCRC_LVLPOS   + ''' ' + // SC 위치 (단)
+              '      , SCRC_ERROR    = ''' + DBSCRC[SC_NO].SCRC_ERROR    + ''' ' + // SC 에러상태
+              '      , SCRC_ERRCODE  = ''' + DBSCRC[SC_NO].SCRC_ERRCODE  + ''' ' + // 에러 코드
+              '      , CR_DT = sysdate   ' +
+              ' Where SCRC_SC = ''' + IntToStr(SC_No) + ''' ' ; // 대상 호기
+
+    with qryUpdate do
+    begin
+      Close;
+      SQL.Text := StrSQL;
+      ExecSQL;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'procedure SCRCUpdate Error: ' +
+                     '[' + E.Message + ']' + ', SQL : ' + StrSQL );
+    end;
+  end;
+end;
+
+//==============================================================================
+// procedure SendAckMessage : Ack Message를 보낸다.
+//==============================================================================
+procedure TfrmSCComm.SendAckMessage(SC_No:Integer; Comm_Packet:TComm_Packet);
+var
+  Str : String ;
+begin
+  // Ack-Message Send : Clear send buffer...
+  FillChar(SendBuf[SC_No], SizeOf(SendBuf[SC_No]), #0 );
+
+  SendBuf[SC_No, 1] := ACK ;  // ACK
+  SendBuf[SC_No, 2] := '0' ;  // Machine No #1
+  str := Copy(IntToStr(SC_NO), 2, 1) ;
+  StrMove(@SendBuf[SC_NO, 3], Pchar(Str), 1) ; // Machine No #2
+  if CharToHexaChar(Comm_Packet.Buff[5]) = '3A' then // ':' = 0x3A : 초기 데이터
+       SendBuf[SC_No, 4] := ':'
+  else StrMove(@SendBuf[SC_No, 4], Pchar(IntToStr(iRxMsgNo[SC_No])), 1 ) ;  // Recv Message No
+
+  Str := GetBCC(SendBuf[SC_No], 2, 4) ; // ACK 제외 하면 Array[2..4] 까지
+  if Length(Str) = 1 then Str:= '0' + Str ;
+
+  StrMove(@SendBuf[SC_No,5], Pchar(copy(Str, 1, 1)), 1 ) ; // BCC (High)
+  StrMove(@SendBuf[SC_No,6], Pchar(copy(Str, 2, 1)), 1 ) ; // BCC (Low)
+
+  SendBuf[SC_No,7] := CR ; // CR
+
+  SendCnt[SC_No] := 7 ; // Send Byte 수
+
+  DataSend(SC_NO, 'A') ;
+end;
+
+//==============================================================================
+// Get_Status_Msg
+//==============================================================================
+function TfrmSCComm.Get_Status_Msg(src: TScStatus): String;
+begin
+ case Src of
+   START       : Result := 'START' ;
+   STANDBY     : Result := 'STANDBY' ;
+   READY1      : Result := 'READY1' ;
+   DATA1       : Result := 'DATA1' ;
+   ORDER1      : Result := 'ORDER1' ;
+   RESET1      : Result := 'RESET1' ;
+   ERR1        : Result := 'ERR1' ;
+   READY2      : Result := 'READY2' ;
+   DATA2       : Result := 'DATA2' ;
+   ORDER2      : Result := 'ORDER2' ;
+   RESET2      : Result := 'RESET2' ;
+   ERR2        : Result := 'ERR2' ;
+   RETRY_REQ   : Result := 'RETRY_REQ' ;
+   CANCEL_REQ  : Result := 'CANCEL_REQ' ;
+   DATAERR     : Result := 'DATAERR' ;
+   HOME_BACK   : Result := 'HOME_BACK' ;
+   else Result := '' ;
+ end;
+end;
+
+//==============================================================================
+// fn_Get_SCUSED
+//==============================================================================
+function TfrmSCComm.fn_Get_SCUSED(SC_No:Integer):Boolean ;
+var
+  StrSQL : String ;
+begin
+  try
+    StrSQL := ' Select NVL(USECHECK, 0) as USECHECK ' +
+              '   From TC_CONTROL ' +
+              '  Where MACH_No =  ' + IntToStr(SC_No) ;
+    with qryInfo do
+    begin
+      Close ;
+      SQL.Text := StrSQL ;
+      Open ;
+
+      if (FieldByName('USECHECK').AsInteger = 1 ) then
+           Result := True
+      else Result := False ;
+      Close ;
+    end;
+  except
+    ON E: Exception do
+    begin
+      ErrorLogWrite( 'fn_Get_SCUSED function(SC_No): ' + IntToStr(SC_No) +', SQL : ' + StrSQL );
+      Close ;
+    End;
+  end;
+end;
+
+//==============================================================================
+// function fn_SCIO_Exist : 해당 호기가 현재 작업지시 중인 건이 있는지 확인
+//                          작업이 있으면 : True, 없으면 : False
+//==============================================================================
+function TfrmSCComm.fn_SCIO_Exist(SC_NO: integer): Boolean;
+var
+  aStrSQL : String ;
+begin
+  aStrSQL  := ' SELECT Count(*) as CNT ' +
+              '   FROM TT_SCIO         ' +
+              '  WHERE ID_NO = ''' + IntToStr(SC_NO) + ''' ' ;
+  try
+    with qryFN_SCIO do
+    begin
+      Close;
+      SQL.Text := aStrSQL ;
+      Open;
+      Result := Boolean(FieldByName('CNT').AsInteger > 0) ;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      QryInfo.Close;
+      Result := False;
+      ErrorLogWrite( 'function fn_SCIO_Exist SC:(' +
+                   IntToStr(SC_NO) + '), SQL:[' + aStrSQL +
+                   '], Error -> (' + E.Message + ')');
+    end;
+  End;
+end;
+
+//==============================================================================
+// function fn_SCIO_ReLoad : SCIO 작업을 검색해서 SCIO 작업 데이터를
+//                           SC_JOB(xSCNO)에 SET
+//==============================================================================
+function TfrmSCComm.fn_SCIO_ReLoad(SC_NO: integer): Boolean;
+var
+  aStrSQL : String ;
+begin
+  Result := False ;
+
+  aStrSQL  := ' Select SCIO.* ' +
+              '      , ORD.JobInsert as ORD_TYPE    ' +                           // JobInsert 0:RCP, 1:WMS
+              '      , Case when JobD = ''2'' and SRCSITE1 = 11  then ''750'' ' + // JobD 1:입고, 2:출고,6:Site To Site, 7:Rack To Rack
+              '             when JobD = ''2'' and SRCSITE1 = 12  then ''754'' ' +
+              '             when JobD = ''2'' and SRCSITE1 = 13  then ''758'' ' +
+              '             when JobD = ''2'' and SRCSITE1 = 14  then ''762'' ' +
+              '             else ''000''                   ' +
+              '         end as CV_FROM, DSTSITE1 as CV_TO  ' +
+              '   from TT_SCIO SCIO ' +
+              '      , TT_ORDER ORD ' +
+              '  WHERE ID_NO = ''' + IntToStr(SC_NO) + ''' ' +
+              '    and ID_ORDINDEX =  LUGG' +
+              '    and ID_ORDDATE  = SubStr(REG_TIME,1,8)  ' +
+              '    and ID_ORDTIME  = SubStr(REG_TIME,9,6)  ' ;
+  try
+    with qryFN_SCIO do
+    begin
+      Close;
+      SQL.Text := aStrSQL ;
+      Open;
+      if not ( Bof and Eof ) then
+      begin
+        SC_JOB[SC_NO].ID_ORDLUGG   := FieldByName('ID_ORDINDEX' ).AsString ; // 작업 번호
+        SC_JOB[SC_NO].ID_ORDDATE   := FieldByName('ID_ORDDATE'  ).AsString ; // 작업 생성 일자
+        SC_JOB[SC_NO].ID_ORDTIME   := FieldByName('ID_ORDTIME'  ).AsString ; // 작업 생성 시간
+        SC_JOB[SC_NO].ID_REGTIME   := SC_JOB[SC_NO].ID_ORDDATE + SC_JOB[SC_NO].ID_ORDTIME ; // 작업 등록일시
+        SC_JOB[SC_NO].IO_TYPE      := FieldByName('IO_TYPE'     ).AsString ; // 입출고 유형
+        SC_JOB[SC_NO].ID_FROM      := FieldByName('CV_FROM'     ).AsString ; // 현재 구간 시작 CV No
+        SC_JOB[SC_NO].ID_TO        := FieldByName('CV_TO'       ).AsString ; // 현재 구간 도착 CV No
+        SC_JOB[SC_NO].LOAD_BANK    := FieldByName('LOAD_BANK'   ).AsString ; // 적재(열)
+        SC_JOB[SC_NO].LOAD_BAY     := FieldByName('LOAD_BAY'    ).AsString ; // 적재(연)
+        SC_JOB[SC_NO].LOAD_LEVEL   := FieldByName('LOAD_LEVEL'  ).AsString ; // 적재(단)
+        SC_JOB[SC_NO].UNLOAD_BANK  := FieldByName('UNLOAD_BANK' ).AsString ; // 하역(열)
+        SC_JOB[SC_NO].UNLOAD_BAY   := FieldByName('UNLOAD_BAY'  ).AsString ; // 하역(연)
+        SC_JOB[SC_NO].UNLOAD_LEVEL := FieldByName('UNLOAD_LEVEL').AsString ; // 하역(단)
+
+        // 작업 단계에 따른 SC 상태 입력
+        if      FieldByName('SC_STEP').AsString = 'L' then SC_STAT[SC_NO] := ORDER1
+        else if FieldByName('SC_STEP').AsString = 'U' then SC_STAT[SC_NO] := ORDER2
+        else SC_STAT[SC_NO] := READY1  ;
+
+        SC_JOB[SC_NO].SC_STEP := FieldByName('SC_STEP').AsString ; // 작업 단계
+        SC_JOB[SC_NO].RECV_A  := 'N' ;
+        Result := True ;
+      end;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      QryInfo.close;
+      Result := False;
+      ErrorLogWrite( 'function fn_SCIO_ReLoad SC:(' +
+                   IntToStr(SC_NO) + '), SQL:[' + aStrSQL +
+                   '], Error -> (' + E.Message + ')');
+    end;
+  End;
+end;
+
+//==============================================================================
+// CargoExist : 해당 CV Buffer 에 화물이 있는지 Check 
+//==============================================================================
+function TfrmSCComm.CargoExist(Buff_ID: integer): boolean;
+var
+  astrSQL : String;
+begin
+  Result := False;
+  with qryInfo do
+  begin
+    try
+      Close;
+      aStrSQL  := ' SELECT CARGO AS FLAG FROM VW_CVC_CARGO ' +
+                  '  WHERE CV_NO = ''' + FormatFloat('000', Buff_ID) + ''' ' ;
+      SQL.Text := aStrSQL ;
+      Open;
+      if (trim(FieldByName('FLAG').AsString) = '1') then Result := True ; //  화물 유무
+      Close ;
+    except
+      ON E: Exception do
+      begin
+        ErrorLogWrite( 'TrackDataExist function(Buff_ID): ' + IntToStr(Buff_ID) +', SQL : ' + aStrSQL );
+        Close ;
+      End;
+    End;
+  end;
+end;
+
+//==============================================================================
+// GetTrackValue
+//==============================================================================
+function TfrmSCComm.GetTrackValue(FName: String; BuffNo: integer): String;
+var
+  aStrSQL : String;
+begin
+  Result := 'NG' ;
+  try
+    with qrySearch do
+    begin
+      Close;
+      SQL.Clear;
+      aStrSQL := ' Select ' + FName + ' as Data From TT_TRACK  ' +
+                 ' Where TRACK_NO = ''' + FormatFloat('000', BuffNo) + ''' ' ;
+      SQL.Text := aStrSQL;
+      Open;
+      if Not (eof and bof) then
+      begin
+        Result := FieldByName('Data').AsString ;
+      end;
+      Close;
+    end;
+  except
+    ErrorLogWrite( 'GetTrackValue function(FName:String;LineNo:integer), ' +
+                   ' FName : ' + FName + ', LineNo : ' + IntToStr(BuffNo) + ', SQL : ' + aStrSQL );
+    LogWriteCheck('Err GetTrackValue : ' + aStrSQL);
+    qrySearch.Close;
+  end;
+end;
+
+//==============================================================================
+// SCRC_Copy
+//==============================================================================
+procedure TfrmSCComm.SCRC_Copy(SC_NO: Integer);
+begin
+  DBSCRC_B[SC_NO].SCRC_FK        := DBSCRC[SC_NO].SCRC_FK         ; // 작업 포크
+  DBSCRC_B[SC_NO].SCRC_CYCLE     := DBSCRC[SC_NO].SCRC_CYCLE      ; // 작업 Cycle
+  DBSCRC_B[SC_NO].SCRC_PHASE     := DBSCRC[SC_NO].SCRC_PHASE      ; // 작업 PHASE
+  DBSCRC_B[SC_NO].SCRC_ONOFF     := DBSCRC[SC_NO].SCRC_ONOFF      ; // Power Bit 관련
+  DBSCRC_B[SC_NO].SCRC_RUNNING   := DBSCRC[SC_NO].SCRC_RUNNING    ; // 동작 상태
+  DBSCRC_B[SC_NO].SCRC_SCCREADY  := DBSCRC[SC_NO].SCRC_SCCREADY   ; // 기상반 자동
+  DBSCRC_B[SC_NO].SCRC_SCTREADY  := DBSCRC[SC_NO].SCRC_SCTREADY   ; // 지상반 자동
+  DBSCRC_B[SC_NO].SCRC_FK_STS    := DBSCRC[SC_NO].SCRC_FK_STS     ; // 포크 상태
+  DBSCRC_B[SC_NO].SCRC_STOCK     := DBSCRC[SC_NO].SCRC_STOCK      ; // Fork 내 화물 유무
+  DBSCRC_B[SC_NO].SCRC_BAYPOS    := DBSCRC[SC_NO].SCRC_BAYPOS     ; // SC 위치
+  DBSCRC_B[SC_NO].SCRC_LVLPOS    := DBSCRC[SC_NO].SCRC_LVLPOS     ; // SC 위치
+  DBSCRC_B[SC_NO].SCRC_ERROR     := DBSCRC[SC_NO].SCRC_ERROR      ; // SC 에러상태
+  DBSCRC_B[SC_NO].SCRC_ERRCODE   := DBSCRC[SC_NO].SCRC_ERRCODE    ; // 에러 코드
+end;
+
+//==============================================================================
+// SCRC_Clear
+//==============================================================================
+procedure TfrmSCComm.SCRC_Clear(SC_NO: Integer);
+var
+  i : Integer ;
+begin
+  if SC_NO = 0 then
+  begin
+    for i := Low(DBSCRC) to High(DBSCRC) do
+    begin
+      DBSCRC[i].SCRC_FK        := '' ; // 작업 포크
+      DBSCRC[i].SCRC_CYCLE     := '' ; // 작업 Cycle
+      DBSCRC[i].SCRC_PHASE     := '' ; // 작업 PHASE
+      DBSCRC[i].SCRC_ONOFF     := '' ; // Power Bit 관련
+      DBSCRC[i].SCRC_RUNNING   := '' ; // 동작 상태
+      DBSCRC[i].SCRC_SCCREADY  := '' ; // 기상반 자동
+      DBSCRC[i].SCRC_SCTREADY  := '' ; // 지상반 자동
+      DBSCRC[i].SCRC_FK_STS    := '' ; // 포크 상태
+      DBSCRC[i].SCRC_STOCK     := '' ; // Fork 내 화물 유무
+      DBSCRC[i].SCRC_BAYPOS    := '' ; // SC 위치
+      DBSCRC[i].SCRC_LVLPOS    := '' ; // SC 위치
+      DBSCRC[i].SCRC_ERROR     := '' ; // SC 에러상태
+      DBSCRC[i].SCRC_ERRCODE   := '' ; // 에러 코드
+    end;
+  end else
+  begin
+    DBSCRC[SC_NO].SCRC_FK        := '' ; // 작업 포크
+    DBSCRC[SC_NO].SCRC_CYCLE     := '' ; // 작업 Cycle
+    DBSCRC[SC_NO].SCRC_PHASE     := '' ; // 작업 PHASE
+    DBSCRC[SC_NO].SCRC_ONOFF     := '' ; // Power Bit 관련
+    DBSCRC[SC_NO].SCRC_RUNNING   := '' ; // 동작 상태
+    DBSCRC[SC_NO].SCRC_SCCREADY  := '' ; // 기상반 자동
+    DBSCRC[SC_NO].SCRC_SCTREADY  := '' ; // 지상반 자동
+    DBSCRC[SC_NO].SCRC_FK_STS    := '' ; // 포크 상태
+    DBSCRC[SC_NO].SCRC_STOCK     := '' ; // Fork 내 화물 유무
+    DBSCRC[SC_NO].SCRC_BAYPOS    := '' ; // SC 위치
+    DBSCRC[SC_NO].SCRC_LVLPOS    := '' ; // SC 위치
+    DBSCRC[SC_NO].SCRC_ERROR     := '' ; // SC 에러상태
+    DBSCRC[SC_NO].SCRC_ERRCODE   := '' ; // 에러 코드
+  end;
+end;
+
+//==============================================================================
+// SC_JOBClear
+//==============================================================================
+procedure TfrmSCComm.SC_JOBClear(SC_NO: Integer);
+var
+  i : Integer ;
+begin
+  if SC_NO = 0 then
+  begin
+    for i := START_SCNO to End_SCNO do
+    begin
+      SC_JOB[i].ID_ORDLUGG    := '' ; // 작업 번호
+      SC_JOB[i].ID_REGTIME    := '' ; // 작업 생성 일시
+      SC_JOB[i].ID_ORDDATE    := '' ; // 작업 생성 일자
+      SC_JOB[i].ID_ORDTIME    := '' ; // 작업 생성 시간
+      SC_JOB[i].IO_TYPE       := '' ; // 입출고 유형(I/O)
+      SC_JOB[i].ID_FROM       := '' ; // 현재 구간 시작 CV No
+      SC_JOB[i].ID_TO         := '' ; // 현재 구간 도착 CV No
+      SC_JOB[i].LOAD_BANK     := '' ; // 적재(열)
+      SC_JOB[i].LOAD_BAY      := '' ; // 적재(연)
+      SC_JOB[i].LOAD_LEVEL    := '' ; // 적재(단)
+      SC_JOB[i].UNLOAD_BANK   := '' ; // 하역(열)
+      SC_JOB[i].UNLOAD_BAY    := '' ; // 하역(연)
+      SC_JOB[i].UNLOAD_LEVEL  := '' ; // 하역(단)
+      SC_JOB[i].SC_STEP       := '' ; // 작업 단계
+      SC_JOB[i].RECV_A        := 'N'; // A-Message 수신 상태(Y/N)
+    end;
+  end else
+  begin
+    SC_JOB[SC_NO].ID_ORDLUGG    := '' ; // 작업 번호
+    SC_JOB[SC_NO].ID_REGTIME    := '' ; // 작업 생성 일시
+    SC_JOB[SC_NO].ID_ORDDATE    := '' ; // 작업 생성 일자
+    SC_JOB[SC_NO].ID_ORDTIME    := '' ; // 작업 생성 시간
+    SC_JOB[SC_NO].IO_TYPE       := '' ; // 입출고 유형
+    SC_JOB[SC_NO].ID_FROM       := '' ; // 현재 구간 시작 CV No
+    SC_JOB[SC_NO].ID_TO         := '' ; // 현재 구간 도착 CV No
+    SC_JOB[SC_NO].LOAD_BANK     := '' ; // 적재(열)
+    SC_JOB[SC_NO].LOAD_BAY      := '' ; // 적재(연)
+    SC_JOB[SC_NO].LOAD_LEVEL    := '' ; // 적재(단)
+    SC_JOB[SC_NO].UNLOAD_BANK   := '' ; // 하역(열)
+    SC_JOB[SC_NO].UNLOAD_BAY    := '' ; // 하역(연)
+    SC_JOB[SC_NO].UNLOAD_LEVEL  := '' ; // 하역(단)
+    SC_JOB[SC_NO].SC_STEP       := '' ; // 작업 단계
+    SC_JOB[SC_NO].RECV_A        := 'N'; // A-Message 수신 상태(Y/N)
+  end;
+end;
+
+//==============================================================================
+// ListBoxDisplay
+//==============================================================================
+procedure TfrmSCComm.ListBoxDisplay(xListBox: TListBox; Msg: String);
+begin
+  if (xListBox.Items.Count >= 50) then xListBox.Items.Delete(0);
+  xListBox.Items.Add(Msg);
+  xListBox.ItemIndex := xListBox.Items.Count -1;
+end;
+
+//==============================================================================
+// Get_PLC_InterLoc             //2015
+//==============================================================================
+function TfrmSCComm.Get_PLC_InterLoc(SC_NO:Integer) : String ;
+var
+  StrSQL, tStr : String ;
+begin
+  try
+    Result := '00000000' ;
+    StrSQL := ' Select SubStr(CH55, 5, 4) as INSTN '+
+              '      , SubStr(CH56, 1, 4) as OTSTN '+
+              '   from TT_CVC         ' +
+              '  where CVC_NO = ''1'' ' +
+              '    and CVC_SR = ''R'' ' ;
+
+    with qryInfo do
+    begin
+      Close ;
+      SQL.Text := StrSQL ;
+      Open ;
+      if not (Bof and Eof ) then
+      begin
+        tStr := FieldByName('INSTN').AsString + FieldByName('OTSTN').AsString;
+        Result := tStr ;
+      end;
+      Close ;
+    end;
+  except
+    On E:Exception do
+    begin
+      DisplayLog(SC_NO, ' Error : func Get_PLC_InterLoc:['+
+                StrSQL + '], [' + E.Message + ']', 'E', 0 ) ;
+
+    end;
+  end;
+end;
+
+//==============================================================================
+// procedure DisplayLog : AddTxMsgNo
+//==============================================================================
+procedure TfrmSCComm.AddTxMsgNo(SC_No:Integer) ;
+begin
+  inc(iTxMsgNo[SC_No]) ;
+  if (iTxMsgNo[SC_No] > 9) then
+     iTxMsgNo[SC_No] := 0;
+end;
+
+//==============================================================================
+// procedure DisplayLog : Log Display 및 Save
+//==============================================================================
+procedure TfrmSCComm.DisplayLog(SC_NO:Integer;Msg, SR_Type: String; Len: Integer);
+var
+  StrLog : String ;
+begin
+  if CommLog.Lines.Count > 200 then CommLog.Lines.Clear;
+
+  if      SR_TYPE = 'S' then // Send Log
+       StrLog := FormatDatetime('HH:NN:SS.ZZZ', now) +
+                 ' SEND(' + FormatFloat('000', Len) + ') >> ['+ Msg + ']'
+  else if SR_TYPE = 'R' then // Receive Log
+       StrLog := FormatDatetime('HH:NN:SS.ZZZ', now) +
+                 ' RECV(' + FormatFloat('000', Len) + ') << ['+ Msg + ']'
+  else if SR_TYPE = 'N' then // Normal Information
+       StrLog := FormatDatetime('HH:NN:SS.ZZZ', now) +
+                 ' INFO(' + FormatFloat('000', Len) + ') || ['+ Msg + ']'
+  else if SR_TYPE = 'E' then // Error Log
+       StrLog := FormatDatetime('HH:NN:SS.ZZZ', now) +
+                 ' ERROR || ['+ Msg + ']' ;
+
+  CommLog.Lines.Add(StrLog) ;
+  if CBLog.Checked then LogWrite(LogFileName + IntToStr(SC_NO)+'.Log', StrLog);
+end;
+
+//==============================================================================
+// LogWriteCheck
+//==============================================================================
+procedure TfrmSCComm.LogWriteCheck(WriteStr: String);
+var
+  FileName : string;
+  i : integer;
+begin
+  if CommLog.Lines.Count > 50 then
+  begin
+    for i := 1 to 6 do
+    begin
+      CommLog.Lines.Delete(i);
+    end;
+  end;
+  CommLog.lines.add(WriteStr);
+  if LogWriteFlag then
+  begin
+    FileName := '.\Log\SC_' + FormatDatetime('YYYYMMDD', Now) + '.log';
+    LogWrite(FileName, WriteStr);
+  end;
+end;
+
+//==============================================================================
+// ErrorLogWrite
+//==============================================================================
+procedure TfrmSCComm.ErrorLogWrite(WriteStr: String);
+var
+  FileName : String ;
+begin
+  if LogWriteFlag then
+  begin
+    filename := '.\Log\SCError_' + FormatDatetime('YYYYMMDD', Now) + '.log';
+    LogWrite(FileName,WriteStr);
+  end;
+end;
+
+//==============================================================================
+// GetLogData
+//==============================================================================
+function TfrmSCComm.GetLogData(SC_No:Integer; Buff_Data: array of Char;
+  Len: Integer): String;
+var
+  StrTemp, StrReturn : String ;
+  i : integer ;
+begin
+  StrTemp   := '' ;
+  StrReturn := '' ;
+  try
+    for i := 0 to Len -1 do
+    begin
+      // 2013.11.13 SCC Message Type 에 맞게 Log 표시 수정.
+      StrTemp := CharToHexaChar(Buff_Data[i]) ;
+      case Buff_Data[i] of
+        #00 : StrTemp := '<NUL>' ;
+        #01 : StrTemp := '<SOH>' ;
+        #02 : StrTemp := '<STX>' ;
+        #03 : StrTemp := '<ETX>' ;
+        #04 : StrTemp := '<EOT>' ;
+        #05 : StrTemp := '<ENQ>' ;
+        #06 : StrTemp := '<ACK>' ;
+        #10 : StrTemp := '<LF*>' ;
+        #13 : StrTemp := '<CR*>' ;
+        #21 : StrTemp := '<NAK>' ;
+        else  StrTemp := Buff_Data[i] ;
+      end;
+      StrReturn := StrReturn + StrTemp ;
+    end;
+    Result := StrReturn ;
+  except
+    On E:Exception do
+    begin
+      DisplayLog(SC_No,  ' Error : proc GetLogData, ['+E.Message + ']', 'E', 0 ) ;
+    end;
+  end;
+end;
+
+
+// 이중입고 / 공출고 처리 Procedure  Z=공출고, T=이중입고
+procedure TfrmSCComm.DoubleZeroOrder(ID_NO, Job_Type : String);
+{var
+  aStrSQL, aStrSQL0, aStrSQL1, aStrSQL2,  aStrSQL3,  aStrSQL4, aStrSQL5, aStrSQL6, aStrSQL7, aStrSQL8, aStrSQL9 : string;
+  aStrSQL_D1, aStrSQL_D2 : string;
+  OrderCaption, ScStatus, Job_No : String;
+  Bank, Bay, Lvl, TRack_job_no, NewLoc: string; }
+begin
+{  try
+    with qrySCIO do
+    begin
+      Close;
+      SQL.Clear;
+      aStrSQL  := ' SELECT * FROM SCIO ' +
+                  ' WHERE ID_NO = ''' + ID_NO + ''' ';
+      SQL.Text := aStrSQL ;
+      Open;
+      if qrySCIO.RecordCount = 1  then
+      begin
+         Job_No := fieldbyname('ID_INDEX').AsString;
+        if Job_Type = 'T' then
+        begin
+          Bank   := fieldbyname('UNLOAD_BANK').AsString;
+          Bay    := fieldbyname('UNLOAD_BAY').AsString;
+          Lvl    := fieldbyname('UNLOAD_LEVEL').AsString;
+        end else
+        begin
+          Bank   := fieldbyname('LOAD_BANK').AsString;
+          Bay    := fieldbyname('LOAD_BAY').AsString;
+          Lvl    := fieldbyname('LOAD_LEVEL').AsString;
+          TRack_job_no := IntToStr(GetCVBuffNo());
+        end;
+      end else
+      begin
+        exit;
+      end;
+      Close ;
+    end;
+  except
+    on E: Exception do
+      begin
+        close;
+        ErrorLogWrite( 'DoubleZeroOrder  (ID_NO, Job_Type : String): ' +
+                       'SQL : ' + aStrSQL + ', Error -> (' + E.Message + ') ');
+      end;
+  end;
+
+  with qryInfo do
+  begin
+
+        SQL.Clear;
+        if Job_Type = 'T' then
+        begin
+         //이중입고 시 ///////////////////////////////////
+                     // Stock 이중입고셀로 바꾸기  LSTK_STAT = 4
+          aStrSQL0 := ' Update TTStock set    ' +
+                       ' LSTK_STAT = ''4'' ' +
+                       ' WHERE LSTK_LOC   = '+  QuotedStr(ID_NO + copy(Bank, 2,1) + Bay + Lvl) ;
+
+          SQL.Text := aStrSQL0 ;
+          ExecSQL;
+
+          NewLoc   := fnCellFind('I', 'A', ID_NO) ;
+        //310406
+
+
+        // order_info 셀위치 업데이트
+          aStrSQL1 := ' Update Order_Info set UNLOAD_BANK  = ' + QuotedStr('0'+copy(NewLoc, 2,1)) + ', ' +
+                      '                       UNLOAD_BAY   = ' + QuotedStr(copy(NewLoc, 3,2)) + ', ' +
+                      '                       UNLOAD_LEVEL = ' + QuotedStr(copy(NewLoc, 5,2)) +
+                      ' WHERE ID_NO = ' + QuotedStr(ID_NO) +
+                      '   and ID_INDEX   = ' + Job_No ;
+
+
+          // SCIO 셀위치 업데이트 (새로 검색한 셀 위치 지정
+          aStrSQL2 := ' UPDATE SCIO SET  UNLOAD_BANK  = ' + QuotedStr('0'+copy(NewLoc, 2,1)) + ', ' +
+                      '                  UNLOAD_BAY   = ' + QuotedStr(copy(NewLoc, 3,2)) + ', ' +
+                      '                  UNLOAD_LEVEL = ' + QuotedStr(copy(NewLoc, 5,2)) +
+                      ' WHERE ID_NO = ''' + ID_NO + ''' ';
+        end else
+        if Job_Type = 'Z' then
+        begin
+
+          //공출고 시 ///////////////////////////////////
+
+          // Stock 공출고셀로 바꾸기  LSTK_STAT = 5
+          aStrSQL3 := ' Update TTStock set    ' +
+                       ' LSTK_STAT = ''5'' ' +
+                       ' WHERE LSTK_LOC   = '+  QuotedStr(ID_NO + copy(Bank, 2,1) + Bay + Lvl) ;
+
+          // SCIO 상태 업데이트 status = 공출고 : history Triger에 예외처리를 위해서
+          aStrSQL4 := ' UPDATE SCIO SET  SC_STATUS  = ' + QuotedStr('공출고') +
+                      ' WHERE ID_NO = ''' + ID_NO + ''' ';
+
+           // SCIO 삭제
+           aStrSQL5 := ' DELETE FROM SCIO    ' +
+                       ' WHERE ID_NO   = ''' + ID_NO + ''' '+
+                       '  and ID_INDEX = ' + job_no   ;
+
+           aStrSQL6 := ' DELETE FROM ORDER_INFO    ' +
+                       ' WHERE ID_NO   = ''' + ID_NO + '''  ' +
+                       '  and  ID_INDEX = ' + job_no  ;
+         end;
+
+        try
+          MainDm.MainDatabase.BeginTrans;
+        If Job_Type = 'T' then
+        begin
+          SQL.Text := aStrSQL1;
+          ExecSQL;
+
+          SQL.Clear;
+          SQL.Text := aStrSQL2;
+          ExecSQL;
+        end else
+        if Job_Type = 'Z' then
+        begin
+          SQL.Text := aStrSQL3;
+          ExecSQL;
+
+          SQL.Clear;
+          SQL.Text := aStrSQL4;
+          ExecSQL;
+
+          SQL.Clear;
+          SQL.Text := aStrSQL5;
+          ExecSQL;
+
+          SQL.Clear;
+          SQL.Text := aStrSQL6;
+          ExecSQL;
+        end;
+        MainDm.MainDatabase.CommitTrans;
+        Close;
+    except
+       MainDm.MainDatabase.RollbackTrans;
+    end;
+  end;
+       }
+end;
+
+//==============================================================================
+// Set_Mach_Error : 설비 Error 처리 관련 ( RGV, SC 공통 사용 예정 )
+//==============================================================================
+procedure TfrmSCComm.Set_Mach_Error(SC_NO:Integer; ErrorCode:String);
+var
+  StrSQL, StrLog, StrProc : string;
+  JobErrorT, JobErrorc, JobErrord, SendType, SendFlag : String ;
+  ExecNo  : Integer;
+begin
+
+  if StrToIntDef(ErrorCode, 0) = 0 then
+  begin // 에러 해제 상황이면
+    StrProc   := ' Error Reset ' ;
+    JobErrorT := '0' ;       // 에러타입 0:없음, A:AGV, S:SC, C/CV, P:Pallet, R:RGV
+    JobErrorc := '0' ;       // 0 정상 1 : 에러
+    JobErrord := ErrorCode ; // 실제 에러 코드
+    SendType  := '0' ;       // 작업보고 0:None, G:완료,  H:에러
+    SendFlag  := '0' ;       // 작업보고 0:초기, 1:전송, 2:미전송
+  end else
+  begin // 에러 발생 상황이면
+    StrProc   := ' Error Set ' ;
+    JobErrorT := 'S' ;       // 에러타입 0:없음, A:AGV, S:SC, C/CV, P:Pallet, R:RGV
+    JobErrorc := '1' ;       // 0 정상 1 : 에러
+    JobErrord := ErrorCode ; // 실제 에러 코드
+    SendType  := 'H' ;       // 작업보고 0:None, G:완료,  H:에러
+    SendFlag  := '2' ;       // 작업보고 0:초기, 1:전송, 2:미전송
+  end;
+
+  StrSQL := ' Update TT_ORDER ' +
+            '    Set JobErrorT = ''' + JobErrorT + '''   ' + // 에러타입 0:없음, A:AGV, S:SC, C/CV, P:Pallet, R:RGV
+            '      , JobErrorc = ''' + JobErrorc + '''   ' + // 0 정상 1 : 에러
+            '      , JobErrord = ''' + JobErrord + '''   ' + // 실제 에러 코드
+            '      , SendType  = ''' + SendType  + '''   ' + // 작업보고 0:None, G:완료,  H:에러
+            '      , SendFlag  = ''' + SendFlag  + '''   ' + // 작업보고 0:초기, 1:전송, 2:미전송
+            '  Where LUGG = '   + SC_JOB[SC_No].ID_ORDLUGG +
+            '    and REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME  + ''' ' ;
+
+  try
+
+    with qryError do
+    begin
+      Close;
+      SQL.Text := StrSQL ;
+      ExecNo   := ExecSQL ;
+      if ExecNo > 0 then
+      begin
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] ' + StrProc + ' 처리 관련 TT_ORDER Update 성공 : ' +
+                  'Job Error Code  [' + JobErrord  + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+      end else
+      begin // TT_ORDER 상태 Update 실패
+        StrLog := '<<< SC['+ IntToStr(SC_No) + '] ' + StrProc + ' 처리 관련 TT_ORDER Update 실패 : ' +
+                  'Job Error Code  [' + JobErrord  + '],' +
+                  'ORD_LUGG [' + SC_JOB[SC_No].ID_ORDLUGG + '],' +
+                  'ORD_TIME [' + SC_JOB[SC_No].ID_REGTIME + '] >>> ' ;
+        DisplayLog(SC_No, StrLog, 'N', Length(StrLog)) ;
+      end;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function Set_Mach_Error SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// Get_SCSETINFO : 설비 명령 관련 데이터값 반환.
+//==============================================================================
+function TfrmSCComm.Get_SCSETINFO(SC_NO: Integer;
+  GetField: String): Boolean;
+var
+  StrSQL  : String ;
+  tResult : Boolean ;
+begin
+  tResult := False ;
+  StrSQL := ' Select ' + GetField + ' as Data from TC_SCSETINFO ' +
+            '  Where SC_NO = '   + IntToStr(SC_No)  ;
+
+  try
+
+    with qryError do
+    begin
+      Close;
+      SQL.Text := StrSQL ;
+      Open ;
+      if not ( Bof and Eof) then
+      begin
+        tResult := Boolean(FieldByName('Data').AsString = '1' ) ;
+      end;
+      Close ;
+      Result := tResult ;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function Get_SCSETINFO SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// Set_SCSETINFO : 설비 명령 관련 데이터값 저장.
+//==============================================================================
+function TfrmSCComm.Set_SCSETINFO(SC_NO: Integer; SetField,
+  SetValue: String):Boolean;
+var
+  StrSQL  : String ;
+  ExecNo  : Integer;
+  tResult : Boolean ;
+begin
+
+  StrSQL := ' Update TC_SCSETINFO ' +
+            '    Set ' + SetField + ' = ''' + SetValue + '''  ' +
+            '  Where SC_NO = '   + IntToStr(SC_No)  ;
+
+  try
+    with qryError do
+    begin
+      Close;
+      SQL.Text := StrSQL ;
+      ExecNo   := ExecSQL ;
+      tResult  := Boolean( ExecNo > 0 ) ;
+      Result   := tResult ;
+    end;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function Set_SCSETINFO SC(' + IntToStr(SC_No) + ') ' +
+                     'Error[' + E.Message + '], ' +
+                     'SQL ['  + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// Chk_SC_JOB : Order check 해서 위치 변경 되었으면 SC_JOB 및 SCIO 값 변경. 
+//==============================================================================
+procedure TfrmSCComm.Chk_SC_JOB(SC_NO: Integer);
+var
+  StrSQL, JobD, StrLog, JobLog : String ;
+  POS_Change : Boolean ;
+begin
+  StrSQL  := ' Select * from TT_ORDER   ' +
+             '  Where LUGG = ''' + SC_JOB[SC_NO].ID_ORDLUGG + ''' ' +
+             '    and REG_TIME = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
+  try
+    with qryInfo do
+    begin
+      Close;
+      SQL.Text := StrSQL ;
+      Open;
+      if not (Bof and Eof) then
+      begin
+        POS_Change := False ;
+        JobD := FieldByName('JobD').AsString ;  // 작업 종류
+        if JobD = '1' then
+        begin // 입고작업
+          if (SC_JOB[SC_NO].UNLOAD_BANK  <> Trim(FieldByName('DSTAISLE1').AsString)) OR  // 하역(열)
+             (SC_JOB[SC_NO].UNLOAD_BAY   <> Trim(FieldByName('DSTBAY1'  ).AsString)) OR  // 하역(연)
+             (SC_JOB[SC_NO].UNLOAD_LEVEL <> Trim(FieldByName('DSTLEVEL1').AsString)) then  // 하역(단)
+          begin
+            POS_Change := True ;
+            SC_JOB[SC_NO].UNLOAD_BANK   := Trim(FieldByName('DSTAISLE1').AsString) ;  // 하역(열)
+            SC_JOB[SC_NO].UNLOAD_BAY    := Trim(FieldByName('DSTBAY1'  ).AsString) ;  // 하역(연)
+            SC_JOB[SC_NO].UNLOAD_LEVEL  := Trim(FieldByName('DSTLEVEL1').AsString) ;  // 하역(단)
+
+            JobLog := '입고변경:STN[1:'+SC_JOB[SC_NO].LOAD_LEVEL+']->' +
+                       SC_JOB[SC_NO].UNLOAD_BANK  + '-' +
+                       SC_JOB[SC_NO].UNLOAD_BAY   + '-' +
+                       SC_JOB[SC_NO].UNLOAD_LEVEL ;
+          end;
+        end else
+        if JobD = '2' then
+        begin // 출고작업
+          if (SC_JOB[SC_NO].LOAD_BANK   <> Trim(FieldByName('SRCAISLE1').AsString)) OR    // 적재(열)
+             (SC_JOB[SC_NO].LOAD_BAY    <> Trim(FieldByName('SRCBAY1'  ).AsString)) OR    // 적재(연)
+             (SC_JOB[SC_NO].LOAD_LEVEL  <> Trim(FieldByName('SRCLEVEL1').AsString)) then  // 적재(단)
+          begin
+            POS_Change := True ;
+            SC_JOB[SC_NO].LOAD_BANK     := Trim(FieldByName('SRCAISLE1').AsString) ;  // 적재(열)
+            SC_JOB[SC_NO].LOAD_BAY      := Trim(FieldByName('SRCBAY1'  ).AsString) ;  // 적재(연)
+            SC_JOB[SC_NO].LOAD_LEVEL    := Trim(FieldByName('SRCLEVEL1').AsString) ;  // 적재(단)
+
+            JobLog := '출고변경:' +
+                       SC_JOB[SC_NO].LOAD_BANK  + '-' +
+                       SC_JOB[SC_NO].LOAD_BAY   + '-' +
+                       SC_JOB[SC_NO].LOAD_LEVEL + '-> STN[1'+IntToStr(OT_track_no[SC_NO])+']' ;
+          end;
+        end else
+        if JobD = '7' then
+        begin // Rack To Rack
+          if (SC_JOB[SC_NO].LOAD_BANK   <> Trim(FieldByName('SRCAISLE1').AsString)) OR    // 적재(열)
+             (SC_JOB[SC_NO].LOAD_BAY    <> Trim(FieldByName('SRCBAY1'  ).AsString)) OR    // 적재(연)
+             (SC_JOB[SC_NO].LOAD_LEVEL  <> Trim(FieldByName('SRCLEVEL1').AsString)) OR    // 적재(단)
+             (SC_JOB[SC_NO].UNLOAD_BANK  <> Trim(FieldByName('DSTAISLE1').AsString)) OR   // 하역(열)
+             (SC_JOB[SC_NO].UNLOAD_BAY   <> Trim(FieldByName('DSTBAY1'  ).AsString)) OR   // 하역(연)
+             (SC_JOB[SC_NO].UNLOAD_LEVEL <> Trim(FieldByName('DSTLEVEL1').AsString)) then // 하역(단)
+          begin
+            POS_Change := True ;
+            SC_JOB[SC_NO].LOAD_BANK     := Trim(FieldByName('SRCAISLE1').AsString) ;  // 적재(열)
+            SC_JOB[SC_NO].LOAD_BAY      := Trim(FieldByName('SRCBAY1'  ).AsString) ;  // 적재(연)
+            SC_JOB[SC_NO].LOAD_LEVEL    := Trim(FieldByName('SRCLEVEL1').AsString) ;  // 적재(단)
+            SC_JOB[SC_NO].UNLOAD_BANK   := Trim(FieldByName('DSTAISLE1').AsString) ;  // 하역(열)
+            SC_JOB[SC_NO].UNLOAD_BAY    := Trim(FieldByName('DSTBAY1'  ).AsString) ;  // 하역(연)
+            SC_JOB[SC_NO].UNLOAD_LEVEL  := Trim(FieldByName('DSTLEVEL1').AsString) ;  // 하역(단)
+
+            JobLog := 'RackToRack 작업변경:' +
+                       SC_JOB[SC_NO].LOAD_BANK    + '-' +
+                       SC_JOB[SC_NO].LOAD_BAY     + '-' +
+                       SC_JOB[SC_NO].LOAD_LEVEL   + '->'+
+                       SC_JOB[SC_NO].UNLOAD_BANK  + '-' +
+                       SC_JOB[SC_NO].UNLOAD_BAY   + '-' +
+                       SC_JOB[SC_NO].UNLOAD_LEVEL ;
+          end;
+        end;
+
+        if POS_Change then
+        begin
+          StrSQL  := ' Update TT_SCIO ' +
+                     '    Set LOAD_BANK    = ''' + SC_JOB[SC_NO].LOAD_BANK    + ''' ' +
+                     '      , LOAD_BAY     = ''' + SC_JOB[SC_NO].LOAD_BAY     + ''' ' +
+                     '      , LOAD_LEVEL   = ''' + SC_JOB[SC_NO].LOAD_LEVEL   + ''' ' +
+                     '      , UNLOAD_BANK  = ''' + SC_JOB[SC_NO].UNLOAD_BANK  + ''' ' +
+                     '      , UNLOAD_BAY   = ''' + SC_JOB[SC_NO].UNLOAD_BAY   + ''' ' +
+                     '      , UNLOAD_LEVEL = ''' + SC_JOB[SC_NO].UNLOAD_LEVEL + ''' ' +
+                     '  Where ID_NO = ''' + IntToStr(SC_NO) + ''' ' +
+                     '    and ID_ORDINDEX = ' + SC_JOB[SC_NO].ID_ORDLUGG ;
+          Close;
+          SQL.Text := StrSQL ;
+          ExecSQL ;
+
+          StrLog := 'SC['+ IntToStr(SC_NO) + '] ' + JobLog ;
+          ListBoxDisplay(  ListBoxOrder, JobLog );
+          DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+        end else
+        begin
+          StrLog := 'SC['+ IntToStr(SC_NO) + '] 위치 변경 없음.' ;
+          DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+        end;
+      end;
+      Close ;
+    End;
+  except
+    on E: Exception do
+    begin
+      ErrorLogWrite( 'Function Chk_SC_JOB, '+
+                     'Error[' + E.Message + '], ' +
+                     'ORD_IDX  [' + SC_JOB[SC_NO].ID_ORDLUGG + '], ' +
+                     'ORD_DATE [' + SC_JOB[SC_NO].ID_ORDDATE + '], ' +
+                     'ORD_TIME [' + SC_JOB[SC_NO].ID_ORDTIME + '], ' +
+                     'SQL [' + StrSQL + ']' );
+      if qryInfo.Active then
+         qryInfo.Close ;
+    end;
+  end;
+end;
+
+procedure TfrmSCComm.Delete_ORDER(LUGG, REG_TIME: String);
+var
+  StrSQL : String ;
+begin
+  try
+    StrSQL :=  ' Delete From TT_ORDER ' +
+               '  Where Lugg = ''' + LUGG + ''' ' +
+               '    and REG_TIME = ''' + REG_TIME + ''' ' ;
+    with QryDelete do
+    begin
+      Close ;
+      SQL.Text := StrSQL ;
+      ExecSQL ;
+    end;
+  except
+  end;
+end;
+
+//==============================================================================
+// procedure Set_SCSETINFO_Clear Process -> 2015.08.26 add ljs
+// 지시를 받은 상태에서는 재기동, 작업취소, 홈 이동 막음
+// 에러처리 시에 에러 호기가 아닌 다른 호기에 요청 비트를 누르는 실수 시
+// 해당 로직에서 초기화 함.
+//==============================================================================
+procedure TfrmSCComm.Set_SCSETINFO_Clear(SC_NO:Integer);
+begin
+  if Get_SCSETINFO(SC_No, 'RETRY')      then Set_SCSETINFO(SC_No, 'RETRY', '0') ;      // 재 기동  요청 비트 살아있으면 초기화
+  if Get_SCSETINFO(SC_No, 'JOB_CANCEL') then Set_SCSETINFO(SC_No, 'JOB_CANCEL', '0') ; // 작업취소 요청 비트 살아있으면 초기화
+  if Get_SCSETINFO(SC_No, 'HOME_BACK')  then Set_SCSETINFO(SC_No, 'HOME_BACK', '0') ;  // 홈 이동  요청 비트 살아있으면 초기화
+end;
+
+//==============================================================================
+// procedure RGVJOBSTATUSUpdate Process -> ETC(작업 설명) 변경
+//==============================================================================
+procedure TfrmSCComm.SCJOBSTATUSUpdate(LUGG, REG_TIME, Status: String);
+var
+  StrSQL, StrLog : String ;
+begin
+  try
+    StrSQL := ' Update TT_ORDER ' +
+              '    Set ETC  = ''' + Status + ''' ' +
+              '  where LUGG     = ''' + LUGG     + ''' ' +
+              '    and REG_TIME = ''' + REG_TIME + ''' ' ;
+
+    with qrySCStatUdt do
+    begin
+      Close ;
+      SQL.Text := StrSQL ;
+      ExecSQL;
+    end;
+  except
+    On E:Exception do
+    begin
+      StrLog := ' Error : proc RGVJOBSTATUSUpdate : SQL[' + StrSQL + '], [' + E.Message + ']'  ;
+      ErrorLogWrite( StrLog ); // Exception 에러로그만 별도로 따로 남김.
+    end;
+  end;
+end;
+
+//==============================================================================
+// procedure SCNOWSTATUSUpdate Process -> SC 프로그램 현재 상태 Update
+//==============================================================================
+procedure TfrmSCComm.SCNOWSTATUSUpdate(SC_NO:Integer; Status: String);
+var
+  StrSQL, StrLog : String ;
+begin
+  try
+    StrSQL := ' Update TC_SCSETINFO ' +
+              '    Set NOW_STATUS  = ''' + Status + ''' ' +
+              '  where SC_NO = ''' + IntToStr(SC_NO) + ''' ' ;
+
+
+    with qrySCStatUdt do
+    begin
+      Close ;
+      SQL.Text := StrSQL ;
+      ExecSQL;
+    end;
+  except
+    On E:Exception do
+    begin
+      StrLog := ' Error : proc SCNOWSTATUSUpdate : SQL[' + StrSQL + '], [' + E.Message + ']'  ;
+      ErrorLogWrite( StrLog ); // Exception 에러로그만 별도로 따로 남김.
+    end;
+  end;
+end;
+
+initialization
+
+  //중복 실행 방지 코드 부분
+ CreateFileMapping($FFFFFFFF, nil, PAGE_READWRITE, 0, 1, 'RCP_SC');
+  if GetlastError = ERROR_ALREADY_EXISTS then halt;
+
+end.
+

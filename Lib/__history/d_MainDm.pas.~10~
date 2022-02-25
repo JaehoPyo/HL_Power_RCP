@@ -1,0 +1,95 @@
+unit d_MainDm;
+
+interface
+
+uses
+  Windows, SysUtils, ADODB, DB, Dialogs, Classes, h_MainLib, h_ReferLib;
+
+type
+  TMainDm = class(TDataModule)
+    MainDB: TADOConnection;
+    procedure MainDBAfterDisconnect(Sender: TObject);
+    procedure MainDBAfterConnect(Sender: TObject);
+    procedure MainDBBeforeConnect(Sender: TObject);
+    procedure MainDBBeforeDisconnect(Sender: TObject);
+  private
+     { Private declarations }
+  public
+    { Public declarations }
+  end;
+    function  ADOConnection : Boolean;
+type
+  TDB_Info = Record
+    DbOle   : String ;
+    DbType  : String ;
+    DbUser  : String ;
+    DbPswd  : String ;
+    DbAlais : String ;
+    WRHS    : String ;
+    ConChk  : Boolean ;
+  end;
+
+var
+  MainDm: TMainDm;
+  m : TDB_Info ;
+
+
+implementation
+
+{$R *.dfm}
+//==============================================================================
+// ADOConnection -> Database Connect
+//==============================================================================
+function ADOConnection: Boolean;
+begin
+  Result := False;
+  m.ConChk := False;
+  m.DbType := UpperCase ( IniRead( INI_PATH, 'Database', 'Connection', 'ORACLE' ) );
+  if  m.DbType = 'ORACLE' then
+  begin
+    m.DbOle   := IniRead( INI_PATH, 'Database', 'Provider', 'OraOLEDB.Oracle.1' );
+    m.DbAlais := IniRead( INI_PATH, 'Database', 'Alais'   , 'COMMSERV'  );
+    m.DbUser  := IniRead( INI_PATH, 'Database', 'User'    , 'DYMOSUSER'  );
+    m.DbPswd  := IniRead( INI_PATH, 'Database', 'Pswd'    , 'DYMOSPASS'  );
+    m.WRHS    := UpperCase(IniRead( INI_PATH, 'WRHS'      , 'WRHS' , 'HEAT' ));
+  end;
+
+  try
+    with MainDm.MainDB do
+    begin
+      Close;
+      ConnectionString := 'Provider=' + m.DbOle +
+                          ';Data Source=' + m.DbAlais+
+                          ';Persist Security Info=True' +
+                          ';Password=' + m.DbPswd +
+                          ';User ID =' + m.DbUser ;
+      Connected := True;
+      Result := True;
+      m.ConChk := True ;
+    end;
+  except
+    m.ConChk := False ;
+  end;
+end;
+
+procedure TMainDm.MainDBBeforeConnect(Sender: TObject);
+begin
+  m.ConChk := True ;
+end;
+
+procedure TMainDm.MainDBAfterConnect(Sender: TObject);
+begin
+  m.ConChk := True ;
+end;
+
+procedure TMainDm.MainDBAfterDisconnect(Sender: TObject);
+begin
+  m.ConChk := False ;
+end;
+
+procedure TMainDm.MainDBBeforeDisconnect(Sender: TObject);
+begin
+  m.ConChk := False ;
+end;
+
+end.

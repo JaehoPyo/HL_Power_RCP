@@ -1,0 +1,3 @@
+Procedure SCTREAD SC(1) Error['$' is not a valid integer value] , SQL [ SELECT * FROM VW_SC_STAUS   WHERE SC_NO ='1' ]
+Function fnGetSCSetInfo SC(1) Error[열 이름 'MOVE_ON'이(가) 유효하지 않습니다] , SQL [ SELECT MOVE_ON AS DATA    FROM TC_SCSETINFO   WHERE SC_NO = 1]
+Function fnSCIO_Insert SC(1) Error[열 이름 'SYSDATE'이(가) 유효하지 않습니다], SQL [ INSERT INTO TT_SCIO   ( ID_NO, ID_DT, ID_DATE, ID_TIME,     ID_INDEX, IO_TYPE,                          LOAD_BANK, LOAD_BAY, LOAD_LEVEL,            UNLOAD_BANK, UNLOAD_BAY, UNLOAD_LEVEL,      SC_STATUS, SC_STEP, CR_DATE )            VALUES ( '1', '20220224112954', '20220224', '112954', '0000', 'M', '0002', '0008', '0006', '0002', '0009', '0006', '지시대기', 'L', SYSDATE ) ]

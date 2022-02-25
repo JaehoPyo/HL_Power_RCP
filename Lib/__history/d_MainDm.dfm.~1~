@@ -1,0 +1,13 @@
+object MainDm: TMainDm
+  OldCreateOrder = False
+  Left = 350
+  Top = 269
+  Height = 422
+  Width = 389
+  object MainDatabase: TADOConnection
+    LoginPrompt = False
+    Provider = 'SQLOLEDB.1'
+    Left = 40
+    Top = 24
+  end
+end

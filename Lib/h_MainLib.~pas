@@ -1,0 +1,546 @@
+unit h_MainLib;
+
+interface
+
+uses inifiles,Windows, Sysutils, ExtCtrls, ADODB, ScktComp, Graphics ;
+
+Const
+  LogFileName  : String = '.\Log\SCComm';
+  INI_PATH : String = 'RCP_SCC.INI';
+  STX  = #2 ;
+  ETX  = #3 ;
+  ENQ  = #5 ;
+  ACK  = #6 ;
+  NAK  = #21 ; // 0x15
+  CR   = #13 ; // 0x0D
+  LF   = #10 ; // 0x0A
+
+
+  START_SCNO = 11 ; // Start SC No
+  End_SCNO   = 14 ; // End SC No
+  MaxSC_Cnt  = 4 ;  // Sc Count
+
+  // RGV 와 '0', '1' 신호가 정확히 같지 않음.
+  Auto_Text   : Array[0..1] of String = ( '  수동', '  자동'); // Auto Mode Caption Text
+  Auto_BColor : Array[0..1] of TColor = ( clYellow, clLime);   // Auto Mode Base Color
+  Auto_FColor : Array[0..1] of TColor = ( clBlack, clBlack);   // Auto Mode Font Color
+
+  EMG_Text   : Array[0..1] of String = ( '비상스위치 정상', '비상스위치 동작');    // Emergency S/W Status Caption Text
+  EMG_BColor : Array[0..1] of TColor = ( clWhite, clRed   );    // Emergency S/W  Status Base Color
+  EMG_FColor : Array[0..1] of TColor = ( clBlack, clWhite );    // Emergency S/W  Status Font Color
+
+  Error_Text   : Array[0..1] of String = ( '  정상', '  에러');  // Error Status Caption Text
+  Error_BColor : Array[0..1] of TColor = ( clWhite , clRed   );  // Error Status Base Color
+  Error_FColor : Array[0..1] of TColor = ( clBlack , clWhite );  // Error Status Font Color
+
+  Move_Text   : Array[0..1] of String = ( ' 대기중', ' 작업중'); // Working Mode Caption Text
+  Move_BColor : Array[0..1] of TColor = ( clWhite  , clLime   ); // Working Status Base Color
+  Move_FColor : Array[0..1] of TColor = ( clBlack  , clBlack  ); // Working Status Font Color
+
+  Pwr_Text   : Array[0..1] of String = ( '  OFF' , '  ON'  );    // Power Bit Status Caption Text
+  Pwr_BColor : Array[0..1] of TColor = ( clWhite , clYellow);    // Power Bit Status Base Color
+  Pwr_FColor : Array[0..1] of TColor = ( clBlack , clRed   );    // Power Bit Status Font Color
+
+  Comm_Text   : Array[0..1] of String = ( 'SCT ↔ SCC 통신정상', 'SCT ↔ SCC 통신이상');  // SCT ↔SCC 통신 Mode Caption Text
+  Comm_BColor : Array[0..1] of TColor = ( clLime  , clRed   );  // SCT ↔SCC 통신 Mode Base Color
+  Comm_FColor : Array[0..1] of TColor = ( clBlack , clWhite );  // SCT ↔SCC 통신 Mode Font Color
+
+  OX_Text     : Array[0..1] of String = ( '     X', '     O');  // 기타 O, X 관련 Caption Text  
+
+  //============================================================================
+  // TCP_Comm_Info : 라인, 설비별 통신 정의 Table .
+  //============================================================================
+  // 1..4 :  Socket No,
+  // 1..2 : [1] TCP_Comm_Def 의 First Parameter Index
+  //        [2] TCP_Comm_Def 의 Second Parameter Index
+  //============================================================================
+
+  IN_track_no : Array[11..14] of Integer = (749, 753, 757, 761) ;
+  OT_track_no : Array[11..14] of Integer = (750, 754, 758, 762) ;
+
+  SC_track_no : Array[1..4] of Integer = (301, 302, 303, 304) ;
+
+  // SC Phase Msg
+  SCPhase : Array[1..48, 1..2] of String
+            = (
+               ('00','대기중'), ('01','학습중'), ('02','학습중'), ('03','학습중'), ('04','학습중'),
+               ('05','학습중'), ('06','학습중'), ('07','학습중'), ('08','학습중'), ('09','학습중'),
+               ('0A','학습중'), ('0B','학습중'), ('0C','홈이동'), ('0D','홈이동'), ('0E','홈이동'),
+               ('0F','홈이동'),
+               ('10','입고대 작업전 화물검사'),
+               ('11','입고대로 이동'),
+               ('12','인터록 검사'),
+               ('13','포크 인출'),
+               ('14','상위치로 이동'),
+               ('15','포크 회수'),
+               ('16','포크위의 화물 검사'),
+               ('17','입고대 작업 완료'),
+               ('18','랙으로 이동전 화물검사'),
+               ('19','랙으로 이동'),
+               ('1A','이중격납 검사'),
+               ('1B','포크 인출'),
+               ('1C','하위치로 이동'),
+               ('1D','포크 회수'),
+               ('1E','포크위의 화물 검사'),
+               ('1F','랙에 입고작업 완료'),
+               ('20','랙으로 이동전 화물검사'),
+               ('21','랙으로 이동'),
+               ('22','더미 작업'),
+               ('23','포크 인출'),
+               ('24','상위치로 이동'),
+               ('25','포크 회수'),
+               ('26','공출고 검사'),
+               ('27','랙에서 출고작업 완료'),
+               ('28','출고대 작업전 화물검사'),
+               ('29','출고대로 이동'),
+               ('2A','인터록 검사'),
+               ('2B','포크 인출'),
+               ('2C','하위치로 이동'),
+               ('2D','포크 회수'),
+               ('2E','포크위의 화물 검사'),
+               ('2F','출고대 작업 완료')
+              );
+
+type
+
+  //========================================================================
+  // 2013.10.31 : SCT-5000 Message Type Protocol 기능 추가.
+  //========================================================================
+  // 통신 내용 : [TX-P], [TX-A], [TX-U]
+  //             [RX-A], [RX-S]
+  // ※ U-Message 한번 던지고, P한번 던진후 다시 U던지게...
+  //    연달아 던지면 에러남. SCT에서 P->S->U->A(정상등록)->P->A(이종진행)
+  //    이렇게 처리돼서 이와같이 처리함.
+  //------------------------------------------------------------------------
+  // 작업지시 가능하면(SC제어모드가 자동) DB에서 작업오더를 Search하고
+  // 명령을 보낼 오더가 있으면 지시가능 조건 확인 후 U를 보내고 아니면 P를 보낸다.
+  // - 지시가능 조건 : SCC자동, SCT자동, 통신에러無, 비상정지아님
+  //                 , 에러無, 작업중아님, PowerBit On아님
+  //========================================================================
+  // 수신한 데이터를 분석 A, S 받았을때 처리수순
+  // 1. BCC를 체크
+  // 2. Recv Message-No Get
+  // 3. 메세지 타입에 따른 처리
+  // switch (rBuff[6])
+  //------------------------------------------------------------------------
+
+  TComm_Packet = Record
+    Buff : Array[1..1024] of Char ;
+    Size : integer ;
+  end;
+
+  //--------------------------------------------
+  // TSys_CMD : P-Message.SYS_CMD 로 사용
+  //--------------------------------------------
+  TSys_CMD = Record // P-Message.SYS_CMD 로 사용
+  Case Integer Of
+    1 : ( ALL : Array [1..04] Of char );
+    2 : (
+     Power_Clear  : char; // B4 - Power_Clear
+     Open_Door    : char; // B5 - Door Open (1:Open, 0:Close) 1->0 자동 재기동
+     Error_Clear  : char; // B6 - Error_Clear
+     Emg_Stop     : char; // B7 - 비상정지
+     );
+  end;
+
+  //--------------------------------------------
+  // TSts_SMC : S-Message.Sts_SMC 로 사용
+  //--------------------------------------------
+  TSts_SMC = Record  // Sts_SMC
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     SCC_Mode    : char; // B0 - SCC Mode (1:자동, 0:수동)
+     SCT_Mode    : char; // B1 - SCT Mode (1:자동, 0:수동)
+     SCC_Comm    : char; // B2 - SCC 와의 통신상태 (1:통신에러)
+     EMG_Stop    : char; // B3 - 비상정지
+     Mach_Err    : char; // B4 - Error 상태임
+     POS_OK      : char; // B5 - 위치 파악됨.
+     Mach_Run    : char; // B6 - 작업 중
+     Power_Bit   : char; // B7 - Power Bit On
+     );
+  end;
+
+  //--------------------------------------------
+  // TSts_X : S-Message.Sts_X 로 사용
+  //--------------------------------------------
+  // 주행위치 ( 1:주행홈, 2:한계점ON, 4:HP고속컷, 8:OP고속컷,
+  //           16:Zone위에있음, 32:정위치에있음, 64:중속컷, 128 : 재기동 요구)
+  //--------------------------------------------
+  TSts_X = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     Home_Pos_X  : char; // B0 - Home 위치
+     Limit_X     : char; // B1 - 한계점 ON
+     HP_High_Cut : char; // B2 - HP 고속컷
+     OP_High_Cut : char; // B3 - OP 고속컷
+     POS_On_Zone : char; // B4 - Zone위에있음
+     POS_X_OK    : char; // B5 - 정위치에있음
+     Middle_Cut  : char; // B6 - 중속컷
+     Retry_Req   : char; // B7 - 재기동 요구
+     );
+  end;
+
+  TSts_RCP = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..02] Of char );
+    2 : (
+     JOB_CANCEL  : char; // RCP 작업취소 요구
+     RETRY_REQ   : char; // RCP 재기동 요구
+     );
+  end;
+
+  //--------------------------------------------
+  // TSts_Y : S-Message.Sts_Y 로 사용
+  //--------------------------------------------
+  // 승강위치 ( 1:승강홈, 2:한계점ON, 4:ST상위치, 8:ST하위치,
+  //           16:Rack상위치,   32:Rack하위치, 64 : None, 128 : 승강위치 파악됨
+  //--------------------------------------------
+  TSts_Y = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     Home_Pos_Y  : char; // B0 - Home 위치
+     Limit_Y     : char; // B1 - 한계점 ON
+     STN_UP_Pos  : char; // B2 - Station 승강 상위치
+     STN_DN_Pos  : char; // B3 - Station 승강 하위치
+     Rack_UP_Pos : char; // B4 - Rack 승강 상위치
+     Rack_DN_Pos : char; // B5 - Rack 승강 하위치
+     Reserved    : char; // B6 - None
+     POS_Y_OK    : char; // B7 - 승강위치 파악됨
+     );
+  end;
+
+  //--------------------------------------------
+  // TSts_Z1 : S-Message.Sts_Z1 로 사용
+  //--------------------------------------------
+  // 화물유무          (1:화물有,    0:화물無)    -> 화물상태
+  // 화물붕괴          (1:화물붕괴)
+  // 좌측랙화물유무    (1:좌측 랙내에 화물有)
+  // 우측랙화물유무    (1:우측 랙내에 화물有)
+  // 포크진행상태      (0:진행無,   1:좌중(좌진행중),  2:우중(우진행중))
+  // 포크끝여부        (0:확인안됨, 1:포크끝, 2:포크중심);
+  //--------------------------------------------
+  TSts_Z1 = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     Cargo_Exist : char; // B0 - 화물상태(화물유무) = (1:화물有,    0:화물無)
+     Cargo_Error : char; // B1 - 화물붕괴 (1:화물붕괴)
+     LRack_Cargo : char; // B2 - 좌측랙화물유무    (1:좌측 랙내에 화물有)
+     RRack_Cargo : char; // B3 - 우측랙화물유무    (1:우측 랙내에 화물有)
+     Fork_Left   : char; // B4 - 좌중(좌진행중)
+     Fork_Right  : char; // B5 - 우중(우진행중)
+     Fork_End    : char; // B6 - 포크끝
+     Fork_Center : char; // B7 - 포크중심
+     );
+  end;
+
+  //--------------------------------------------
+  // TSts_Z2 : S-Message.Sts_Z2 로 사용
+  //--------------------------------------------
+  TSts_Z2 = Record  // Sts_SMC
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     Reserved1    : char; // B0 - None
+     Reserved2    : char; // B1 - None
+     LRack_Cargo2 : char; // B2 - 좌측랙화물유무2    (1:좌측 랙내에 화물有)
+     RRack_Cargo2 : char; // B3 - 우측랙화물유무2    (1:우측 랙내에 화물有)
+     Fork_Left2   : char; // B4 - 좌중2(좌진행중)
+     Fork_Right2  : char; // B5 - 우중2(우진행중)
+     Fork_End2    : char; // B6 - 포크끝2
+     Fork_Center2 : char; // B7 - 포크중심2
+     );
+  end;
+
+  //--------------------------------------------
+  // A-Message(Acknowledge) : Send/Receive
+  //--------------------------------------------
+  TA_MSG = Record 
+  Case Integer Of
+    1 : ( ALL : Array [1..14] Of char );
+    2 : (
+
+     Lugg_High    : char; // Lugg number High
+     Lugg_Low     : char; // Lugg number Low
+     BYTE_1       : char; // Always 1 ?
+     Ack_Status   : char; // ACK 상태
+                          // 0: 작업정상등록, 1: 작업정상완료, 2: 작업이상종료 → 에러발생시...
+                          // 3: 작업이 삭제되었음, 4: 같은 작업이 진행중, 5: 수동상태,
+                          // 6: 다른작업이 진행중, 8: 데이터 이상
+     ErrCode_High : char; // Error Code High ( Ack_Status 가 2일때만 유효 )
+     ErrCode_Low  : char; // Error Code Low  ( Ack_Status 가 2일때만 유효 )
+     Rpt_X_Pos    : char; // 작업 보고시의 X 위치
+     Rpt_Y_Pos    : char; // 작업 보고시의 Y 위치
+     Param_2      : char; // Parameter +2
+     Param_3      : char; // Parameter +3
+     Param_4      : char; // Parameter +4
+     Param_5      : char; // Parameter +5
+     Param_6      : char; // Parameter +6
+     Param_7      : char; // Parameter +7
+     );
+  end;
+
+  //--------------------------------------------
+  // P-Message(Polling) : Send
+  //--------------------------------------------
+  TP_MSG = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     SYS_CMD     : TSys_CMD; // System Command (4)
+     Reserved    : char;     // Reserved
+     Reason_Code : char; // Reason Code
+     IN_InterLoc : char; // 입고대 인터록 신호 (B0~B7 : 입고대 1~8번) 포킹 가능시 1
+     OT_InterLoc : char; // 출고대 인터록 신호 (B0~B7 : 입고대 1~8번) 포킹 가능시 1
+     );
+  end;
+
+  //--------------------------------------------
+  // S-Message(Status) : Receive
+  //--------------------------------------------
+  TS_MSG = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..(25 + (8*5))] Of char );
+    2 : (
+     Sts_SMC     : TSts_SMC; // [01] Sts_SMC   (8)
+     Sts_X       : TSts_X ;  // [02] Status_X  (8)
+     Sts_Y       : TSts_Y ;  // [03] Status_Y  (8)
+     Sts_Z1      : TSts_Z1;  // [04] Status_Z1 (8)
+     Sts_Z2      : TSts_Z2;  // [05] Status_Z2 (8)
+     Bay         : char;     // [06] Bay
+     Tier        : char;     // [07] Tier
+     Phase       : char;     // [08] Phase
+     ErrCode_Hi  : char;     // [09] ErrCode Hi
+     ErrCode_Lo  : char;     // [10] ErrCode Lo
+     Analog_XZ   : char;     // [11] Analog X or Z1
+     Encoder_Hi1 : char;     // [12] Encoder Hi
+     Encoder_Md1 : char;     // [13] Encoder Mid
+     Encoder_Lo1 : char;     // [14] Encoder Low
+     Analog_YZ   : char;     // [15] Analog Y or Z2
+     Encoder_Hi2 : char;     // [16] Encoder Hi
+     Encoder_Md2 : char;     // [17] Encoder Mid
+     Encoder_Lo2 : char;     // [18] Encoder Low
+     Output      : Array[0..3] of char; // [19] Output+0 ~ [22] Output+3
+     Input       : Array[0..7] of char; // [23] Input+0 ~ [30] Input+7
+     );
+  end;
+
+  //--------------------------------------------
+  // U-Message(Update Job) : Send
+  //--------------------------------------------
+  TU_MSG = Record
+  Case Integer Of
+    1 : ( ALL : Array [1..08] Of char );
+    2 : (
+     Lugg_No_Hi  : char;     // [1] Lugg number Hi
+     Lugg_No_Lo  : char;     // [2] Lugg number Lo
+     Fork_No     : char;     // [3] Fork number : Always 1
+     Bit_Command : char;     // [4] Bit Command : b7 = 1 작업취소
+     Job_Kind    : char;     // [5] Job Kind ( 6 : back HOME
+                             //              , 8 : 입고대에서 loading, 9 : 출고대에서 unloading
+                             //              , 10 = 입고대로 이동 , 11 = 출고대로 이동
+                             //              , 12 = 랙에서 loading, 13 = 랙에서 unloading
+                             //              , 14 = 랙으로 simple moving
+     Bank        : char;     // [6] Bank  Bank 좌우 열을 나타낸다. (1-24)
+                             //           B7 = 1 (1: Half,  0 : Full 파렛)
+     Bay         : char;     // [7] Bay  (Site Hi) Bay 번지를 나타낸다. (1-127)
+     Tier        : char;     // [8] Tier (Site Lo) Tier 단을 나타낸다. (1-63)
+     Depth       : char;     // [9] Depth          Depth 스태커에서 가까운 쪽이 1, 먼쪽이 4. (1-4)
+     );
+  end;
+
+  TSEND_MSG = Record
+      TX_P : TP_MSG; // P-Message(Polling)     : Send
+      TX_A : TA_MSG; // A-Message(Acknowledge) : Send/Receive
+      TX_U : TU_MSG; // U-Message(Update Job)  : Send
+  end;
+
+  TRECV_MSG = Record
+      RX_A : TA_MSG; // A-Message(Acknowledge) : Send/Receive
+      RX_S : TS_MSG; // S-Message(Status)      : Receive
+  end;
+
+  TSC_MSG = Record
+      SEND_MSG : TSEND_MSG; // All Send Message
+      RECV_MSG : TRECV_MSG; // All Receive Message
+  end;
+
+  //========================================================================
+  // 2013.10.31 : SCT-5000 Message Type Protocol 기능 추가 END.
+  //========================================================================
+  //========================================================================
+  //   작업 시작 -> 작업 준비 -> READY
+  // 
+  //       작업 검색         지시                 완료
+  // 'L' : 데이터 입력(DATA1) -> SC오더접수(ORDER1) -> 중간 완료(RESET1) 
+  // 'U' : 데이터 입력(DATA2) -> SC오더접수(ORDER2) -> 최종 완료(RESET2)
+  //       ※ 각 단계 작업 완료시 따로 작업 삭제는 안시켜도 됨.
+  //------------------------------------------------------------------------
+  // 어디서든 에러 발생 ERR1, ERR2, RESET
+  // 작업자가 에러를 해제하고, SCT "RETRY" 버튼을 통해 재기동 요구(RETRY_REQ)
+  // RCP 에서 U-Message 재 송신.
+  // 
+  // 작업 취소(CANCEL_REQ)는 ?
+  //========================================================================
+  TScStatus = (START, STANDBY, READY1, DATA1, ORDER1, RESET1, ERR1,
+               READY2, DATA2, ORDER2, RESET2, ERR2, RETRY_REQ, CANCEL_REQ, DATAERR) ;
+  //           프로그램 시작, 준비, 지시, 완료, 리셋, 에러.. 등등 
+
+  TSCJobMode = (None, StoreIn, StoreOut, RackToRack) ;
+
+  // U->S->U->A
+  // ComStart : 통신 시작, TxP : P-Message, TxA : A-Message, TxU : U-Message
+  TCONTROL_FLAG = ( ComStart, TxP, TxA, TxU );
+
+  TDB_Info = Record
+    DBProvider, DBAlias, DBUser, DBPswd : String;
+  end;
+
+  TComm_Check_Info = Record
+    Check_Status : Boolean ;
+    Check_Count  : Integer ;
+  end;
+
+  // Database 작업 Data : 작업 지시 가능 조건을 보고 TT_ORDER 에서 가져와
+  // 작업을 TT_SCIO 에 Insert 하고 작업을 구성
+  // Structure TSC_JOB = DB.TT_SCIO
+  // 해당 Data를 이용해 U-Message 전송, 작업 완료시 Data 처리는
+  // TT_ORDER 에서 작업번호, 일자, 시간을 Join 해서 Tracking 처리.
+
+  TSC_JOB = Record
+    ID_ORDLUGG    : String ;    // 작업 번호
+    ID_REGTIME    : String ;    // 작업 등록 일시 TT_ORDER.REG_TIME
+    ID_ORDDATE    : String ;    // 작업 등록 일자 Copy(REG_TIME, 1, 8)
+    ID_ORDTIME    : String ;    // 작업 등록 일간 Copy(REG_TIME, 9, 6)
+    IO_TYPE       : String ;    // 입출고 유형(I:입고, O:출고, M:Rack이동)
+    ID_FROM       : String ;    // 현재 구간 시작 CV No : 종근당 사용안함
+    ID_TO         : String ; 	// 현재 구간 도착 CV No : 종근당 사용안함
+    LOAD_BANK     : String ;    // 적재(열)
+    LOAD_BAY      : String ;    // 적재(연)
+    LOAD_LEVEL    : String ;    // 적재(단)
+    UNLOAD_BANK   : String ;    // 하역(열)
+    UNLOAD_BAY    : String ;    // 하역(연)
+    UNLOAD_LEVEL  : String ;    // 하역(단)
+    SC_STEP       : String ;    // 작업 단계 ( L : Loading, U : UnLoading ) C : Cancel (작업 취소시 사용)
+    RECV_A        : String ;    // A-Message 수신 상태(Y/N) : 작업 등록여부 등 확인용 - Default 'N'
+  end;
+
+  TSCRC = Record // DB에 SC상태 저장용.
+    SCRC_FK        : String ;    // 작업 포크 '1': 전포크, '2' : 후포크
+    SCRC_CYCLE     : String ;    // 작업 Cycle -> 0: Idle, 1: 작업지시, 2: 동작중, 3: 화물 재하,
+                                 //               4: 작업완료, 5: 작업 에러발생, 6: 데이터 에러 발생
+    SCRC_PHASE     : String ;    // 작업 PHASE : 세부 내용은 SC Manual 참조.
+    SCRC_ONOFF     : String ;    // Power Bit 관련
+    SCRC_RUNNING   : String ;    // 동작 상태 ( 0: 대기중, 1: 작업중 )
+    SCRC_SCCREADY  : String ;    // 기상반 자동 ( 0: 수동, 1: 자동 )
+    SCRC_SCTREADY  : String ;    // 지상반 자동 ( 0: 수동, 1: 자동 )
+    SCRC_FK_STS    : String ;    // 포크 상태 ( 0 : 포크중심, 1 : 좌출중, 2 : 좌끝, 3 : 우출중, 4 : 우끝 )
+    SCRC_STOCK     : String ;    // Fork 내 화물 유무 ( 0: 화물X, 1 : 화물 재하 )
+    SCRC_BAYPOS    : String ;    // SC 위치 (연)
+    SCRC_LVLPOS    : String ;    // SC 위치 (단)
+    SCRC_ERROR     : String ;    // SC 에러상태 ( 0: 정상, 1: 에러 )
+    SCRC_ERRCODE   : String ;    // 에러 코드
+  end;
+
+
+  // CV 상태 정보
+  TCV_Info = Record  // ljh
+   Case Integer of
+    1 : (All : Array [0..4] of Char);
+    2 : (
+      CargoExist     : Char;
+      CV_Running     : Char;
+      Time_Warning   : Char;
+      Time_Error     : Char;
+      Motor_Trip     : Char;
+    )
+  End;
+
+
+  //OP 상태 정보 YEH 98 ~ 103
+  TOP_STATUS = Record
+   Case Integer of
+    1 : (All : Array [0..1] of Char);
+    2 : (
+      Auto      : Char;  // OP 자동
+      Emergency : Char;  // OP 비상정지
+    )
+  End;
+
+
+  TCVReady = Record
+   Case Integer of
+    1 : (All : Array [0..1] of Char);
+    2 : (
+      InReady        : Char;
+      OutReady       : Char;
+    )
+  End;
+
+  //CV 기타 정보
+  TCV_Etc = Record
+   Case Integer of
+    1 : (All : Array [0..4] of Char);
+    2 : (
+      FrontDoorErr      : Char;
+      BackDoorErr       : Char;
+      Tb1ConErr         : Char;
+      Tb2ConErr         : Char;
+      Tb3ConErr         : Char;
+    )
+  End;
+
+
+  // CV Read 정보 구조체 : OK
+  TCVCR = Record
+   Case Integer of
+    1 : (All : Array [0..301] of Char);
+    2 : (
+      Buff            : Array[101..154] of TCV_Info;      // 5 * 54 = 270 : Buff 정보(101~154)
+      OP_STATUS       : Array[1.. 4] of TOP_STATUS;       // 2 *  4 =   8 : OP정보 (4개소 : 자동, 수동)
+      CVReady         : Array[1.. 4] of TCVReady;         // 2 *  4 =   8 : 입출고 컨베어 상태(Ready)
+      ETC             : Array[1.. 16] of Char;            // 16 : 예비 Bit 16개
+    )
+  End;
+
+  TCVCW = Record
+   Case Integer of
+    1 : (All : Array [0..4] of Char);
+    2 : (
+      PLC_Reset         : char;                          // (  1) PLC DATA Reset
+      OP_Reset          : Array[1..  4] of Char;         // (  4) OP 경고 해제 지시
+    )
+  End;
+
+
+  TCVC_JOB = Record
+   Case Integer of
+    1 : (All : Array [0..1] of integer);
+    2 : (
+      NO   : Integer;
+      DEST : Integer
+    )
+  End;
+
+
+
+  TCV = Record
+    Case Integer of
+      1 : (All : Array[0..(sizeof(TCVCR) + sizeof(TCVCW) -1)] of Char);
+      2 : (
+        Read  : TCVCR;
+        Write : TCVCW;
+      )
+  end;
+
+  TPLC_COMM_OBJ = Record
+      Comm_Step       : Integer ;
+      Comm_Check_Info : TComm_Check_Info ;
+  end;
+
+implementation
+
+end.

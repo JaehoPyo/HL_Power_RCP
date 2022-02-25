@@ -1,0 +1,6 @@
+Procedure SCTREAD SC(1) Error[Access violation at address 0040B550 in module 'RCP_SCC.exe'. Read of address 30303028] , SQL [ SELECT * FROM VW_SC_STAUS   WHERE SC_NO ='1' ]
+Procedure SCTREAD SC(1) Error[Access violation at address 0040B550 in module 'RCP_SCC.exe'. Read of address 30303028] , SQL [ SELECT * FROM VW_SC_STAUS   WHERE SC_NO ='1' ]
+Procedure SCTREAD SC(4) Error[ORA-03114: ORACLE에 연결되어 있지 않습니다] , SQL [ SELECT * FROM VW_SC_STAUS   WHERE SC_NO ='4' ]
+Function SCNowStatusUpdate SC(4) Error[ORA-03114: ORACLE에 연결되어 있지 않습니다] , SQL [ UPDATE TC_SCSETINFO     SET NOW_STATUS  = 'READY'   WHERE SC_NO = '4' ]
+Function SCNowCycleUpdate SC(4) Error[ORA-03114: ORACLE에 연결되어 있지 않습니다] , SQL [ UPDATE TC_SCSETINFO     SET NOW_CYCLE  = '0'   WHERE SC_NO = '4' ]
+Function fnGetSCSetInfo SC(4) Error[ORA-03114: ORACLE에 연결되어 있지 않습니다] , SQL [ SELECT HOME_BACK AS DATA    FROM TC_SCSETINFO   WHERE SC_NO = 4]
