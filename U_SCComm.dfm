@@ -170,10 +170,8 @@ object frmSCComm: TfrmSCComm
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 394
     object tsCommLog: TTabSheet
       Caption = '[ '#53685#49888#47196#44536' ]'
-      ExplicitWidth = 386
       object Pnl_Main: TPanel
         Left = 0
         Top = 0
@@ -183,7 +181,6 @@ object frmSCComm: TfrmSCComm
         BevelInner = bvLowered
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 386
         object ListBoxOrder: TListBox
           Left = 1
           Top = 238
@@ -205,7 +202,6 @@ object frmSCComm: TfrmSCComm
           MultiSelect = True
           ParentFont = False
           TabOrder = 0
-          ExplicitWidth = 384
         end
         object CommLog: TMemo
           Left = 1
@@ -232,14 +228,12 @@ object frmSCComm: TfrmSCComm
           ScrollBars = ssBoth
           ShowHint = False
           TabOrder = 1
-          ExplicitWidth = 384
         end
       end
     end
     object tsStatus: TTabSheet
       Caption = '[ '#49345#53468#51221#48372' ]'
       ImageIndex = 3
-      ExplicitWidth = 386
       object PnlSC1: TPanel
         Left = 0
         Top = 0
@@ -265,7 +259,6 @@ object frmSCComm: TfrmSCComm
         ParentShowHint = False
         ShowHint = False
         TabOrder = 0
-        ExplicitWidth = 386
         object gbStatus: TGroupBox
           Left = 0
           Top = 0
@@ -292,7 +285,6 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 0
-          ExplicitWidth = 386
           object Bevel1: TBevel
             Left = 10
             Top = 83
@@ -1586,7 +1578,6 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 1
-          ExplicitWidth = 386
           object Panel24: TPanel
             Left = 10
             Top = 100
@@ -2133,7 +2124,6 @@ object frmSCComm: TfrmSCComm
         Text = 'YYYY/MM/DD HH:MM:SS'
         Width = 30
       end>
-    ExplicitWidth = 394
   end
   object PnlBtm: TPanel
     Left = 0
@@ -2159,7 +2149,6 @@ object frmSCComm: TfrmSCComm
     ParentShowHint = False
     ShowHint = False
     TabOrder = 2
-    ExplicitWidth = 394
     object gb_SC_COMM: TGroupBox
       Left = 0
       Top = 0

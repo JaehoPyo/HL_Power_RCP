@@ -16,7 +16,7 @@ Const
   MaxSC_Cnt  = 1 ; // SC COUNT
 
   START_STATION = 1;
-  END_STATION   = 3;
+  END_STATION   = 6;
 
   IN_CV_NO  : Array [1..1] of String = ('100') ;
   OT_CV_NO  : Array [1..1] of String = ('100') ;
@@ -142,7 +142,7 @@ Type
 
     DATA_RESET     ,          // 데이터초기화
 
-    MOVE_ON        : String ; // 기동지시
+    MOVE_ON        : String   // 기동지시
   end;
 
   TSC_STATUS = Record
@@ -358,6 +358,13 @@ Type
     D1390  ,
     D1391  : String;
   end;
+
+  TPLC_ORDER = Record
+    ORDER  ,
+    D111   ,
+    ORD_ST ,
+    ORD_DT : String;
+  End;
 
   TSC_ORDER = Record
     SCORD_NO  ,           // 작업번호
