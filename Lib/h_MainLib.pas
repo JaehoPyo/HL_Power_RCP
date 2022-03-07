@@ -113,8 +113,7 @@ Type
   End;
 
   TPLC_VAL = Record
-    InSt_Door : Array [1..3] of String;
-    OtSt_Door : Array [1..3] of String;
+    Curtain : Array [1..6] of String;
   End;
 
   TSC_JOB = Record

@@ -30,7 +30,7 @@ Uses SysUtils, IniFiles;
   function Dec2Bin(Value : LongInt) : string;
   function Bin2Dec(BinString: string): LongInt;
   function HexToInt(Hex : string) : Integer ;//Cardinal;   {Hex-->Integer}
-  
+  function  AsciiToString(AsciiString: String) : String;
 implementation
 
 //==============================================================================
@@ -710,5 +710,18 @@ begin
   Result := Result ;
 end;
 
+function  AsciiToString(AsciiString: String) : String; // 3435 -> 45 [Ascii:34 -> 1]
+var
+  I,j,Len : Integer;
+begin
+  Result := '';
+  Len := Length(AsciiString) div 2;
+  j := 1;
+  for I := 1 to Len do
+  begin
+    Result := Result + Char(StrToInt('$' + Copy(AsciiString, j, 2)));
+    j := j + 2;
+  end;
+end;
 
 end.

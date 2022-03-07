@@ -183,7 +183,8 @@ type
     function  fnGetCVStatus(SC_NO:Integer; BuffNo,GetField:String ): Boolean ;  // CV 입&출고대 화물,레디,에러상태 Get
     function  fnSetWriteInfo(SC_NO:Integer;Job_Type:String): Boolean;           // SC 지시 데이터 SET
     function  fnSetSCORDWrite(SC_NO: Integer; Flag: String): Boolean;           // SC 지시 데이터 INSERT
-    function  fnSetPLCORDWrite(PLC_NO: Integer; Flag: String): Boolean;
+    function  fnSetPLCWriteInfo: Boolean;                                       // PLC 지시 데이터 SET
+    function  fnSetPLCORDWrite(PLC_NO: Integer; Flag: String): Boolean;         // PLC 지시 데이터 INSERT
     function  fnGetSCJOB(SC_NO:Integer;JFlag:TSCJobMode): Boolean ;             // SC 작업 검색
     function  fnChkSCJOB(SC_NO:Integer): Boolean ;                              // SC 작업 체크
     function  fnGetCVOrderStr(SC_NO: Integer; IO: String) : String;                            // TT_ORDER CVCURR 조건 설정
@@ -209,6 +210,9 @@ type
     function  fnStockUpdate(SC_No:Integer;FName,FValue:String): Boolean; overload; // 셀 상태 변경 시
     function  fnStockUpdate(Loc, FName, FValue: String): Boolean; overload;
     function  fnGetStockLoc(ItemCode : String): String;                            // 품목 위치 반환
+    function  fnGetStockCount(ItemCode: String): Integer;                          // 품목 갯수 반환
+    function  fnIsCellEmpty: Boolean;                                              // 창고 자리 있는지 여부
+
 
     // TM_ITEM 테이블 관련 함수
     function fnITEM_Value(SC_No: Integer; FName, FValue : String): String;
@@ -253,6 +257,7 @@ var
 
   SC_ORDER      : Array[START_SCNO..End_SCNO] of TSC_ORDER ;     // SC 지시
   CONTROL_FLAG  : Array[START_SCNO..End_SCNO] of TCONTROL_FLAG ; // 프로그램 제어 Falg
+  Curtain_FLAG  : TCONTROL_FLAG;
 
   PLC_ORDER : TPLC_ORDER;
 
@@ -289,10 +294,9 @@ procedure TfrmSCComm.FormShow(Sender: TObject);
 var
   i : Integer;
 begin
-  for i := 1 to 3 do
+  for i := 1 to 6 do
   begin
-    PLC_WriteVal.InSt_Door[i] := '0';
-    PLC_WriteVal.OtSt_Door[i] := '0';
+    PLC_WriteVal.Curtain[i] := '0';
   end;
 
   if ADOConnection then
@@ -349,7 +353,6 @@ end;
 procedure TfrmSCComm.GetACS_Status(PortNo: Integer);
 var
   StrSQL : String;
-  i : Integer;
 begin
 
   // RFID Read Data Check
@@ -388,7 +391,6 @@ end;
 //==============================================================================
 procedure TfrmSCComm.ACSControlProcess(SC_NO: Integer);
 var
-  StrSQL : String;
   i : Integer;
   JobNo, WhereStr : String;
   Loc, ItemCode, OtReady : String;
@@ -456,20 +458,20 @@ begin
         // 작업생성
         if (SetJobOrder) then
         begin
-          if (PLC_ReadVal.InSt_Door[i] = '0') then
+          if (PLC_ReadVal.Curtain[i] = '0') then
           begin
-            if PLC_WriteVal.InSt_Door[i] = '0' then
+            if (PLC_WriteVal.Curtain[i] = '0') then
             begin
               PLC_ORDER.ORDER := '1';
-              CONTROL_FLAG[SC_NO] := ComWrite;
+              Curtain_FLAG := ComWrite;
             end;
-            PLC_WriteVal.InSt_Door[i] := '1';
+            PLC_WriteVal.Curtain[i] := '1';
           end;
         end;
       end;
 
       // 커튼 열린 상태라면 응답 전송
-      if (PLC_ReadVal.InSt_Door[i] = '1') then
+      if (PLC_ReadVal.Curtain[i] = '1') then
       begin
         // ACS 응답 데이터 생성
         Tx_AcsData.Heart_Beat       := '1';
@@ -490,7 +492,7 @@ begin
     end;
 
     //==================================//
-    // (AGV가 커튼 앞에 위치) 출고 작업 // ** 출고가 완료된 후에 AGV가 진입하도록 한다. **
+    // (AGV가 커튼 앞에 위치)           //
     //==================================//
     // *** 출고 작업 생성 *** //
     if (i in [2, 4, 6] )                       and
@@ -499,104 +501,133 @@ begin
        (Rx_AcsData[i].Docking_Request  = '1' ) and
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
-      if i = 1 then OtReady := SC_STATUS[SC_NO].D211[9]
-      else if i = 2 then OtReady := SC_STATUS[SC_NO].D211[11]
-      else if i = 3 then OtReady := SC_STATUS[SC_NO].D211[13] ;
+      // 출고스테이션 커튼 오픈
+      if (PLC_ReadVal.Curtain[i] = '0') then
+      begin
+        if (PLC_WriteVal.Curtain[i] = '0') then
+        begin
+          PLC_ORDER.ORDER := '1';
+          Curtain_FLAG := ComWrite;
+        end;
+        PLC_WriteVal.Curtain[i] := '1';
+      end;
 
-      // 해당 AGV의 출고작업이 없고 출고레디 On일때
+      // 해당 AGV의 출고작업이 없을 때
       WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
                   '   And JOBD = ''2'' ' +
                   '   And JOB_END = ''0'' ';
-      if (fnOrder_Value(WhereStr, 'LINE_NO') = '') and
-         (OtReady = '1')  then
+      if (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
       begin
-
-        // 품목 찾기
         ItemCode := Rx_AcsData[i].Model_No;
-        // Loc = 110101  호기(1)/열(1)/연(2)/단(2)
-        Loc := fnGetStockLoc(ItemCode);
-
-        // 출고작업 데이터 생성
-        OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
-        OrderData.LUGG       := Format('%.4d', [GetJobNo]) ;  // 작업번호
-        OrderData.JOBD       := '2';     // 출고지시
-
-        OrderData.SRCSITE    := Format('%.4d', [StrToInt(Copy(Loc, 1, 1))]) ;  // 적재 호기
-        OrderData.SRCAISLE   := Format('%.4d', [StrToInt(Copy(Loc, 2, 1))]) ;  // 적재 열
-        OrderData.SRCBAY     := Format('%.4d', [StrToInt(Copy(Loc, 3, 2))]) ;  // 적재 연
-        OrderData.SRCLEVEL   := Format('%.4d', [StrToInt(Copy(Loc, 5, 2))]) ;  // 적재 단
-        // 목적지 랙 열-연-단은 AGV->CV이동 완료 후 지정
-        OrderData.DSTSITE    := '0000';
-        OrderData.DSTAISLE   := '0000';
-        OrderData.DSTBAY     := '0000';
-        OrderData.DSTLEVEL   := Format('%.4d', [i]);
-        OrderData.ID_CODE    := '';
-        OrderData.NOWMC      := '2'; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
-        OrderData.JOBSTATUS  := '1';
-        OrderData.NOWSTATUS  := '1';
-        OrderData.BUFFSTATUS := '0';
-        OrderData.JOBREWORK  := '';
-        OrderData.JOBERRORT  := '';
-        OrderData.JOBERRORC  := '';
-        OrderData.JOBERRORD  := '';
-        OrderData.JOB_END    := '0';
-        OrderData.CVFR       := '0';
-        OrderData.CVTO       := '0';
-        OrderData.CVCURR     := '0';
-        OrderData.ETC        := '';
-        OrderData.EMG        := '0';
-        OrderData.LINE_NO    := IntToStr(i);
-        OrderData.ITM_CD     := ItemCode;
-        OrderData.UP_TIME    := 'GETDATE()';
-
-        // 작업생성
-        if (SetJobOrder) then
+        // 창고에 재고가 있을 때
+        if (fnGetStockCount(ItemCode) > 0) then
         begin
-          // 셀 업데이트, 출고예약
-          fnStockUpdate(Loc, 'ID_STATUS', '5');
+          // 품목 찾기
+          // Loc = 110101  호기(1)/열(1)/연(2)/단(2)
+          Loc := fnGetStockLoc(ItemCode);
 
-          // 출고스테이션 커튼 오픈
-          if (PLC_ReadVal.OtSt_Door[i] = '0') then
+          // 출고작업 데이터 생성
+          OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
+          OrderData.LUGG       := Format('%.4d', [GetJobNo]) ;  // 작업번호
+          OrderData.JOBD       := '2';     // 출고지시
+
+          OrderData.SRCSITE    := Format('%.4d', [StrToInt(Copy(Loc, 1, 1))]) ;  // 적재 호기
+          OrderData.SRCAISLE   := Format('%.4d', [StrToInt(Copy(Loc, 2, 1))]) ;  // 적재 열
+          OrderData.SRCBAY     := Format('%.4d', [StrToInt(Copy(Loc, 3, 2))]) ;  // 적재 연
+          OrderData.SRCLEVEL   := Format('%.4d', [StrToInt(Copy(Loc, 5, 2))]) ;  // 적재 단
+          // 목적지 랙 열-연-단은 AGV->CV이동 완료 후 지정
+          OrderData.DSTSITE    := '0000';
+          OrderData.DSTAISLE   := '0000';
+          OrderData.DSTBAY     := '0000';
+          OrderData.DSTLEVEL   := Format('%.4d', [i]);
+          OrderData.ID_CODE    := '';
+          OrderData.NOWMC      := '2'; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
+          OrderData.JOBSTATUS  := '1';
+          OrderData.NOWSTATUS  := '1';
+          OrderData.BUFFSTATUS := '0';
+          OrderData.JOBREWORK  := '';
+          OrderData.JOBERRORT  := '';
+          OrderData.JOBERRORC  := '';
+          OrderData.JOBERRORD  := '';
+          OrderData.JOB_END    := '0';
+          OrderData.CVFR       := '0';
+          OrderData.CVTO       := '0';
+          OrderData.CVCURR     := '0';
+          OrderData.ETC        := '';
+          OrderData.EMG        := '0';
+          OrderData.LINE_NO    := IntToStr(i);
+          OrderData.ITM_CD     := ItemCode;
+          OrderData.UP_TIME    := 'GETDATE()';
+          // 작업생성
+          if (SetJobOrder) then
           begin
-            if PLC_WriteVal.OtSt_Door[i] = '0' then
-            begin
-              PLC_ORDER.ORDER := '1';
-              CONTROL_FLAG[SC_NO] := ComWrite;
-            end;
-            PLC_WriteVal.OtSt_Door[i] := '1';
+            // 셀 업데이트, 출고예약
+            fnStockUpdate(Loc, 'ID_STATUS', '5');
           end;
+        end
+        // 재고가 없을 때
+        else
+        begin
+          Tx_AcsData.Call_Answer := '2';
         end;
+
       end;
 
-      // 해당 라인의 출고 완료된 작업을 찾아옴.
-      WhereStr := ' Where JOBD = ''2'' ' +
-                    ' And NOWSTATUS = ''4'' ' +
-                    ' And JOBSTATUS = ''7'' ' +
-                    ' And JOB_END = ''1'' ' +
-                    ' And LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                  ' Order By REG_TIME Desc ' ;
-      ItemCode := fnOrder_Value(WhereStr, 'LINE_NO');
-
-      // ****************** ItemCode 와 RFID 비교. How To? **************************
-
-      // 커튼 열린 상태, 출고작업 완료상태, RFID 데이터 일치상태
-      // 응답 전송
-      if (PLC_ReadVal.InSt_Door[i] = '1') then
+      // 재고가 없는 경우 응답
+      if (Tx_AcsDAta.Call_Answer = '2') then
       begin
-        // ACS 응답 데이터 생성
-        Tx_AcsData.Heart_Beat       := '1';
-        Tx_AcsData.Line_Name_Source := '';
-        Tx_AcsData.Line_No_Source   := '';
-        Tx_AcsData.Port_No_Source   := '';
-        Tx_AcsData.Line_Name_Dest   := '';
-        Tx_AcsData.Line_No_Dest     := '';
-        Tx_AcsData.Port_No_Dest     := '';
-        Tx_AcsData.Model_No         := '';
-        Tx_AcsData.Call_Request     := '0';
-        Tx_AcsData.Call_Answer      := '1';
-        Tx_AcsData.Docking_Approve  := '1';
-        Tx_AcsData.Docking_Complete := '0';
-        SetAcsResponse(i);
+        if (PLC_ReadVal.Curtain[i] = '1') then
+        begin
+          // ACS 응답 데이터 생성
+          Tx_AcsData.Heart_Beat       := '1';
+          Tx_AcsData.Line_Name_Source := '';
+          Tx_AcsData.Line_No_Source   := '';
+          Tx_AcsData.Port_No_Source   := '';
+          Tx_AcsData.Line_Name_Dest   := '';
+          Tx_AcsData.Line_No_Dest     := '';
+          Tx_AcsData.Port_No_Dest     := '';
+          Tx_AcsData.Model_No         := '';
+          Tx_AcsData.Call_Request     := '0';
+  //        Tx_AcsData.Call_Answer      := '1';
+          Tx_AcsData.Docking_Approve  := '1';
+          Tx_AcsData.Docking_Complete := '0';
+          SetAcsResponse(i);
+        end;
+      end
+      // 재고가 있어서 출고지시 된 경우, 출고 완료 후 응답
+      else
+      begin
+        // 해당 라인의 출고 완료된 작업을 찾아옴.
+        WhereStr := ' Where JOBD = ''2'' ' +
+                      ' And NOWSTATUS = ''4'' ' +
+                      ' And JOBSTATUS = ''7'' ' +
+                      ' And JOB_END = ''1'' ' +
+                      ' And LINE_NO = ' + QuotedStr(IntToStr(i)) +
+                    ' Order By REG_TIME Desc ' ;
+        ItemCode := fnOrder_Value(WhereStr, 'LINE_NO');
+
+        // ****************** ItemCode 와 RFID 비교. How To? **************************
+        // 데이터가 일치하지 않으면 다시 입고하고 다른 셀에서 다시 꺼내온다.
+
+        // 커튼 열린 상태, 출고작업 완료상태, RFID 데이터 일치상태
+        // 응답 전송
+        if (PLC_ReadVal.Curtain[i] = '1') then
+        begin
+          // ACS 응답 데이터 생성
+          Tx_AcsData.Heart_Beat       := '1';
+          Tx_AcsData.Line_Name_Source := '';
+          Tx_AcsData.Line_No_Source   := '';
+          Tx_AcsData.Port_No_Source   := '';
+          Tx_AcsData.Line_Name_Dest   := '';
+          Tx_AcsData.Line_No_Dest     := '';
+          Tx_AcsData.Port_No_Dest     := '';
+          Tx_AcsData.Model_No         := '';
+          Tx_AcsData.Call_Request     := '0';
+  //        Tx_AcsData.Call_Answer      := '1';
+          Tx_AcsData.Docking_Approve  := '1';
+          Tx_AcsData.Docking_Complete := '0';
+          SetAcsResponse(i);
+        end;
       end;
     end;
 
@@ -609,6 +640,24 @@ begin
        (Rx_AcsData[i].Docking_Request  = '0' ) and
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
+      // 출고의 경우 품목이 있는지 확인
+      // 품목이 있으면 출고작업 생성, CallAnswer = 1
+      // 없으면 CallAnswer = 2
+      if (i in [2, 4, 6]) then
+      begin
+        ItemCode := Rx_AcsData[i].Model_No;
+        if (fnGetStockCount(ItemCode) > 0) then
+        begin
+          Tx_AcsData.Call_Answer := '1';
+        end else
+        begin
+          Tx_AcsData.Call_Answer := '2';
+        end;
+      end else
+      begin
+        Tx_AcsData.Call_Answer := '1';
+      end;
+
       // ACS 응답 데이터 생성
       Tx_AcsData.Heart_Beat       := '1';
       Tx_AcsData.Line_Name_Source := '';
@@ -619,7 +668,7 @@ begin
       Tx_AcsData.Port_No_Dest     := '';
       Tx_AcsData.Model_No         := '';
       Tx_AcsData.Call_Request     := '0';
-      Tx_AcsData.Call_Answer      := '1';
+//      Tx_AcsData.Call_Answer      := '1';
       Tx_AcsData.Docking_Approve  := '0';
       Tx_AcsData.Docking_Complete := '0';
       SetAcsResponse(i);
@@ -630,20 +679,35 @@ begin
        (Rx_AcsData[i].Docking_Request  = '1' ) and
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
-      // ACS 응답 데이터 생성
-      Tx_AcsData.Heart_Beat       := '1';
-      Tx_AcsData.Line_Name_Source := '';
-      Tx_AcsData.Line_No_Source   := '';
-      Tx_AcsData.Port_No_Source   := '';
-      Tx_AcsData.Line_Name_Dest   := '';
-      Tx_AcsData.Line_No_Dest     := '';
-      Tx_AcsData.Port_No_Dest     := '';
-      Tx_AcsData.Model_No         := '';
-      Tx_AcsData.Call_Request     := '0';
-      Tx_AcsData.Call_Answer      := '0';
-      Tx_AcsData.Docking_Approve  := '1';
-      Tx_AcsData.Docking_Complete := '0';
-      SetAcsResponse(i);
+      // 커튼 오픈
+      if (PLC_ReadVal.Curtain[i] = '0') then
+      begin
+        if (PLC_WriteVal.Curtain[i] = '0') then
+        begin
+          PLC_ORDER.ORDER := '1';
+          Curtain_FLAG := ComWrite;
+        end;
+        PLC_WriteVal.Curtain[i] := '1';
+      end;
+
+      // 커튼이 열려 있을 때에만 전송
+      if (PLC_ReadVal.Curtain[i] = '1') then
+      begin
+        // ACS 응답 데이터 생성
+        Tx_AcsData.Heart_Beat       := '1';
+        Tx_AcsData.Line_Name_Source := '';
+        Tx_AcsData.Line_No_Source   := '';
+        Tx_AcsData.Port_No_Source   := '';
+        Tx_AcsData.Line_Name_Dest   := '';
+        Tx_AcsData.Line_No_Dest     := '';
+        Tx_AcsData.Port_No_Dest     := '';
+        Tx_AcsData.Model_No         := '';
+        Tx_AcsData.Call_Request     := '0';
+        Tx_AcsData.Call_Answer      := '0';
+        Tx_AcsData.Docking_Approve  := '1';
+        Tx_AcsData.Docking_Complete := '0';
+        SetAcsResponse(i);
+      end;
     end else
     // *** 적재물이 AGV에서 설비로 이동한 상태, 진출 요청 *** //
     // *** 적재물이 설비에서 AGV로 이동한 상태, 진출 요청 *** //
@@ -653,34 +717,37 @@ begin
        (Rx_AcsData[i].Docking_Complete = '1' ) then
     begin
 
-      // CV 화물감지 확인 ? 이부분 확인 필요 .
-      // 입고작업이면 NOWMC = 1, NOWSTATUS = 4 변경
-      if (i in [1, 3, 5]) then
-      begin
-        // Order 데이터 CV로 변경
-        WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                    '   And JOBD = ''1'' ' +
-                    '   And JOB_END = ''0'' ';
-        JobNo := fnOrder_Value(WhereStr, 'LUGG');
-        fnOrder_Update(JobNo, 'NOWMC', '1');
-      end;
-
       // 출고작업이면 변경없음.
 
-      // ACS 응답 데이터 생성
-      Tx_AcsData.Heart_Beat       := '1';
-      Tx_AcsData.Line_Name_Source := '';
-      Tx_AcsData.Line_No_Source   := '';
-      Tx_AcsData.Port_No_Source   := '';
-      Tx_AcsData.Line_Name_Dest   := '';
-      Tx_AcsData.Line_No_Dest     := '';
-      Tx_AcsData.Port_No_Dest     := '';
-      Tx_AcsData.Model_No         := '';
-      Tx_AcsData.Call_Request     := '0';
-      Tx_AcsData.Call_Answer      := '0';
-      Tx_AcsData.Docking_Approve  := '1';
-      Tx_AcsData.Docking_Complete := '1';
-      SetAcsResponse(i);
+      // 커튼 오픈
+      if (PLC_ReadVal.Curtain[i] = '0') then
+      begin
+        if (PLC_WriteVal.Curtain[i] = '0') then
+        begin
+          PLC_ORDER.ORDER := '1';
+          Curtain_FLAG := ComWrite;
+        end;
+        PLC_WriteVal.Curtain[i] := '1';
+      end;
+
+      // 커튼이 열려 있을 때에만 전송
+      if (PLC_ReadVal.Curtain[i] = '1') then
+      begin
+        // ACS 응답 데이터 생성
+        Tx_AcsData.Heart_Beat       := '1';
+        Tx_AcsData.Line_Name_Source := '';
+        Tx_AcsData.Line_No_Source   := '';
+        Tx_AcsData.Port_No_Source   := '';
+        Tx_AcsData.Line_Name_Dest   := '';
+        Tx_AcsData.Line_No_Dest     := '';
+        Tx_AcsData.Port_No_Dest     := '';
+        Tx_AcsData.Model_No         := '';
+        Tx_AcsData.Call_Request     := '0';
+        Tx_AcsData.Call_Answer      := '0';
+        Tx_AcsData.Docking_Approve  := '1';
+        Tx_AcsData.Docking_Complete := '1';
+        SetAcsResponse(i);
+      end;
     end else
     // *** 진출완료, 초기상태로 돌아감... *** //
     if (Rx_AcsData[i].Call_Request     = '0' ) and
@@ -690,30 +757,52 @@ begin
     begin
 
       // 입고일 때 TT_ORDER 값 변경하면 스태커 작업시작 함.
-      ///
-      ///  ////////////
-      ///  ////////////
-      ///
+      // CV 화물감지 확인 ? 이부분 확인 필요 .
+      // 입고작업이면 NOWMC = 1, NOWSTATUS = 4 변경
+      if (i in [1, 3, 5]) then
+      begin
+        // Order 데이터 CV로 변경
+        WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+                    '   And JOBD = ''1'' ' +
+                    '   And JOB_END = ''0'' ';
+        JobNo := fnOrder_Value(WhereStr, 'LUGG');
+        if (JobNo <> '') then
+        begin
+          fnOrder_Update(JobNo, 'NOWMC', '1');
+        end;
+      end;
 
+      // 커튼 닫음
+      if (PLC_ReadVal.Curtain[i] = '1') then
+      begin
+        if PLC_WriteVal.Curtain[i] = '1' then
+        begin
+          PLC_ORDER.ORDER := '1';
+          Curtain_Flag := ComWrite;
+        end;
+        PLC_WriteVal.Curtain[i] := '0';
+      end;
 
-      // ACS 응답 데이터 생성
-      Tx_AcsData.Heart_Beat       := '1';
-      Tx_AcsData.Line_Name_Source := '';
-      Tx_AcsData.Line_No_Source   := '';
-      Tx_AcsData.Port_No_Source   := '';
-      Tx_AcsData.Line_Name_Dest   := '';
-      Tx_AcsData.Line_No_Dest     := '';
-      Tx_AcsData.Port_No_Dest     := '';
-      Tx_AcsData.Model_No         := '';
-      Tx_AcsData.Call_Request     := '0';
-      Tx_AcsData.Call_Answer      := '0';
-      Tx_AcsData.Docking_Approve  := '0';
-      Tx_AcsData.Docking_Complete := '0';
-      SetAcsResponse(i);
+      // 커튼이 닫혀 있을 때에만 전송
+      if (PLC_ReadVal.Curtain[i] = '0') then
+      begin
+        // ACS 응답 데이터 생성
+        Tx_AcsData.Heart_Beat       := '1';
+        Tx_AcsData.Line_Name_Source := '';
+        Tx_AcsData.Line_No_Source   := '';
+        Tx_AcsData.Port_No_Source   := '';
+        Tx_AcsData.Line_Name_Dest   := '';
+        Tx_AcsData.Line_No_Dest     := '';
+        Tx_AcsData.Port_No_Dest     := '';
+        Tx_AcsData.Model_No         := '';
+        Tx_AcsData.Call_Request     := '0';
+        Tx_AcsData.Call_Answer      := '0';
+        Tx_AcsData.Docking_Approve  := '0';
+        Tx_AcsData.Docking_Complete := '0';
+        SetAcsResponse(i);
+      end;
     end;
-
   end;
-
 end;
 
 //==============================================================================
@@ -771,7 +860,7 @@ procedure TfrmSCComm.sbtClick(Sender: TObject);
 var
   i : integer ;
 begin
-  for i := START_SCNO to End_SCNO do fnSCIO_Delete(i) ;
+//  for i := START_SCNO to End_SCNO do fnSCIO_Delete(i) ;
 
   if (Sender as TBitBtn).Caption = '통신시작' then
   begin
@@ -807,7 +896,6 @@ end;
 //==============================================================================
 procedure TfrmSCComm.tmrConnectCheckTimer(Sender: TObject);
 var
-  i : integer;
   strLog : String ;
 begin
   try
@@ -1176,7 +1264,7 @@ end;
 //==============================================================================
 procedure TfrmSCComm.SCTREAD(SC_NO: Integer);
 var
-  j, k : integer ;
+  j : integer ;
   StrSql, TmpCol, StrLog, D210, D211, D212 : String ;
 begin
   D210:=''; D211:=''; D212:='';
@@ -1208,13 +1296,13 @@ begin
         // Bit Data -> 2 Word
         for j := 0 to 15 do
         begin
-          TmpCol := 'D210_' + FormatFloat('00',j) ;
+          TmpCol := 'D210_' + FormatFloat('00', j) ;
           SC_STATUS[SC_NO].D210[j] := FieldByName(TmpCol).AsString ;
           D210 := D210 + SC_STATUS[SC_NO].D210[j] ;
-          TmpCol := 'D211_' + FormatFloat('00',j) ;
+          TmpCol := 'D211_' + FormatFloat('00', j) ;
           SC_STATUS[SC_NO].D211[j] := FieldByName(TmpCol).AsString ;
           D211 := D211 + SC_STATUS[SC_NO].D211[j] ;
-          TmpCol := 'D212_' + FormatFloat('00',j) ;
+          TmpCol := 'D212_' + FormatFloat('00', j) ;
           SC_STATUS[SC_NO].D212[j] := FieldByName(TmpCol).AsString ;
           D212 := D212 + SC_STATUS[SC_NO].D212[j] ;
         end;
@@ -1418,12 +1506,22 @@ begin
         SC_STATUS[SC_NO].D1391 := FieldByName('D1391').AsString ;
 
         //라이트 커튼 상태
-        PLC_ReadVal.InSt_Door[1] := SC_STATUS[SC_NO].D212[0];
-        PLC_ReadVal.OtSt_Door[1] := SC_STATUS[SC_NO].D212[1];
-        PLC_ReadVal.InSt_Door[2] := SC_STATUS[SC_NO].D212[2];
-        PLC_ReadVal.OtSt_Door[2] := SC_STATUS[SC_NO].D212[3];
-        PLC_ReadVal.InSt_Door[3] := SC_STATUS[SC_NO].D212[4];
-        PLC_ReadVal.OtSt_Door[3] := SC_STATUS[SC_NO].D212[5];
+        PLC_ReadVal.Curtain[1] := SC_STATUS[SC_NO].D212[0];
+        PLC_ReadVal.Curtain[2] := SC_STATUS[SC_NO].D212[1];
+        PLC_ReadVal.Curtain[3] := SC_STATUS[SC_NO].D212[2];
+        PLC_ReadVal.Curtain[4] := SC_STATUS[SC_NO].D212[3];
+        PLC_ReadVal.Curtain[5] := SC_STATUS[SC_NO].D212[4];
+        PLC_ReadVal.Curtain[6] := SC_STATUS[SC_NO].D212[5];
+
+
+        // RFID 변환
+        // 변환한 값을 TC_RFID에 넣음. RFID 구분자가 확실하지 않음.
+
+
+
+
+
+
 
 
         StrLog := ' READ SC'+IntToStr(SC_No)+
@@ -1490,17 +1588,22 @@ end;
 // SCTWRITE
 //==============================================================================
 procedure TfrmSCComm.SCTWRITE(SC_NO:Integer);
-var
-  str, StrHigh, StrLow : String ;
 begin
   if CONTROL_FLAG[SC_NO] = ComRead then
   begin
     //
   end else
-  if CONTROL_FLAG[SC_NO] = ComWrite then
+  if (CONTROL_FLAG[SC_NO] = ComWrite) then
   begin
     fnSetWriteInfo(SC_NO, SC_JOB[SC_NO].IO_TYPE) ;
   end;
+
+  if (Curtain_FLAG = ComWrite) then
+  begin
+    fnSetPLCWriteInfo;
+    Curtain_FLAG := ComRead;
+  end;
+
 end;
 
 //==============================================================================
@@ -1508,7 +1611,6 @@ end;
 //==============================================================================
 procedure TfrmSCComm.SCControlProcess(SC_NO:Integer);
 var
-  Str, StrLog : String ;
   ErrorCode, ErrHigh, ErrLow, MOV_NO : String ;
 begin
   staInfo.Panels[0].Text := fnGetSCStatus(SC_STAT[SC_NO]) ;
@@ -2221,12 +2323,9 @@ end;
 //==============================================================================
 // fnSetWriteInfo : 지시 데이터 SET
 //==============================================================================
-function TfrmSCComm.fnSetWriteInfo(SC_NO:Integer;Job_Type:String): Boolean;
+function TfrmSCComm.fnSetWriteInfo(SC_NO: Integer; Job_Type: String): Boolean;
 var
-  TempIdx : Integer;
-  StrLog : String ;
   i : Integer;
-  BinDoor : String;
 begin
   SC_ORDClear(SC_NO) ; // 지시 구조체 초기화
 
@@ -2352,26 +2451,36 @@ begin
       fnSetSCORDWrite(SC_NO,'1'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
     end;
 
-    // 커튼 on/off
-    if (PLC_ORDER.ORDER = '1') then
-    begin
-      Sleep(500);
-      PLC_ORDER.ORDER := '0';
-
-      BinDoor := '00';
-      for i := 3 downto 1 do
-      begin
-        BinDoor := BinDoor + PLC_WriteVal.OtSt_Door[i] + PLC_WriteVal.InSt_Door[i];
-      end;
-      PLC_ORDER.D111 := FormatFloat('0000', Bin2Dec(BinDoor));
-
-      fnSetPLCORDWrite(SC_NO, '0'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
-    end;
-
     Sleep(2000);
   end;
 end;
 
+//==============================================================================
+// fnSetPLCWriteInfo : 지시 데이터 TT_PLCORD INSERT (MELSEC 프로그램에서 TT_PLCORD 폴링 중)
+//==============================================================================
+function TfrmSCComm.fnSetPLCWriteInfo: Boolean;
+var
+ BinDoor : String;
+ i : Integer;
+begin
+  // 커튼 on/off
+  if (PLC_ORDER.ORDER = '1') then
+  begin
+    Sleep(500);
+    PLC_ORDER.ORDER := '0';
+
+    BinDoor := '00';
+    for i := 6 downto 1 do
+    begin
+      BinDoor := BinDoor + PLC_WriteVal.Curtain[i];
+    end;
+    PLC_ORDER.D111 := FormatFloat('0000', Bin2Dec(BinDoor));
+
+    fnSetPLCORDWrite(1, '0'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
+  end;
+
+  Sleep(2000);
+end;
 
 //==============================================================================
 // fnSetSCORDWrite : 지시 데이터 TT_SCORD에 INSERT (MELSEC 프로그램에서 TT_SCORD 폴링 중)
@@ -2387,8 +2496,8 @@ begin
              '    D111, ' +
              '    ORD_STATUS, ORD_DT ) ' +
              ' VALUES ( ' +
-             ' ''' + IntToStr(PLC_NO) + ''' ' +
-             ' ''' + PLC_ORDER.D111 + ''' ' +
+             ' ''' + IntToStr(PLC_NO) + ''', ' +
+             ' ''' + PLC_ORDER.D111 + ''', ' +
              ' ''' + Flag + ''', ' +
              ' GETDATE() ) ' ;
   try
@@ -4416,7 +4525,9 @@ begin
   end;
 end;
 
-
+//==============================================================================
+// fnGetStockLoc : 품목 위치 반환
+//==============================================================================
 function TfrmSCComm.fnGetStockLoc(ItemCode : String): String;
 var
   StrSQL : String;
@@ -4454,6 +4565,72 @@ begin
 end;
 
 //==============================================================================
+// fnGetSocktCount : 품목 갯수 반환
+//==============================================================================
+function TfrmSCComm.fnGetStockCount(ItemCode: String): Integer;
+var
+  StrSQL : string;
+begin
+  Result := 0 ;
+  StrSQL := '';
+  try
+    with qryStock do
+    begin
+      Close;
+      SQL.Clear;
+      StrSQL := ' SELECT COUNT(*) as CNT ' +
+                '   FROM TT_STOCK ' +
+                '  WHERE ITM_CD = ' + QuotedStr(ItemCode) +
+                '    AND ID_STATUS = ''2'' ';
+      SQL.Text := StrSQL ;
+      Open ;
+      Result := FieldByName('CNT').AsInteger;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryStock.Close ;
+      ErrorLogWRITE( 'Function fnGetSocktCount ItemCode(' + ItemCode + ') ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// fnStockUpdate : STOCK 해당 데이터 Update
+//==============================================================================
+function TfrmSCComm.fnIsCellEmpty: Boolean;
+var
+  StrSQL : string;
+begin
+  Result := False ;
+  StrSQL := '';
+  try
+    with qryStock do
+    begin
+      Close;
+      SQL.Clear;
+      StrSQL := ' SELECT COUNT(*) as CNT ' +
+                '   FROM TT_STOCK ' +
+                '  WHERE ID_STATUS = ''0'' ';
+      SQL.Text := StrSQL ;
+      Open ;
+      Result := Boolean(FieldByName('CNT').AsInteger);
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryStock.Close ;
+      ErrorLogWRITE( 'Function fnIsCellEmpty ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+end;
+
+
+//==============================================================================
 // fnStockUpdate : STOCK 해당 데이터 Update
 //==============================================================================
 function TfrmSCComm.fnStockUpdate(Loc, FName, FValue: String): Boolean;
@@ -4463,7 +4640,7 @@ begin
   Result := False ;
   StrSQL := '';
   try
-    with qryStock do
+    with qryUpdate do
     begin
       Close;
       SQL.Clear;
@@ -4780,7 +4957,7 @@ begin
       '    :NOWMC, :JOBSTATUS, :NOWSTATUS, :BUFFSTATUS,    ' + #13#10 +
       '    :JOBREWORK, :JOBERRORT, :JOBERRORC, :JOBERRORD, ' + #13#10 +
       '    :JOB_END, :CVFR, :CVTO, :CVCURR,                ' + #13#10 +
-      '    :ETC, :EMG, :ITM_CD, :LINE_NO, :UP_TIME         ' + #13#10 +
+      '    :ETC, :EMG, :ITM_CD, :LINE_NO, GETDATE()        ' + #13#10 +
       ' )';
 
 
@@ -4812,7 +4989,6 @@ begin
       Parameters[i].Value := OrderData.EMG;         Inc(i);
       Parameters[i].Value := OrderData.ITM_CD;      Inc(i);
       Parameters[i].Value := OrderData.LINE_NO;     Inc(i);
-      Parameters[i].Value := OrderData.UP_TIME;     Inc(i);
       ExecSql;
       Close;
     end;
