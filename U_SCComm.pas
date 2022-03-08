@@ -74,10 +74,10 @@ type
     Panel19: TPanel;
     edt_Complete: TEdit;
     Panel20: TPanel;
-    edt_InReady: TEdit;
+    edt_InReady1: TEdit;
     edt_Double: TEdit;
     Panel25: TPanel;
-    edt_OutReady: TEdit;
+    edt_OutReady1: TEdit;
     Panel26: TPanel;
     edt_StandBy: TEdit;
     Panel27: TPanel;
@@ -113,6 +113,39 @@ type
     Panel18: TPanel;
     qryACS: TADOQuery;
     PD_GET_JOBNO: TADOStoredProc;
+    Panel31: TPanel;
+    edt_InReady3: TEdit;
+    edt_InReady2: TEdit;
+    Panel34: TPanel;
+    Panel38: TPanel;
+    edt_OutReady3: TEdit;
+    edt_OutReady2: TEdit;
+    Panel40: TPanel;
+    Panel32: TPanel;
+    edt_Fire1: TEdit;
+    edt_Fire2: TEdit;
+    Panel39: TPanel;
+    Panel41: TPanel;
+    edt_Fire5: TEdit;
+    edt_Fire3: TEdit;
+    Panel42: TPanel;
+    Panel43: TPanel;
+    edt_Fire6: TEdit;
+    edt_Fire4: TEdit;
+    Panel44: TPanel;
+    Panel45: TPanel;
+    edt_Curtain1: TEdit;
+    edt_Curtain2: TEdit;
+    Panel46: TPanel;
+    Panel47: TPanel;
+    edt_Curtain5: TEdit;
+    edt_Curtain3: TEdit;
+    Panel48: TPanel;
+    Panel49: TPanel;
+    edt_Curtain6: TEdit;
+    edt_Curtain4: TEdit;
+    Panel50: TPanel;
+    Bevel3: TBevel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -212,6 +245,7 @@ type
     function  fnGetStockLoc(ItemCode : String): String;                            // 품목 위치 반환
     function  fnGetStockCount(ItemCode: String): Integer;                          // 품목 갯수 반환
     function  fnIsCellEmpty: Boolean;                                              // 창고 자리 있는지 여부
+    function  fnGetCellCount(Status: String): Integer;                             // 창고 빈 칸 갯수 반환
 
 
     // TM_ITEM 테이블 관련 함수
@@ -403,6 +437,30 @@ begin
 
     // ACS 요청에 맞는 대응을 하고 응답 값을 만듦
 
+    // 입고 포트
+    if( i in [1, 3, 5]) then
+    begin
+      // 넣을 자리가 있을 경우
+      if (fnIsCellEmpty) then
+      begin
+        Tx_AcsData.Status := '0';
+      end else
+      begin
+        Tx_AcsData.Status := '1';
+      end;
+    end else
+    // 출고 포트
+    begin
+      // 창고가 아예 비어있을 경우
+      if (fnGetCellCount('0') = 108) then
+      begin
+        Tx_AcsData.Status := '2';
+      end else
+      begin
+        Tx_AcsData.Status := '0';
+      end;
+    end;
+
     //==================================//
     // (AGV가 커튼 앞에 위치) 입고 작업 //
     //==================================//
@@ -487,7 +545,7 @@ begin
         Tx_AcsData.Docking_Approve  := '1';
         Tx_AcsData.Docking_Complete := '0';
         // 응답 값 업데이트
-        SetAcsResponse(i);
+//        SetAcsResponse(i);
       end;
     end;
 
@@ -591,7 +649,7 @@ begin
   //        Tx_AcsData.Call_Answer      := '1';
           Tx_AcsData.Docking_Approve  := '1';
           Tx_AcsData.Docking_Complete := '0';
-          SetAcsResponse(i);
+//          SetAcsResponse(i);
         end;
       end
       // 재고가 있어서 출고지시 된 경우, 출고 완료 후 응답
@@ -626,7 +684,7 @@ begin
   //        Tx_AcsData.Call_Answer      := '1';
           Tx_AcsData.Docking_Approve  := '1';
           Tx_AcsData.Docking_Complete := '0';
-          SetAcsResponse(i);
+//          SetAcsResponse(i);
         end;
       end;
     end;
@@ -671,7 +729,7 @@ begin
 //      Tx_AcsData.Call_Answer      := '1';
       Tx_AcsData.Docking_Approve  := '0';
       Tx_AcsData.Docking_Complete := '0';
-      SetAcsResponse(i);
+//      SetAcsResponse(i);
     end else
     // *** 도킹 완료 *** //
     if (Rx_AcsData[i].Call_Request     = '0' ) and
@@ -706,7 +764,7 @@ begin
         Tx_AcsData.Call_Answer      := '0';
         Tx_AcsData.Docking_Approve  := '1';
         Tx_AcsData.Docking_Complete := '0';
-        SetAcsResponse(i);
+//        SetAcsResponse(i);
       end;
     end else
     // *** 적재물이 AGV에서 설비로 이동한 상태, 진출 요청 *** //
@@ -746,7 +804,7 @@ begin
         Tx_AcsData.Call_Answer      := '0';
         Tx_AcsData.Docking_Approve  := '1';
         Tx_AcsData.Docking_Complete := '1';
-        SetAcsResponse(i);
+//        SetAcsResponse(i);
       end;
     end else
     // *** 진출완료, 초기상태로 돌아감... *** //
@@ -755,7 +813,6 @@ begin
        (Rx_AcsData[i].Docking_Request  = '0' ) and
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
-
       // 입고일 때 TT_ORDER 값 변경하면 스태커 작업시작 함.
       // CV 화물감지 확인 ? 이부분 확인 필요 .
       // 입고작업이면 NOWMC = 1, NOWSTATUS = 4 변경
@@ -783,26 +840,22 @@ begin
         PLC_WriteVal.Curtain[i] := '0';
       end;
 
-      // 커튼이 닫혀 있을 때에만 전송
-      if (PLC_ReadVal.Curtain[i] = '0') then
-      begin
-        // ACS 응답 데이터 생성
-        Tx_AcsData.Heart_Beat       := '1';
-        Tx_AcsData.Line_Name_Source := '';
-        Tx_AcsData.Line_No_Source   := '';
-        Tx_AcsData.Port_No_Source   := '';
-        Tx_AcsData.Line_Name_Dest   := '';
-        Tx_AcsData.Line_No_Dest     := '';
-        Tx_AcsData.Port_No_Dest     := '';
-        Tx_AcsData.Model_No         := '';
-        Tx_AcsData.Call_Request     := '0';
-        Tx_AcsData.Call_Answer      := '0';
-        Tx_AcsData.Docking_Approve  := '0';
-        Tx_AcsData.Docking_Complete := '0';
-        SetAcsResponse(i);
-      end;
+      // ACS 응답 데이터 생성
+      Tx_AcsData.Heart_Beat       := '1';
+      Tx_AcsData.Line_Name_Source := '';
+      Tx_AcsData.Line_No_Source   := '';
+      Tx_AcsData.Port_No_Source   := '';
+      Tx_AcsData.Line_Name_Dest   := '';
+      Tx_AcsData.Line_No_Dest     := '';
+      Tx_AcsData.Port_No_Dest     := '';
+      Tx_AcsData.Model_No         := '';
+      Tx_AcsData.Call_Request     := '0';
+      Tx_AcsData.Call_Answer      := '0';
+      Tx_AcsData.Docking_Approve  := '0';
+      Tx_AcsData.Docking_Complete := '0';
     end;
-  end;
+    SetAcsResponse(i);
+  end; // end for statement
 end;
 
 //==============================================================================
@@ -1063,8 +1116,25 @@ begin
   TEdit(Self.FindComponent('edt_Double'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[03]); // 이중입고
   TEdit(Self.FindComponent('edt_Empty'        )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[04]); // 공출고
   TEdit(Self.FindComponent('edt_ForceComplete')).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[07]); // 강제완료
-  TEdit(Self.FindComponent('edt_InReady'      )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[08]); // 입고레디
-  TEdit(Self.FindComponent('edt_OutReady'     )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[09]); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady1'     )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[08]); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady1'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[09]); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady2'     )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[10]); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady2'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[11]); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady3'     )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[12]); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady3'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D211[13]); // 출고레디
+  // D212.00 ~ D212.15
+  TEdit(Self.FindComponent('edt_Curtain1'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[00]); // 라이트커튼1
+  TEdit(Self.FindComponent('edt_Curtain2'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[01]); // 라이트커튼2
+  TEdit(Self.FindComponent('edt_Curtain3'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[02]); // 라이트커튼3
+  TEdit(Self.FindComponent('edt_Curtain4'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[03]); // 라이트커튼4
+  TEdit(Self.FindComponent('edt_Curtain5'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[04]); // 라이트커튼5
+  TEdit(Self.FindComponent('edt_Curtain6'    )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[05]); // 라이트커튼6
+  TEdit(Self.FindComponent('edt_Fire1'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[10]); // 화재경보기1
+  TEdit(Self.FindComponent('edt_Fire2'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[11]); // 화재경보기2
+  TEdit(Self.FindComponent('edt_Fire3'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[12]); // 화재경보기3
+  TEdit(Self.FindComponent('edt_Fire4'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[13]); // 화재경보기4
+  TEdit(Self.FindComponent('edt_Fire5'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[14]); // 화재경보기5
+  TEdit(Self.FindComponent('edt_Fire6'       )).Text := fnSignalMsg(SC_STATUS[SC_NO].D212[15]); // 화재경보기6
 
   //++++++++++++++++++++++++++++++++++++++++++++
   // 에디트 색상 변경 (D210.00 ~ D210.15)
@@ -1088,8 +1158,25 @@ begin
   TEdit(Self.FindComponent('edt_Double'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[03],'1'); // 이중입고
   TEdit(Self.FindComponent('edt_Empty'        )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[04],'1'); // 공출고
   TEdit(Self.FindComponent('edt_ForceComplete')).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[07],'3'); // 강제완료
-  TEdit(Self.FindComponent('edt_InReady'      )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[08],'2'); // 입고레디
-  TEdit(Self.FindComponent('edt_OutReady'     )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[09],'2'); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady1'     )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[08],'2'); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady1'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[09],'2'); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady2'     )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[10],'2'); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady2'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[11],'2'); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady3'     )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[12],'2'); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady3'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D211[13],'2'); // 출고레디
+  // D212.00 ~ D212.15
+  TEdit(Self.FindComponent('edt_Curtain1'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[00],'2'); // 라이트커튼1
+  TEdit(Self.FindComponent('edt_Curtain2'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[01],'2'); // 라이트커튼2
+  TEdit(Self.FindComponent('edt_Curtain3'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[02],'2'); // 라이트커튼3
+  TEdit(Self.FindComponent('edt_Curtain4'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[03],'2'); // 라이트커튼4
+  TEdit(Self.FindComponent('edt_Curtain5'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[04],'2'); // 라이트커튼5
+  TEdit(Self.FindComponent('edt_Curtain6'    )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[05],'2'); // 라이트커튼6
+  TEdit(Self.FindComponent('edt_Fire1'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[10],'2'); // 화재경보기1
+  TEdit(Self.FindComponent('edt_Fire2'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[11],'2'); // 화재경보기2
+  TEdit(Self.FindComponent('edt_Fire3'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[12],'2'); // 화재경보기3
+  TEdit(Self.FindComponent('edt_Fire4'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[13],'2'); // 화재경보기4
+  TEdit(Self.FindComponent('edt_Fire5'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[14],'2'); // 화재경보기5
+  TEdit(Self.FindComponent('edt_Fire6'       )).Color := fnSignalEditColor(SC_STATUS[SC_NO].D212[15],'2'); // 화재경보기6
 
   //++++++++++++++++++++++++++++++++++++++++++++
   // 에디트 폰트 색상 변경 (D210.00 ~ D210.15)
@@ -1113,8 +1200,25 @@ begin
   TEdit(Self.FindComponent('edt_Double'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[03],'1'); // 이중입고
   TEdit(Self.FindComponent('edt_Empty'        )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[04],'1'); // 공출고
   TEdit(Self.FindComponent('edt_ForceComplete')).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[07],'3'); // 강제완료
-  TEdit(Self.FindComponent('edt_InReady'      )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[08],'2'); // 입고레디
-  TEdit(Self.FindComponent('edt_OutReady'     )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[09],'2'); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady1'     )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[08],'2'); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady1'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[09],'2'); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady2'     )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[10],'2'); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady2'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[11],'2'); // 출고레디
+  TEdit(Self.FindComponent('edt_InReady3'     )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[12],'2'); // 입고레디
+  TEdit(Self.FindComponent('edt_OutReady3'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D211[13],'2'); // 출고레디
+  // D212.00 ~ D212.15
+  TEdit(Self.FindComponent('edt_Curtain1'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[00],'2'); // 라이트커튼1
+  TEdit(Self.FindComponent('edt_Curtain2'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[01],'2'); // 라이트커튼2
+  TEdit(Self.FindComponent('edt_Curtain3'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[02],'2'); // 라이트커튼3
+  TEdit(Self.FindComponent('edt_Curtain4'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[03],'2'); // 라이트커튼4
+  TEdit(Self.FindComponent('edt_Curtain5'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[04],'2'); // 라이트커튼5
+  TEdit(Self.FindComponent('edt_Curtain6'    )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[05],'2'); // 라이트커튼6
+  TEdit(Self.FindComponent('edt_Fire1'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[10],'2'); // 화재경보기1
+  TEdit(Self.FindComponent('edt_Fire2'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[11],'2'); // 화재경보기2
+  TEdit(Self.FindComponent('edt_Fire3'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[12],'2'); // 화재경보기3
+  TEdit(Self.FindComponent('edt_Fire4'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[13],'2'); // 화재경보기4
+  TEdit(Self.FindComponent('edt_Fire5'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[14],'2'); // 화재경보기5
+  TEdit(Self.FindComponent('edt_Fire6'       )).Font.Color := fnSignalFontColor(SC_STATUS[SC_NO].D212[15],'2'); // 화재경보기6
 end;
 
 //==============================================================================
@@ -4598,7 +4702,7 @@ begin
 end;
 
 //==============================================================================
-// fnStockUpdate : STOCK 해당 데이터 Update
+// fnIsCellEmpty : 랙이 비어있는지 확인 비어있으면 True, 꽉 차 있으면 False
 //==============================================================================
 function TfrmSCComm.fnIsCellEmpty: Boolean;
 var
@@ -4629,6 +4733,39 @@ begin
   end;
 end;
 
+
+//==============================================================================
+// fnIsCellEmpty : 랙 빈칸 갯수 반환
+//==============================================================================
+function TfrmSCComm.fnGetCellCount(Status: String): Integer;
+var
+  StrSQL : string;
+begin
+  Result := 0 ;
+  StrSQL := '';
+  try
+    with qryStock do
+    begin
+      Close;
+      SQL.Clear;
+      StrSQL := ' SELECT COUNT(*) as CNT ' +
+                '   FROM TT_STOCK ' +
+                '  WHERE ID_STATUS = ' + QuotedStr(Status);
+      SQL.Text := StrSQL ;
+      Open ;
+      Result := FieldByName('CNT').AsInteger;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryStock.Close ;
+      ErrorLogWRITE( 'Function fnIsCellEmpty ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+
+end;
 
 //==============================================================================
 // fnStockUpdate : STOCK 해당 데이터 Update
@@ -5042,14 +5179,14 @@ begin
                     '    PORT_NO_SOURCE, LINE_NAME_DEST,                  ' + #13#10 +
                     '    LINE_NO_DEST, PORT_NO_DEST, MODEL_NO,            ' + #13#10 +
                     '    CALL_REQUEST, CALL_ANSWER, DOCKING_REQ_APPR,     ' + #13#10 +
-                    '    DOCKING_COMPLETE, CRT_DT, UPD_DT,                ' + #13#10 +
+                    '    DOCKING_COMPLETE, STATUS, CRT_DT, UPD_DT         ' + #13#10 +
                     '  ) VALUES (                                         ' + #13#10 +
                     '    :GUBN, :PORT_NO, :HEART_BEAT,                    ' + #13#10 +
                     '    :LINE_NAME_SOURCE, :LINE_NO_SOURCE               ' + #13#10 +
                     '    :PORT_NO_SOURCE, :LINE_NAME_DEST,                ' + #13#10 +
                     '    :LINE_NO_DEST, :PORT_NO_DEST, :MODEL_NO,         ' + #13#10 +
                     '    :CALL_REQUEST, :CALL_ANSWER, :DOCKING_REQ_APPR,  ' + #13#10 +
-                    '    :DOCKING_COMPLETE, GETDATE(), GETDATE(),         ' + #13#10 +
+                    '    :DOCKING_COMPLETE, :STATUS, GETDATE(), GETDATE() ' + #13#10 +
                     '  )';
         i := 0;
         Parameters[i].Value := 'SEND';                        Inc(i);
@@ -5084,6 +5221,7 @@ begin
                     '      , CALL_ANSWER      = ' + QuotedStr(Tx_AcsData.Call_Answer) +
                     '      , DOCKING_REQ_APPR = ' + QuotedStr(Tx_AcsData.Docking_Approve) +
                     '      , DOCKING_COMPLETE = ' + QuotedStr(Tx_AcsData.Docking_Complete) +
+                    '      , STATUS           = ' + QuotedStr(Tx_AcsData.Status) +
                     '      , UPD_DT           = GETDATE() ' +
                     '  WHERE GUBN = ''SEND'' ' +
                     '    AND PORT_NO = ' + QuotedStr(IntToStr(PortNo));
@@ -5142,7 +5280,6 @@ end;
 //==============================================================================
 function TfrmSCComm.GetJobNo : Integer;
 var
-  StrSQL : String;
   returnValue : String;
 begin
   try

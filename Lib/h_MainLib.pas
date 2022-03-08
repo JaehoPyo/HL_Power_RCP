@@ -95,6 +95,7 @@ Type
     Call_Answer      : String;
     Docking_Request  : String;
     Docking_Complete : String;
+    Status           : String;
   End;
 
   TTx_AcsData = Record
@@ -110,6 +111,7 @@ Type
     Call_Answer      : String;
     Docking_Approve  : String;
     Docking_Complete : String;
+    Status           : String;
   End;
 
   TPLC_VAL = Record
