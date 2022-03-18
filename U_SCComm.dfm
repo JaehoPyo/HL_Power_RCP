@@ -5,7 +5,7 @@ object frmSCComm: TfrmSCComm
   BorderStyle = bsSingle
   Caption = 'SC '#51228#50612
   ClientHeight = 737
-  ClientWidth = 731
+  ClientWidth = 394
   Color = 16185078
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -159,7 +159,7 @@ object frmSCComm: TfrmSCComm
   object pcStatus: TPageControl
     Left = 0
     Top = 0
-    Width = 731
+    Width = 394
     Height = 673
     ActivePage = tsStatus
     Align = alClient
@@ -170,24 +170,22 @@ object frmSCComm: TfrmSCComm
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ExplicitHeight = 498
+    ExplicitWidth = 731
     object tsCommLog: TTabSheet
       Caption = '[ '#53685#49888#47196#44536' ]'
-      ExplicitHeight = 470
       object Pnl_Main: TPanel
         Left = 0
         Top = 0
-        Width = 723
+        Width = 386
         Height = 645
         Align = alClient
         BevelInner = bvLowered
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitHeight = 470
         object ListBoxOrder: TListBox
           Left = 1
           Top = 413
-          Width = 721
+          Width = 384
           Height = 231
           Style = lbOwnerDrawFixed
           Align = alBottom
@@ -205,12 +203,11 @@ object frmSCComm: TfrmSCComm
           MultiSelect = True
           ParentFont = False
           TabOrder = 0
-          ExplicitTop = 238
         end
         object CommLog: TMemo
           Left = 1
           Top = 1
-          Width = 721
+          Width = 384
           Height = 412
           Align = alClient
           BiDiMode = bdLeftToRight
@@ -232,18 +229,16 @@ object frmSCComm: TfrmSCComm
           ScrollBars = ssBoth
           ShowHint = False
           TabOrder = 1
-          ExplicitHeight = 237
         end
       end
     end
     object tsStatus: TTabSheet
       Caption = '[ '#49345#53468#51221#48372' ]'
       ImageIndex = 3
-      ExplicitHeight = 470
       object PnlSC1: TPanel
         Left = 0
         Top = 0
-        Width = 723
+        Width = 386
         Height = 645
         ParentCustomHint = False
         Align = alClient
@@ -265,11 +260,10 @@ object frmSCComm: TfrmSCComm
         ParentShowHint = False
         ShowHint = False
         TabOrder = 0
-        ExplicitHeight = 470
         object gbStatus: TGroupBox
           Left = 0
           Top = 0
-          Width = 723
+          Width = 386
           Height = 517
           ParentCustomHint = False
           Align = alTop
@@ -2403,7 +2397,7 @@ object frmSCComm: TfrmSCComm
         object gbOrder: TGroupBox
           Left = 0
           Top = 517
-          Width = 723
+          Width = 386
           Height = 128
           ParentCustomHint = False
           Align = alClient
@@ -2426,8 +2420,6 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 1
-          ExplicitTop = 383
-          ExplicitHeight = 255
           object Panel24: TPanel
             Left = 10
             Top = 100
@@ -2956,7 +2948,7 @@ object frmSCComm: TfrmSCComm
   object staInfo: TStatusBar
     Left = 0
     Top = 717
-    Width = 731
+    Width = 394
     Height = 20
     Panels = <
       item
@@ -2974,12 +2966,11 @@ object frmSCComm: TfrmSCComm
         Text = 'YYYY/MM/DD HH:MM:SS'
         Width = 30
       end>
-    ExplicitTop = 542
   end
   object PnlBtm: TPanel
     Left = 0
     Top = 673
-    Width = 731
+    Width = 394
     Height = 44
     ParentCustomHint = False
     Align = alBottom
@@ -3000,7 +2991,6 @@ object frmSCComm: TfrmSCComm
     ParentShowHint = False
     ShowHint = False
     TabOrder = 2
-    ExplicitTop = 498
     object gb_SC_COMM: TGroupBox
       Left = 0
       Top = 0
@@ -3256,7 +3246,7 @@ object frmSCComm: TfrmSCComm
   end
   object tmrStatusRead: TTimer
     Enabled = False
-    Interval = 200
+    Interval = 300
     OnTimer = tmrStatusReadTimer
     Left = 418
     Top = 43
@@ -3415,5 +3405,23 @@ object frmSCComm: TfrmSCComm
       end>
     Left = 419
     Top = 268
+  end
+  object qryHis: TADOQuery
+    Connection = MainDm.MainDB
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 482
+    Top = 221
+  end
+  object qryRfid: TADOQuery
+    Connection = MainDm.MainDB
+    CursorType = ctStatic
+    Parameters = <>
+    SQL.Strings = (
+      '')
+    Left = 514
+    Top = 221
   end
 end
