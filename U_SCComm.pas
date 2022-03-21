@@ -324,6 +324,7 @@ var
   Cap : String;
 begin
   Cap  := IniRead(INI_PATH, 'Program', 'ProgramName',  'IniRead Failed');
+  ActivePCAddr := SysGetLocalIp(1);   // PC Ip-Address
 
   if  Findwindow(Nil, pChar(Cap)) <> 0 then
   begin
@@ -355,6 +356,7 @@ begin
     ShpCon.Brush.Color := clRed;
     Exit;
   end;
+  InsertPGMHist('[RCP]', 'N', 'FormShow', '시작', '', 'PGM', '', '', '');
 end;
 
 //==============================================================================
@@ -468,7 +470,7 @@ begin
     else
     begin
       // 창고가 아예 비어있을 경우
-      if (fnGetCellCount('0') = 108) then
+      if (fnGetCellCount('0') = 100) then
       begin
         Tx_AcsData[i].Status := '2';
       end else
@@ -951,6 +953,8 @@ begin
     fnSetSCSetInfo(i, 'PROGRAM_START', '0') ;
     fnSetSCSetInfo(i, 'PROGRAM_END'  , '1') ;
   end;
+
+  InsertPGMHist('[RCP]', 'N', 'FormClose', '종료', '', 'PGM', '', '', '');
 
   fnCloseSet ;
   ExitProcess(0);
@@ -2544,7 +2548,7 @@ begin
     //--------------------------------------------------------------------------
     // 정상입고&이중입고재기동, 정상출고&공출고재기동
     //--------------------------------------------------------------------------
-    if (Job_Type = 'I') and (SC_JOB[SC_NO].ID_ORDLUGG<>'')  then // 정상입고
+    if (Job_Type = 'I') and (SC_JOB[SC_NO].ID_ORDLUGG <> '') then // 정상입고
     begin
       SC_ORDER[SC_NO].SCORD_NO   := SC_JOB[SC_NO].ID_ORDLUGG ;    // 작업번호
       SC_ORDER[SC_NO].SCORD_D100 := '0000';                       // 적재 열
@@ -2570,6 +2574,24 @@ begin
       SC_ORDER[SC_NO].SCORD_D102 := SC_JOB[SC_NO].LOAD_LEVEL;     // 적재 단
       SC_ORDER[SC_NO].SCORD_D103 := '0000';                       // 하역 열
       SC_ORDER[SC_NO].SCORD_D104 := '0000';                       // 하역 연
+      SC_ORDER[SC_NO].SCORD_D105 := SC_JOB[SC_NO].UNLOAD_LEVEL;   // 하역 단
+      SC_ORDER[SC_NO].SCORD_D106 := '0000';                       // 예비
+      SC_ORDER[SC_NO].SCORD_D107 := '0000';                       // 예비
+      SC_ORDER[SC_NO].SCORD_D108 := '0000';                       // 예비
+      SC_ORDER[SC_NO].SCORD_D109 := '0000';                       // 예비
+      SC_ORDER[SC_NO].SCORD_D110 := '0000';                       // 예비
+
+      SC_OrderDisplay(SC_NO);     // SC Order 화면 디스플레이
+      fnSetSCORDWrite(SC_NO, '0'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
+    end  else
+    if (Job_Type = 'M') and (SC_JOB[SC_NO].ID_ORDLUGG <> '') then // 정상출고
+    begin
+      SC_ORDER[SC_NO].SCORD_NO   := SC_JOB[SC_NO].ID_ORDLUGG ;    // 작업번호
+      SC_ORDER[SC_NO].SCORD_D100 := SC_JOB[SC_NO].LOAD_BANK;      // 적재 열
+      SC_ORDER[SC_NO].SCORD_D101 := SC_JOB[SC_NO].LOAD_BAY;       // 적재 연
+      SC_ORDER[SC_NO].SCORD_D102 := SC_JOB[SC_NO].LOAD_LEVEL;     // 적재 단
+      SC_ORDER[SC_NO].SCORD_D103 := SC_JOB[SC_NO].UNLOAD_BANK;    // 하역 열
+      SC_ORDER[SC_NO].SCORD_D104 := SC_JOB[SC_NO].UNLOAD_BAY;     // 하역 연
       SC_ORDER[SC_NO].SCORD_D105 := SC_JOB[SC_NO].UNLOAD_LEVEL;   // 하역 단
       SC_ORDER[SC_NO].SCORD_D106 := '0000';                       // 예비
       SC_ORDER[SC_NO].SCORD_D107 := '0000';                       // 예비
@@ -3437,14 +3459,12 @@ begin
   if JFlag = RackToRack then
   begin // 랙이동작업 검색
     IO_Gubun := 'M' ;
-    CVCURR := fnGetCVOrderStr(SC_NO, IO_Gubun);
     StrSQL := ' Select TOP 1 * ' +
               '   From TT_ORDER ' +
               '  Where JOBD      = ''7''   ' +                                 // 랙이동 작업
               '    And NOWMC     = ''2''   ' +                                 // SC작업
               '    And NOWSTATUS = ''1''   ' +                                 // 등록 작업
 //              '    And SRCSITE   = ''' + FormatFloat('0000', SC_NO) + ''' ' +  // 출고 호기
-              CVCURR +
               '  Order By EMG DESC, REG_TIME, LUGG ASC ' ;
   end;
 
@@ -3503,7 +3523,7 @@ begin
                     ' | 하역위치-' + Copy(SC_JOB[SC_NO].UNLOAD_LEVEL,4,1)  ;
         end else
         if JFlag = RackToRack then
-        begin
+        begin // 랙이동
           SC_JOB[SC_NO].LOAD_BANK     := Trim(FieldByName('SRCAISLE').AsString) ;  // 적재 열(0001~0002)
           SC_JOB[SC_NO].LOAD_BAY      := Trim(FieldByName('SRCBAY'  ).AsString) ;  // 적재 연(0001~0011)
           SC_JOB[SC_NO].LOAD_LEVEL    := Trim(FieldByName('SRCLEVEL').AsString) ;  // 적재 단(0001~0003)
@@ -3925,6 +3945,31 @@ begin
                    '    AND REG_TIME  = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
 
     end else Exit;
+  end else
+  //----------------------------------------------------------------------------
+  // 랙투랙 완료 일때
+  // 1. TT_STOCK Update 2. TT_SCIO Delete 3. TT_Order Update
+  //----------------------------------------------------------------------------
+  if (SC_JOB[SC_No].IO_TYPE = 'M') then
+  begin
+    // Step 1. TT_STOCK Update
+    if fnStockUpdateAll(SC_No) then
+    begin
+      // Step 2. TT_SCIO Delete
+      SCIOSQL   := ' DELETE FROM TT_SCIO ' +
+                   '  WHERE ID_NO = ''' + IntToStr(SC_No) + ''' ' +
+                   '    AND ID_INDEX = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                   '    AND ID_DT    = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
+
+      // Step 3. TT_Order Update
+      ORDERSQL  := ' UPDATE TT_ORDER ' +
+                   '    SET NOWSTATUS = ''4'' ' +
+                   '      , JOBSTATUS = ''7'' ' +
+                   '      , JOB_END   = ''1'' ' +
+                   '  WHERE LUGG      = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                   '    AND REG_TIME  = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
+
+    end else Exit;
   end;
 
   if SCIOSQL <> '' then
@@ -3960,8 +4005,9 @@ begin
           begin
             MainDM.MainDB.CommitTrans ;
 
-            // 입고완료시 이력삽입
-            if (SC_JOB[SC_No].IO_TYPE = 'I') then
+            // 입고완료 또는 랙이동시 이력삽입
+            if (SC_JOB[SC_No].IO_TYPE = 'I') or
+               (SC_JOB[SC_No].IO_TYPE = 'M') then
             begin
               fnIns_History(SC_JOB[SC_No].ID_ORDLUGG);
             end;
@@ -4657,13 +4703,13 @@ end;
 //==============================================================================
 function TfrmSCComm.fnStockUpdateAll(SC_NO: Integer): Boolean;
 var
-  StrSQL, StrLog, CellStatus, TmpBank, TmpBay, TmpLevel, StrJob : String ;
+  StrSQL, StrSQL2, StrLog, CellStatus, TmpBank, TmpBay, TmpLevel, StrJob : String ;
   ExecNo : Integer ;
 begin
   // 0 : 공셀,     1 : 실셀(공Box)  2 : 실셀(실Box)  3 : 금지셀
   // 4 : 입고예약  5 : 출고예약     6 : 이중입고     7 : 공출고
   Result := False ;
-  StrSQL:=''; CellStatus:=''; TmpBank:=''; TmpBay:=''; TmpLevel:='';
+  StrSQL := ''; StrSQL2:= ''; CellStatus := ''; TmpBank := ''; TmpBay := ''; TmpLevel := '';
 
   if   UpperCase(SC_JOB[SC_NO].ITM_CD)='EPLT' then CellStatus := '1'
   else                                             CellStatus := '2';
@@ -4677,8 +4723,7 @@ begin
   // 입고 완료 일때
   // 1. TT_STOCK Update 2. TT_SCIO Delete 3. TBL_LOTNO_INFO Update 4. TT_Order Delete
   //----------------------------------------------------------------------------
-  if (SC_JOB[SC_No].IO_TYPE = 'I') or    // 입고 작업 완료
-     (SC_JOB[SC_No].IO_TYPE = 'M') then  // RackToRack 작업 완료
+  if (SC_JOB[SC_No].IO_TYPE = 'I') then
   begin
     StrSQL := ' Update TT_STOCK ' +
               '    Set ITM_CD       = ' + QuotedStr(UpperCase(SC_JOB[SC_NO].ITM_CD)) +
@@ -4718,9 +4763,44 @@ begin
     TmpBank  := SC_JOB[SC_No].LOAD_BANK;
     TmpBay   := SC_JOB[SC_No].LOAD_BAY;
     TmpLevel := SC_JOB[SC_No].LOAD_LEVEL;
+  end else
+  //----------------------------------------------------------------------------
+  // 랙이동 완료 일때
+  // 1. TT_STOCK Update 2. TT_SCIO Delete 3. TBL_LOTNO_INFO Update
+  //----------------------------------------------------------------------------
+  if (SC_JOB[SC_No].IO_TYPE = 'M') then
+  begin
+    StrSQL := ' Update TT_STOCK ' +
+              '    Set ITM_CD       = ''''  ' +
+              '      , ITM_NAME     = ''''  ' +
+              '      , ITM_SPEC     = ''''  ' +
+              '      , ITM_QTY      = 0     ' +
+              '      , ID_STATUS    = ''0'' ' +
+              '      , ID_MEMO      = ''''  ' +
+              '  Where ID_HOGI   = '   + QuotedStr(IntToStr(SC_NO)) +
+              '    AND ID_BANK   = ''' + Copy(SC_JOB[SC_No].LOAD_BANK, 4, 1)  + ''' ' + // 적재 열
+              '    AND ID_BAY    = ''' + Copy(SC_JOB[SC_No].LOAD_BAY, 3, 2)   + ''' ' + // 적재 연
+              '    AND ID_LEVEL  = ''' + Copy(SC_JOB[SC_No].LOAD_LEVEL, 3, 2) + ''' ' ; // 적재 단
+
+    StrSQL2 := ' Update TT_STOCK ' +
+               '    Set ITM_CD       = ' + QuotedStr(UpperCase(SC_JOB[SC_NO].ITM_CD)) +
+               '      , ITM_NAME     = ' + QuotedStr(fnITEM_Value(SC_No, 'ITM_NAME', UpperCase(SC_JOB[SC_NO].ITM_CD))) +
+               '      , ITM_SPEC     = ' + QuotedStr(fnITEM_Value(SC_No, 'ITM_SPEC', UpperCase(SC_JOB[SC_NO].ITM_CD))) +
+               '      , ITM_QTY      = 1' +
+               '      , ID_STATUS    = ' + QuotedStr(CellStatus) +
+               '      , STOCK_IN_DT  = GETDATE()   ' +
+               '      , ID_MEMO      = ' + QuotedStr(fnOrder_Value(SC_No,'ETC')) +
+               '  Where ID_HOGI   = '   + QuotedStr(IntToStr(SC_NO)) +
+               '    AND ID_BANK   = ''' + Copy(SC_JOB[SC_No].UNLOAD_BANK, 4, 1)  + ''' ' + // 하역 열
+               '    AND ID_BAY    = ''' + Copy(SC_JOB[SC_No].UNLOAD_BAY, 3, 2)   + ''' ' + // 하역 연
+               '    AND ID_LEVEL  = ''' + Copy(SC_JOB[SC_No].UNLOAD_LEVEL, 3, 2) + ''' ' ; // 하역 단
+
+    TmpBank  := SC_JOB[SC_No].LOAD_BANK;
+    TmpBay   := SC_JOB[SC_No].LOAD_BAY;
+    TmpLevel := SC_JOB[SC_No].LOAD_LEVEL;
   end;
 
-  if StrSQL<>'' then
+  if (StrSQL <> '') then
   begin
     try
       with qryStock do
@@ -4731,15 +4811,46 @@ begin
         ExecNo := ExecSQL;
         if ExecNo > 0 then
         begin
-          StrLog := ' COMD SC'+IntToStr(SC_No)+
-                    ' | Complete Proc Step[1]' +
-                    '| STOCK UPDATE Success' +
-                    ' | JOB_TYPE- '+ StrJob +
-                    ' | ORD_BANK-' + TmpBank  +
-                    ' | ORD_BAY-'  + TmpBay   +
-                    ' | ORD_LEVEL-'+ TmpLevel ;
-          DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
-          Result := True ;
+          if (StrSQL2 <> '') then
+          begin
+            Close;
+            SQL.Clear;
+            SQL.Text := StrSQL2 ;
+            ExecNo := ExecSQL;
+            if (ExecNo > 0) then
+            begin
+              StrLog := ' COMD SC'+IntToStr(SC_No)+
+                        ' | Complete Proc Step[1]' +
+                        '| STOCK UPDATE Success' +
+                        ' | JOB_TYPE- '+ StrJob +
+                        ' | ORD_BANK-' + TmpBank  +
+                        ' | ORD_BAY-'  + TmpBay   +
+                        ' | ORD_LEVEL-'+ TmpLevel ;
+              DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+              Result := True ;
+            end else
+            begin
+              StrLog := ' COMD SC'+IntToStr(SC_No)+
+                        ' | Complete Proc Step[1]' +
+                        '| STOCK UPDATE Fail   ' +
+                        ' | JOB_TYPE- '+ StrJob +
+                        ' | ORD_BANK-' + TmpBank  +
+                        ' | ORD_BAY-'  + TmpBay   +
+                        ' | ORD_LEVEL-'+ TmpLevel ;
+              DisplayLog(SC_NO, StrLog, 'E', Length(StrLog)) ;
+            end;
+          end else
+          begin
+            StrLog := ' COMD SC'+IntToStr(SC_No)+
+                      ' | Complete Proc Step[1]' +
+                      '| STOCK UPDATE Success' +
+                      ' | JOB_TYPE- '+ StrJob +
+                      ' | ORD_BANK-' + TmpBank  +
+                      ' | ORD_BAY-'  + TmpBay   +
+                      ' | ORD_LEVEL-'+ TmpLevel ;
+            DisplayLog(SC_NO, StrLog, 'N', Length(StrLog)) ;
+            Result := True ;
+          end;
         end else
         begin
           StrLog := ' COMD SC'+IntToStr(SC_No)+
@@ -5430,6 +5541,7 @@ function TfrmSCComm.SetJobOrder(PortNo: Integer; Gubn, ItemCode: String) : Boole
 var
   i : Integer;
   Loc: String;
+  EventDesc : String;
 begin
   try
     Result := False;
@@ -5449,8 +5561,8 @@ begin
       OrderData.SRCLEVEL   := Format('%.4d', [PortNo]);  // 적재 스테이션
       OrderData.DSTSITE    := '0001';   // 하역 호기
       OrderData.DSTAISLE   := Format('%.4d', [StrToInt(Copy(Loc, 1, 1))]) ;  // 하역 열
-      OrderData.DSTBAY     := Format('%.4d', [StrToInt(Copy(Loc, 2, 2))]) ;  // 적재 연
-      OrderData.DSTLEVEL   := Format('%.4d', [StrToInt(Copy(Loc, 4, 2))]) ;  // 적재 단
+      OrderData.DSTBAY     := Format('%.4d', [StrToInt(Copy(Loc, 2, 2))]) ;  // 하역 연
+      OrderData.DSTLEVEL   := Format('%.4d', [StrToInt(Copy(Loc, 4, 2))]) ;  // 하역 단
       OrderData.ID_CODE    := '';
       OrderData.NOWMC      := '4'; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
       OrderData.JOBSTATUS  := '4';
@@ -5472,6 +5584,9 @@ begin
 
       // 셀 업데이트, 입고예약
       fnStockUpdate(Loc, 'ID_STATUS', '4');
+
+      EventDesc := '입고작업생성 작업번호[' + OrderData.LUGG + '] 라인['+ IntToStr(PortNo) +
+                   ' 위치[' + OrderData.DSTAISLE + '-' + OrderData.DSTBAY + OrderData.DSTLEVEL + ']';
     end
     else
     begin
@@ -5514,6 +5629,9 @@ begin
 
       // 셀 업데이트, 출고예약
       fnStockUpdate(Loc, 'ID_STATUS', '5');
+
+      EventDesc := '출고작업생성 작업번호[' + OrderData.LUGG + '] 라인['+ IntToStr(PortNo) +
+                   ' 위치[' + OrderData.SRCAISLE + '-' + OrderData.SRCBAY + OrderData.SRCLEVEL + ']';
     end;
 
     if not MainDm.MainDB.InTransaction then
@@ -5578,6 +5696,8 @@ begin
 
     if MainDm.MainDB.InTransaction then
        MainDm.MainDB.CommitTrans;
+
+    InsertPGMHist('[RCP]', 'N', 'SetJobOrder', '작업생성', EventDesc, 'PGM', '', '', '');
   except
     on E : Exception do
     begin

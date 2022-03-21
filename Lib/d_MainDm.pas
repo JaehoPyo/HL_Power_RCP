@@ -8,6 +8,7 @@ uses
 type
   TMainDm = class(TDataModule)
     MainDB: TADOConnection;
+    PD_INS_PGM_HIST: TADOStoredProc;
     procedure MainDBAfterDisconnect(Sender: TObject);
     procedure MainDBAfterConnect(Sender: TObject);
     procedure MainDBBeforeConnect(Sender: TObject);
@@ -18,6 +19,7 @@ type
     { Public declarations }
   end;
     function  ADOConnection : Boolean;
+    procedure InsertPGMHist(MENU_ID, HIST_TYPE, FUNC_NAME, EVENT_NAME, EVENT_DESC, COMMAND_TYPE, COMMAND_TEXT, PARAM, ERROR_MSG: String);
 type
   TDB_Info = Record
     DbOle    : String ;
@@ -33,7 +35,7 @@ type
 var
   MainDm: TMainDm;
   m : TDB_Info ;
-
+  ActivePCAddr : String;
 
 implementation
 
@@ -105,5 +107,38 @@ procedure TMainDm.MainDBBeforeDisconnect(Sender: TObject);
 begin
   m.ConChk := False ;
 end;
+
+
+//==============================================================================
+// InsertPGMHist ( W_PROGRAM_HIST 테이블에 이력을 넣음)                       //
+//==============================================================================
+procedure InsertPGMHist(MENU_ID, HIST_TYPE, FUNC_NAME, EVENT_NAME, EVENT_DESC, COMMAND_TYPE, COMMAND_TEXT, PARAM, ERROR_MSG: String);
+begin
+  try
+    with MainDm.PD_INS_PGM_HIST do
+    begin
+      Close;
+      ProcedureName := 'PD_INS_PGM_HIST';
+      Parameters.ParamByName('i_MENU_ID'     ).Value := MENU_ID;
+      Parameters.ParamByName('i_HIST_TYPE'   ).Value := HIST_TYPE;
+      Parameters.ParamByName('i_PGM_FUNCTION').Value := FUNC_NAME;
+      Parameters.ParamByName('i_EVENT_NAME'  ).Value := EVENT_NAME;
+      Parameters.ParamByName('i_EVENT_DESC'  ).Value := EVENT_DESC;
+      Parameters.ParamByName('i_COMMAND_TYPE').Value := COMMAND_TYPE;
+      Parameters.ParamByName('i_COMMAND_TEXT').Value := COMMAND_TEXT;
+      Parameters.ParamByName('i_PARAM'       ).Value := PARAM;
+      Parameters.ParamByName('i_ERROR_MSG'   ).Value := ERROR_MSG;
+      Parameters.ParamByName('i_USER_ID'     ).Value := ' ['+ActivePCAddr+']';
+      ExecProc;
+      Close;
+    end;
+  except
+    on E : Exception do
+    begin
+      MainDm.PD_INS_PGM_HIST.Close;
+    end;
+  end;
+end;
+
 
 end.

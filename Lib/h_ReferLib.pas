@@ -2,7 +2,11 @@ unit h_ReferLib;
 
 interface
 
-Uses SysUtils, IniFiles;
+Uses SysUtils, IniFiles, WinSock;
+
+type
+  TaPInAddr = Array [0..10] of PInAddr;
+  PaPInAddr = ^TaPInAddr;
 
   //============================================================================
   //                          Ini File ฐüทร
@@ -30,7 +34,9 @@ Uses SysUtils, IniFiles;
   function Dec2Bin(Value : LongInt) : string;
   function Bin2Dec(BinString: string): LongInt;
   function HexToInt(Hex : string) : Integer ;//Cardinal;   {Hex-->Integer}
-  function  AsciiToString(AsciiString: String) : String;
+  function AsciiToString(AsciiString: String) : String;
+  function SysGetLocalIP(Const Num: Word): String;
+
 implementation
 
 //==============================================================================
@@ -722,6 +728,36 @@ begin
     Result := Result + Char(StrToInt('$' + Copy(AsciiString, j, 2)));
     j := j + 2;
   end;
+end;
+
+//==============================================================================
+// SysGetLocalIP
+//==============================================================================
+function SysGetLocalIP(const Num: Word): String;
+var
+  WSAData : TWSAData;
+  phe : PHostEnt;
+  pptr : PaPInAddr;
+  Buff : Array [0..255] of AnsiChar;
+  i : Integer;
+begin
+  WSAStartup($101, WSAData);
+  GetHostName(Buff, SizeOf(Buff));
+  phe := GetHostByName(Buff);
+
+  result := '';
+  if phe <> nil then
+  begin
+    pptr := PaPInAddr(Phe^.h_addr_list);
+    for i := 0 to (num-1) do
+    begin
+      if pptr^[i] = nil then break;
+      if i <> (num-1)   then continue;
+      result := StrPas(inet_ntoa(pptr^[i]^));
+      break;
+    end;
+  end;
+  WSACleanUp();
 end;
 
 end.
