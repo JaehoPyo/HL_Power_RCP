@@ -3581,7 +3581,7 @@ begin
   // JOBSTATUS -> 완료 상태 ( 0: Claer, 1: 등록,  2: 지시, 3: 진행중, 4: 완료 )
 
   Result := False;
-  StrSQL := ' SELECT * FROM TT_ORDER ' +
+  StrSQL := ' SELECT * FROM TT_ORDER with(nolock) ' +
             '  WHERE LUGG     = ''' + SC_JOB[SC_NO].ID_ORDLUGG + ''' ' +
             '    AND REG_TIME = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
 
@@ -3760,7 +3760,7 @@ var
 begin
   Result := '' ;
   StrSQL := ' SELECT ' + Fname + ' as DATA ' +
-            '   FROM TT_ORDER    ' +
+            '   FROM TT_ORDER with(nolock) ' +
             '  WHERE LUGG      = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
             '    AND REG_TIME  = ''' + SC_JOB[SC_No].ID_REGTIME + ''' ' ;
 
@@ -3795,8 +3795,8 @@ var
   StrSQL : string;
 begin
   Result := '' ;
-  StrSQL := ' SELECT TOP 1 ' + FName + ' as DATA with(nolock) ' +
-            '   FROM TT_ORDER ' + WhereStr;
+  StrSQL := ' SELECT TOP 1 ' + FName + ' as DATA ' +
+            '   FROM TT_ORDER with(nolock) ' + WhereStr;
 
   try
     with qryUpdate do
@@ -4850,7 +4850,7 @@ begin
       Close;
       SQL.Clear;
       StrSQL := ' SELECT COUNT(*) as CNT ' +
-                '   FROM TT_STOCK ' +
+                '   FROM TT_STOCK with(NOLOCK) ' +
                 '  WHERE ITM_CD = ' + QuotedStr(ItemCode) +
                 '    AND ID_STATUS = ''2'' ';
       SQL.Text := StrSQL ;
@@ -4883,7 +4883,7 @@ begin
       Close;
       SQL.Clear;
       StrSQL := ' SELECT COUNT(*) as CNT ' +
-                '   FROM TT_STOCK ' +
+                '   FROM TT_STOCK with(NOLOCK) ' +
                 '  WHERE ID_STATUS = ''0'' ';
       SQL.Text := StrSQL ;
       Open ;
@@ -4916,7 +4916,7 @@ begin
       Close;
       SQL.Clear;
       StrSQL := ' SELECT COUNT(*) as CNT ' +
-                '   FROM TT_STOCK ' +
+                '   FROM TT_STOCK with(NOLOCK)' +
                 '  WHERE ID_STATUS = ' + QuotedStr(Status);
       SQL.Text := StrSQL ;
       Open ;
