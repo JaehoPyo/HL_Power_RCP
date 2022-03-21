@@ -203,7 +203,7 @@ type
     function  fnSetSCSetInfo_Clear(SC_NO:Integer): Boolean ;                    // SC 지시 상태 초기화 (All OFF)
     function  fnSetSCSetInfo_Clear2(SC_NO:Integer): Boolean ;                   // 모니터링 작업처리 상태 초기화 (All OFF)
 
-    function  SetJobOrder(PortNo: Integer; Gubn, ItemCode: String) : Boolean;
+    function  SetJobOrder(PortNo: Integer; Gubn, ItemCode, NOWMC, EMG: String) : Boolean;
 
     // ACS 관련
     procedure GetACS_Status(PortNo: Integer);                                   // ACS 상태가져옴
@@ -229,7 +229,8 @@ type
     function  fnOrder_Value(SC_No: Integer; FName : String): String; overload;                       // ORDER 데이터 Get
     function  fnOrder_Value(WhereStr: String; FName : String) : String; overload;
     function  fnOrder_Cancel(SC_No: Integer; LUGG, REG_TIME: String): Boolean;                       // ORDER 데이터 Delete(작업취소 시)
-    function  fnOrder_Delete(SC_No:Integer): Boolean;                                                // ORDER 데이터 Delete (확인필요)
+    function  fnOrder_Delete(SC_No: Integer): Boolean; overload;                                     // ORDER 데이터 Delete (확인필요)
+    function  fnOrder_Delete(JobNo: String): Boolean; overload;
     function  fnOrder_Update(SC_No:Integer;FName,FValue:String):Boolean;                  overload ; // ORDER 데이터 Update (Value1개)
     function  fnOrder_Update(SC_No:Integer;FName1,FValue1,FName2,FValue2:String):Boolean; overload ; // ORDER 데이터 Update (Value2개)
     function  fnOrder_Update(JobNo, FName, FValue:String):Boolean;                        overload ;
@@ -310,6 +311,7 @@ var
   Rx_AcsData : Array [1..6] of TRx_AcsData;
   Tx_AcsData : Array [1..6] of TTx_AcsData;
   PLC_WriteVal : TPLC_VAL;
+  RFID_Clear : Array[1..6] of Boolean;
   PLC_ReadVal : TPLC_VAL;
   OrderData : TJobOrder;
 implementation
@@ -441,7 +443,7 @@ procedure TfrmSCComm.ACSControlProcess(SC_NO: Integer);
 var
   i : Integer;
   JobNo, WhereStr : String;
-  Loc, ItemCode, OtReady : String;
+  Loc, ItemCode, RfidData, LogStr: String;
   HasEmptyCell, HasStock, RfidCheck : Boolean;
 begin
 
@@ -499,7 +501,7 @@ begin
         begin
           ItemCode := Rx_AcsData[i].Model_No;
           // 작업생성
-          if (SetJobOrder(i, 'I', ItemCode)) then
+          if (SetJobOrder(i, 'I', ItemCode, '4', '0')) then
           begin
             // 커튼 오픈
             if (PLC_ReadVal.Curtain[i] = '0') then
@@ -558,7 +560,7 @@ begin
           HasStock := True;
 
           // 작업생성
-          if (SetJobOrder(i, 'O', ItemCode)) then
+          if (SetJobOrder(i, 'O', ItemCode, '2', '0')) then
           begin
             // 출고스테이션 커튼 오픈
             if (PLC_ReadVal.Curtain[i] = '0') then
@@ -616,7 +618,7 @@ begin
                       ' And LINE_NO = ' + QuotedStr(IntToStr(i)) +
                     ' Order By REG_TIME Desc ' ;
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
-
+        JobNo := fnOrder_Value(WhereStr, 'LUGG');
         // 출고 된 경우에만 실행
         if (ItemCode <> '') then
         begin
@@ -625,7 +627,8 @@ begin
           begin
             if (fnGetRFID_Data(i, 'H01') = 'BM') then
             begin
-              if (fnGetRFID_Data(i, 'H17') = ItemCode) then
+              RfidData := fnGetRFID_Data(i, 'H17');
+              if (RfidData = ItemCode) then
               begin
                 RfidCheck := True;
               end else
@@ -634,7 +637,8 @@ begin
               end;
             end else
             begin
-              if (fnGetRFID_Data(i, 'H25') = ItemCode) then
+              RfidData := fnGetRFID_Data(i, 'H25');
+              if (RfidData = ItemCode) then
               begin
                 RfidCheck := True;
               end else
@@ -647,14 +651,58 @@ begin
             RfidCheck := True;
           end;
 
-          // RFID가 잘못 된 경우.  -- 입고 후 재출고 로직 필요...?
+          // RFID가 잘못 된 경우.  -- 재입고 후 재출고
           if not (RfidCheck) then
           begin
             fnSetOrderError(i, 'RFID Fault');
+            LogStr := 'RFID 불일치 RFID 데이터[' + RfidData +'] ' +
+                      'ACS 출고요청데이터[' + ItemCode + '] 작업번호[' + JobNo +']' ;
+            InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+
+            if (SetJobOrder(i, 'I', RfidData, '1', '1')) then
+            begin
+              LogStr := '재입고 작업 생성';
+              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+
+              if(SetJobOrder(i, 'O', RfidData, '2', '1')) then
+              begin
+                LogStr := '재출고 작업 생성';
+                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+                fnOrder_Delete(JobNo);
+              end
+              else
+              begin
+                LogStr := '재출고 작업 생성 실패 동일 품목 없음';
+                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+                fnOrder_Delete(JobNo);
+
+                // ACS 응답 데이터 생성
+                Tx_AcsData[i].Heart_Beat       := '1';
+                Tx_AcsData[i].Line_Name_Source := '';
+                Tx_AcsData[i].Line_No_Source   := '';
+                Tx_AcsData[i].Port_No_Source   := '';
+                Tx_AcsData[i].Line_Name_Dest   := '';
+                Tx_AcsData[i].Line_No_Dest     := '';
+                Tx_AcsData[i].Port_No_Dest     := '';
+                Tx_AcsData[i].Model_No         := '';
+                Tx_AcsData[i].Call_Request     := '0';
+                Tx_AcsData[i].Call_Answer      := '2';
+                Tx_AcsData[i].Docking_Approve  := '0';
+                Tx_AcsData[i].Docking_Complete := '0';
+              end;
+            end
+            else
+            begin
+              LogStr := '재입고 작업 생성 실패 공셀 없음';
+              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+            end;
           end
           // RFID가 정상인 경우
           else
           begin
+
+            Rfid_Clear[i] := True;
+
             // 커튼 열린 상태
             if (PLC_ReadVal.Curtain[i] = '1') then
             begin
@@ -824,6 +872,8 @@ begin
           begin
             // CV작업으로 변경
             fnOrder_Update(JobNo, 'NOWMC', '1');
+
+            Rfid_Clear[i] := True;
           end;
         end
         // 일치하지 않은 경우 RFID값으로 변경함
@@ -841,6 +891,8 @@ begin
 
             // CV작업으로 변경
             fnOrder_Update(JobNo, 'NOWMC', '1');
+
+            Rfid_Clear[i] := True;
           end;
         end;
       end;
@@ -1670,17 +1722,6 @@ begin
         PLC_ReadVal.Curtain[4] := SC_STATUS[SC_NO].D212[3];
         PLC_ReadVal.Curtain[5] := SC_STATUS[SC_NO].D212[4];
         PLC_ReadVal.Curtain[6] := SC_STATUS[SC_NO].D212[5];
-
-
-        // RFID 변환
-        // 변환한 값을 TC_RFID에 넣음. RFID 구분자가 확실하지 않음.
-
-
-
-
-
-
-
 
         StrLog := ' READ SC'+IntToStr(SC_No)+
                   ' | D200-' + SC_STATUS[SC_NO].D200 +
@@ -2655,6 +2696,15 @@ begin
     fnSetPLCORDWrite(1, '0'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
   end;
 
+  for i := 1 to 6 do
+  begin
+    if (Rfid_Clear[i]) then
+    begin
+      fnSetPLCORDWrite(1, IntToStr(i));
+      Rfid_Clear[i] := False;
+    end;
+  end;
+
   Sleep(2000);
 end;
 
@@ -3299,10 +3349,10 @@ begin
       CVCURR := ' And SRCLEVEL In (''0001'')' ;
     end
     else if (SC_STATUS[SC_NO].D211[08] = '0') and
-            (SC_STATUS[SC_NO].D211[10] = '1') and
+            (SC_STATUS[SC_NO].D211[10] = '0') and
             (SC_STATUS[SC_NO].D211[12] = '0') then
     begin
-      CVCURR := ' And SRCLEVEL In (''0003'')' ;
+      CVCURR := ' And SRCLEVEL In (''0002'')' ;
     end
     else if (SC_STATUS[SC_NO].D211[08] = '1') and
             (SC_STATUS[SC_NO].D211[10] = '1') and
@@ -3427,27 +3477,28 @@ function TfrmSCComm.fnGetSCJOB(SC_NO:Integer; JFlag:TSCJobMode): Boolean;
 var
   StrSQL, StrLog, JobLog, IO_Gubun, CVCURR, LoadBank, LoadBay : String ;
   TmpLugg : Array [START_SCNO..End_SCNO] of String ;
+  LineNo : Integer;
 begin
   Result := False ;
 
   if JFlag = StoreIn then
   begin // 입고작업 검색
     IO_Gubun := 'I' ;
-    CVCURR := fnGetCVOrderStr(SC_NO, IO_Gubun);
-    StrSQL := ' Select TOP 1 * ' +
+//    CVCURR := fnGetCVOrderStr(SC_NO, IO_Gubun);
+    StrSQL := ' Select * ' +
               '   From TT_ORDER ' +
               '  Where JOBD      = ''1''   ' +                                 // 입고 작업
               '    And NOWMC     = ''1''   ' +                                 // CV작업
               '    And NOWSTATUS = ''4''   ' +                                 // 완료 작업
 //              '    And DSTSITE   = ''' + FormatFloat('0000', SC_NO) + '''  ' + // 입고 호기
-              CVCURR +
-              '  Order By REG_TIME, LUGG ' ;
+//              CVCURR +
+              '  Order By EMG DESC, REG_TIME, LUGG ' ;
   end else
   if JFlag = StoreOut then
   begin // 출고작업 검색
     IO_Gubun := 'O' ;
     CVCURR := fnGetCVOrderStr(SC_NO, IO_Gubun);
-    StrSQL := ' Select TOP 1 * ' +
+    StrSQL := ' Select * ' +
               '   From TT_ORDER ' +
               '  Where JOBD      = ''2''   ' +                                 // 출고 작업
               '    And NOWMC     = ''2''   ' +                                 // SC작업
@@ -3476,6 +3527,25 @@ begin
       SQL.Clear;
       SQL.Text := StrSQL ;
       Open;
+
+      while not (Eof) do
+      begin
+        if not (JFlag = RackToRack) then
+        begin
+          LineNo := FieldByName('LINE_NO').AsInteger + 7;
+          if (JFlag = StoreIn) and
+             (SC_STATUS[SC_NO].D211[LineNo] = '0') then
+          begin
+            Next;
+          end else
+          if (JFlag = StoreOut) and
+             (SC_STATUS[SC_NO].D211[LineNo] = '1') then
+          begin
+            Next;
+          end;
+        end;
+      end;
+
 
       if not (Bof and Eof) then
       begin
@@ -4051,6 +4121,38 @@ begin
         ErrorLogWRITE( 'Function fnOrder_Delete SC(' + IntToStr(SC_No) + ') ' +
                        'Error[' + E.Message + '], ' + 'SQL_STEP [' + IntToStr(SQL_Step) + ']' );
       end;
+    end;
+  end;
+end;
+
+//==============================================================================
+// fnOrder_Delete : 작업삭제
+//==============================================================================
+function TfrmSCComm.fnOrder_Delete(JobNo: String): Boolean;
+var
+  StrSQL, StrLog : string;
+  ExecNo  : Integer;
+begin
+  Result := False ;
+  StrSQL := ' DELETE FROM TT_ORDER ' +
+            '  WHERE LUGG = ''' + JobNo + ''' ';
+
+  try
+    with qryDelete do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Text := StrSQL ;
+      ExecNo := ExecSQL ;
+      if ExecNo > 0 then Result := True ;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryDelete.Close ;
+      ErrorLogWRITE( 'Function fnOrder_Delete JobNo(' + JobNo + ') ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
     end;
   end;
 end;
@@ -4898,9 +5000,7 @@ begin
       begin
         Exit;
       end;
-      Result := Copy(FieldByName('ID_CODE').AsString, 5, 1) +
-                Copy(FieldByName('ID_CODE').AsString, 6, 2) +
-                Copy(FieldByName('ID_CODE').AsString, 8, 2) ;
+      Result := Copy(FieldByName('ID_CODE').AsString, 5, 5);
       Close ;
     end;
   except
@@ -5535,9 +5635,9 @@ begin
 end;
 
 //==============================================================================
-// SetJobOrder [입고지시 데이터 저장]
+// SetJobOrder [지시 데이터 저장]
 //==============================================================================
-function TfrmSCComm.SetJobOrder(PortNo: Integer; Gubn, ItemCode: String) : Boolean;
+function TfrmSCComm.SetJobOrder(PortNo: Integer; Gubn, ItemCode, NOWMC, EMG: String) : Boolean;
 var
   i : Integer;
   Loc: String;
@@ -5550,6 +5650,8 @@ begin
     begin
       // 빈 랙 찾기
       Loc := fnGetFreeLoc;
+      if (Loc = '') then Exit;
+
       // 입고작업 데이터 생성
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
       OrderData.LUGG       := Format('%.4d', [GetJobNo]) ;  // 작업번호
@@ -5564,7 +5666,7 @@ begin
       OrderData.DSTBAY     := Format('%.4d', [StrToInt(Copy(Loc, 2, 2))]) ;  // 하역 연
       OrderData.DSTLEVEL   := Format('%.4d', [StrToInt(Copy(Loc, 4, 2))]) ;  // 하역 단
       OrderData.ID_CODE    := '';
-      OrderData.NOWMC      := '4'; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
+      OrderData.NOWMC      := NOWMC; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
       OrderData.JOBSTATUS  := '4';
       OrderData.NOWSTATUS  := '4';
       OrderData.BUFFSTATUS := '0';
@@ -5577,8 +5679,8 @@ begin
       OrderData.CVTO       := '0';
       OrderData.CVCURR     := '0';
       OrderData.ETC        := '';
-      OrderData.EMG        := '0';
-      OrderData.LINE_NO    := IntToStr(i);
+      OrderData.EMG        := EMG;
+      OrderData.LINE_NO    := IntToStr(PortNo);
       OrderData.ITM_CD     := ItemCode;
       OrderData.UP_TIME    := 'GETDATE()';
 
@@ -5593,6 +5695,7 @@ begin
       // 품목 찾기
       // Loc = 10101 열(1)/연(2)/단(2)
       Loc := fnGetStockLoc(ItemCode);
+      if (Loc = '') then Exit;
 
       // 출고작업 데이터 생성
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
@@ -5609,7 +5712,7 @@ begin
       OrderData.DSTBAY     := '0000';
       OrderData.DSTLEVEL   := Format('%.4d', [i]);
       OrderData.ID_CODE    := '';
-      OrderData.NOWMC      := '2'; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
+      OrderData.NOWMC      := NOWMC; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
       OrderData.JOBSTATUS  := '1';
       OrderData.NOWSTATUS  := '1';
       OrderData.BUFFSTATUS := '0';
@@ -5696,8 +5799,6 @@ begin
 
     if MainDm.MainDB.InTransaction then
        MainDm.MainDB.CommitTrans;
-
-    InsertPGMHist('[RCP]', 'N', 'SetJobOrder', '작업생성', EventDesc, 'PGM', '', '', '');
   except
     on E : Exception do
     begin
@@ -5816,7 +5917,6 @@ end;
 procedure TfrmSCComm.fnACS_Update(PortNo: Integer; Gubn, FName, FValue: String);
 var
   StrSQL : string;
-  ExecNo : Integer;
 begin
   try
     with qryUpdate do
@@ -5828,7 +5928,7 @@ begin
                 '  WHERE PORT_NO = ' + QuotedStr(IntToStr(PortNo)) +
                 '    AND GUBN = ' + QuotedStr(Gubn);
       SQL.Text := StrSQL ;
-      ExecNo := ExecSQL ;
+      ExecSQL ;
       Close ;
     end;
   except
