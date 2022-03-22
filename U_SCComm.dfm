@@ -161,7 +161,7 @@ object frmSCComm: TfrmSCComm
     Top = 0
     Width = 394
     Height = 673
-    ActivePage = tsCommLog
+    ActivePage = tsStatus
     Align = alClient
     Font.Charset = GB2312_CHARSET
     Font.Color = clWindowText

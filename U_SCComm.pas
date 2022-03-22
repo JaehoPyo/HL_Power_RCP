@@ -192,7 +192,7 @@ type
     function  fnSignalEditColor(Signal,Flag: string): TColor;                   // 시그날 에디트색상
 
     // 작업 처리 관련 함수
-    function  GetJobNo : Integer;                                               // 작업번호 생성
+    function  GetJobNo(Gubn: String) : Integer;                                               // 작업번호 생성
     function  SCNowStatusUpdate(SC_NO:Integer; Status: String): Boolean ;
     function  SCNowCycleUpdate(SC_NO:Integer; Cycle: String): Boolean ;
 
@@ -3504,7 +3504,7 @@ begin
               '    And NOWMC     = ''2''   ' +                                 // SC작업
               '    And NOWSTATUS = ''1''   ' +                                 // 등록 작업
 //              '    And SRCSITE   = ''' + FormatFloat('0000', SC_NO) + ''' ' +  // 출고 호기
-              CVCURR +
+//              CVCURR +
               '  Order By EMG DESC, REG_TIME, LUGG ASC ' ;
   end else
   if JFlag = RackToRack then
@@ -3534,20 +3534,21 @@ begin
         begin
           LineNo := FieldByName('LINE_NO').AsInteger + 7;
           if (JFlag = StoreIn) and
-             (SC_STATUS[SC_NO].D211[LineNo] = '0') then
-          begin
-            Next;
-          end else
-          if (JFlag = StoreOut) and
              (SC_STATUS[SC_NO].D211[LineNo] = '1') then
           begin
-            Next;
+            break;
+          end else
+          if (JFlag = StoreOut) and
+             (SC_STATUS[SC_NO].D211[LineNo] = '0') then
+          begin
+            break;
           end;
         end;
+        Next;
       end;
 
 
-      if not (Bof and Eof) then
+      if not (Eof) then
       begin
         SC_JOB[SC_NO].ID_ORDLUGG := FormatFloat('0000', FieldByName('LUGG').AsInteger); // 작업 번호
         SC_JOB[SC_NO].ID_REGTIME := FieldByName('REG_TIME').AsString ;                  // 작업 생성 시간
@@ -5032,7 +5033,7 @@ begin
                  ' WHERE CURRENT_NAME = ' + QuotedStr(Cur_Name);
       SQL.Text := StrSQL ;
       Open ;
-      Result := FieldByName('OPTION1').AsBoolean;
+      Result := Boolean(FieldByName('OPTION1').AsInteger);
       Close ;
     end;
   except
@@ -5523,7 +5524,7 @@ begin
       Close ;
       SQL.Clear;
       StrSQL := ' SELECT ' + FNAME +
-                  ' FROM TC_RIFD ' +
+                  ' FROM TC_RFID ' +
                  ' WHERE PORT_NO = ' + QuotedStr(IntToStr(PortNo));
       SQL.Text := StrSQL ;
       Open;
@@ -5654,7 +5655,7 @@ begin
 
       // 입고작업 데이터 생성
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
-      OrderData.LUGG       := Format('%.4d', [GetJobNo]) ;  // 작업번호
+      OrderData.LUGG       := Format('%.4d', [GetJobNo(Gubn)]) ;  // 작업번호
       OrderData.JOBD       := '1';     // 입고지시
 
       OrderData.SRCSITE    := '0001';  // 적재 호기
@@ -5699,7 +5700,7 @@ begin
 
       // 출고작업 데이터 생성
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
-      OrderData.LUGG       := Format('%.4d', [GetJobNo]) ;  // 작업번호
+      OrderData.LUGG       := Format('%.4d', [GetJobNo(Gubn)]) ;  // 작업번호
       OrderData.JOBD       := '2';     // 출고지시
 
       OrderData.SRCSITE    := '0001' ;  // 적재 호기
@@ -5710,7 +5711,7 @@ begin
       OrderData.DSTSITE    := '0001';
       OrderData.DSTAISLE   := '0000';
       OrderData.DSTBAY     := '0000';
-      OrderData.DSTLEVEL   := Format('%.4d', [i]);
+      OrderData.DSTLEVEL   := Format('%.4d', [PortNo]);
       OrderData.ID_CODE    := '';
       OrderData.NOWMC      := NOWMC; // 1: CV, 2 : SC Loading, 3 : SC Unloading, 4 : AGV
       OrderData.JOBSTATUS  := '1';
@@ -5726,7 +5727,7 @@ begin
       OrderData.CVCURR     := '0';
       OrderData.ETC        := '';
       OrderData.EMG        := '0';
-      OrderData.LINE_NO    := IntToStr(i);
+      OrderData.LINE_NO    := IntToStr(PortNo);
       OrderData.ITM_CD     := ItemCode;
       OrderData.UP_TIME    := 'GETDATE()';
 
@@ -5944,17 +5945,31 @@ end;
 //==============================================================================
 // GetJobNo [작업번호 생성]
 //==============================================================================
-function TfrmSCComm.GetJobNo : Integer;
+function TfrmSCComm.GetJobNo(Gubn: String) : Integer;
 var
   returnValue : String;
+  iType : Integer;
 begin
   try
     Result := 0;
+    if (Gubn = 'I') then
+    begin
+      iType := 1;
+    end else
+    if (Gubn = 'O') then
+    begin
+      iType := 2;
+    end else
+    begin
+      iType := 3;
+    end;
+
+
     with PD_GET_JOBNO do
     begin
       Close;
       ProcedureName := 'PD_GET_JOBNO';
-      Parameters.ParamByName('@I_TYPE').Value := 1;
+      Parameters.ParamByName('@I_TYPE').Value := iType;
       ExecProc;
       returnValue := Parameters.ParamValues['@o_JobNo'];
 
