@@ -304,7 +304,7 @@ var
 
   SC_ORDER      : Array[START_SCNO..End_SCNO] of TSC_ORDER ;     // SC 지시
   CONTROL_FLAG  : Array[START_SCNO..End_SCNO] of TCONTROL_FLAG ; // 프로그램 제어 Falg
-  Curtain_FLAG  : TCONTROL_FLAG;
+  PLC_WRITE_FLAG  : TCONTROL_FLAG;
 
   PLC_ORDER : TPLC_ORDER;
 
@@ -509,7 +509,7 @@ begin
               if (PLC_WriteVal.Curtain[i] = '0') then
               begin
                 PLC_ORDER.ORDER := '1';
-                Curtain_FLAG := ComWrite;
+                PLC_WRITE_FLAG := ComWrite;
               end;
               PLC_WriteVal.Curtain[i] := '1';
             end;
@@ -568,7 +568,7 @@ begin
               if (PLC_WriteVal.Curtain[i] = '0') then
               begin
                 PLC_ORDER.ORDER := '1';
-                Curtain_FLAG := ComWrite;
+                PLC_WRITE_FLAG := ComWrite;
               end;
               PLC_WriteVal.Curtain[i] := '1';
             end;
@@ -646,6 +646,7 @@ begin
                 RfidCheck := False;
               end;
             end;
+            PLC_WRITE_FLAG := ComWrite;
           end else
           begin
             RfidCheck := True;
@@ -779,7 +780,7 @@ begin
         if (PLC_WriteVal.Curtain[i] = '0') then
         begin
           PLC_ORDER.ORDER := '1';
-          Curtain_FLAG := ComWrite;
+          PLC_WRITE_FLAG := ComWrite;
         end;
         PLC_WriteVal.Curtain[i] := '1';
       end;
@@ -855,6 +856,7 @@ begin
               ItemCode := fnGetRFID_Data(i, 'H25');
             end;
           end;
+//          PLC_WRITE_FLAG := ComWrite;
         end else
         begin
           RfidCheck := True;
@@ -874,6 +876,7 @@ begin
             fnOrder_Update(JobNo, 'NOWMC', '1');
 
             Rfid_Clear[i] := True;
+            PLC_WRITE_FLAG := ComWrite;
           end;
         end
         // 일치하지 않은 경우 RFID값으로 변경함
@@ -893,6 +896,7 @@ begin
             fnOrder_Update(JobNo, 'NOWMC', '1');
 
             Rfid_Clear[i] := True;
+            PLC_WRITE_FLAG := ComWrite;
           end;
         end;
       end;
@@ -903,7 +907,7 @@ begin
         if (PLC_WriteVal.Curtain[i] = '0') then
         begin
           PLC_ORDER.ORDER := '1';
-          Curtain_FLAG := ComWrite;
+          PLC_WRITE_FLAG := ComWrite;
         end;
         PLC_WriteVal.Curtain[i] := '1';
       end;
@@ -939,7 +943,7 @@ begin
         if PLC_WriteVal.Curtain[i] = '1' then
         begin
           PLC_ORDER.ORDER := '1';
-          Curtain_Flag := ComWrite;
+          PLC_WRITE_Flag := ComWrite;
         end;
         PLC_WriteVal.Curtain[i] := '0';
       end;
@@ -1797,10 +1801,10 @@ begin
     fnSetWriteInfo(SC_NO, SC_JOB[SC_NO].IO_TYPE) ;
   end;
 
-  if (Curtain_FLAG = ComWrite) then
+  if (PLC_WRITE_FLAG = ComWrite) then
   begin
     fnSetPLCWriteInfo;
-    Curtain_FLAG := ComRead;
+    PLC_WRITE_FLAG := ComRead;
   end;
 
 end;
