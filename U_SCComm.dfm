@@ -170,7 +170,6 @@ object frmSCComm: TfrmSCComm
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 731
     object tsCommLog: TTabSheet
       Caption = '[ '#53685#49888#47196#44536' ]'
       object Pnl_Main: TPanel

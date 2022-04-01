@@ -192,7 +192,7 @@ type
     function  fnSignalEditColor(Signal,Flag: string): TColor;                   // 시그날 에디트색상
 
     // 작업 처리 관련 함수
-    function  GetJobNo(Gubn: String) : Integer;                                               // 작업번호 생성
+    function  GetJobNo(Gubn: String) : Integer;                                 // 작업번호 생성
     function  SCNowStatusUpdate(SC_NO:Integer; Status: String): Boolean ;
     function  SCNowCycleUpdate(SC_NO:Integer; Cycle: String): Boolean ;
 
@@ -203,7 +203,7 @@ type
     function  fnSetSCSetInfo_Clear(SC_NO:Integer): Boolean ;                    // SC 지시 상태 초기화 (All OFF)
     function  fnSetSCSetInfo_Clear2(SC_NO:Integer): Boolean ;                   // 모니터링 작업처리 상태 초기화 (All OFF)
 
-    function  SetJobOrder(PortNo: Integer; Gubn, ItemCode, NOWMC, EMG: String) : Boolean;
+    function  SetJobOrder(PortNo: Integer; Gubn, ItemCode, NOWMC, EMG: String) : String;
 
     // ACS 관련
     procedure GetACS_Status(PortNo: Integer);                                   // ACS 상태가져옴
@@ -226,14 +226,15 @@ type
     function  fnGetRFID_Data(PortNo: Integer; FName: String): String;           // TC_RFID 데이터 가져옴
 
     // ORDER 테이블 관련 함수
-    function  fnOrder_Value(SC_No: Integer; FName : String): String; overload;                       // ORDER 데이터 Get
+    function  fnOrder_Value(SC_No: Integer; FName : String): String; overload;    // ORDER 데이터 Get
     function  fnOrder_Value(WhereStr: String; FName : String) : String; overload;
-    function  fnOrder_Cancel(SC_No: Integer; LUGG, REG_TIME: String): Boolean;                       // ORDER 데이터 Delete(작업취소 시)
-    function  fnOrder_Delete(SC_No: Integer): Boolean; overload;                                     // ORDER 데이터 Delete (확인필요)
+    function  fnOrder_Cancel(SC_No: Integer; LUGG, REG_TIME: String): Boolean;    // ORDER 데이터 Delete(작업취소 시)
+    function  fnOrder_Delete(SC_No: Integer): Boolean; overload;                  // ORDER 데이터 Delete (확인필요)
     function  fnOrder_Delete(JobNo: String): Boolean; overload;
-    function  fnOrder_Update(SC_No:Integer;FName,FValue:String):Boolean;                  overload ; // ORDER 데이터 Update (Value1개)
-    function  fnOrder_Update(SC_No:Integer;FName1,FValue1,FName2,FValue2:String):Boolean; overload ; // ORDER 데이터 Update (Value2개)
-    function  fnOrder_Update(JobNo, FName, FValue:String):Boolean;                        overload ;
+    function  fnOrder_Update(SC_No: Integer; FName,FValue: String):Boolean; overload ; // ORDER 데이터 Update (Value1개)
+    function  fnOrder_Update(SC_No: Integer; FName1, FValue1, FName2, FValue2: String):Boolean; overload ; // ORDER 데이터 Update (Value2개)
+    function  fnOrder_Update(JobNo, FName, FValue:String):Boolean; overload ;
+    function  fnOrder_RfidUpdate(JobNo: String; RfidData: TRFID_Data): Boolean;
 
     // RFID
     function  fnRFID_IsClear(PortNo: Integer): Boolean;
@@ -255,6 +256,7 @@ type
     function  fnGetCellCount(Status: String): Integer;                             // 창고 빈 칸 갯수 반환
 
     function  fnGet_Current(Cur_Name: String): Boolean;
+    procedure fnSet_Current(Cur_Name, FName, FValue : String);
 
     // TM_ITEM 테이블 관련 함수
     function fnITEM_Value(SC_No: Integer; FName, FValue : String): String;
@@ -310,7 +312,7 @@ var
   PLC_WRITE_FLAG  : TCONTROL_FLAG;
 
   PLC_ORDER : TPLC_ORDER;
-
+  RFID_Data : TRFID_DATA;
   Rx_AcsData : Array [1..6] of TRx_AcsData;
   Tx_AcsData : Array [1..6] of TTx_AcsData;
   PLC_WriteVal : TPLC_VAL;
@@ -355,6 +357,7 @@ begin
   begin
     fnCreateSet ;
     sbtClick(sbtStart) ;  // 자동시작
+    fnSet_Current('RCP', 'OPTION1', '1');
     ShpCon.Brush.Color := clLime;
   end else
   begin
@@ -445,9 +448,10 @@ end;
 procedure TfrmSCComm.ACSControlProcess(SC_NO: Integer);
 var
   i : Integer;
-  JobNo, WhereStr : String;
-  Loc, ItemCode, RfidData, LogStr: String;
+  NewJobNo, JobNo, WhereStr : String;
+  ItemCode, RfidData, LogStr: String;
   HasEmptyCell, HasStock, RfidCheck : Boolean;
+  tRfidData : TRFID_Data;
 begin
 
   for i := START_STATION to END_STATION do
@@ -503,8 +507,10 @@ begin
         if (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
         begin
           ItemCode := Rx_AcsData[i].Model_No;
+
           // 작업생성
-          if (SetJobOrder(i, 'I', ItemCode, '4', '0')) then
+          JobNo := SetJobOrder(i, 'I', ItemCode, '4', '0');
+          if (JobNo <> '') then
           begin
             // 커튼 오픈
             if (PLC_ReadVal.Curtain[i] = '0') then
@@ -563,7 +569,8 @@ begin
           HasStock := True;
 
           // 작업생성
-          if (SetJobOrder(i, 'O', ItemCode, '2', '0')) then
+          JobNo := SetJobOrder(i, 'O', ItemCode, '2', '0');
+          if (JobNo <> '') then
           begin
             // 출고스테이션 커튼 오픈
             if (PLC_ReadVal.Curtain[i] = '0') then
@@ -623,6 +630,7 @@ begin
                     ' Order By REG_TIME Desc ' ;
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
+
         // 출고 된 경우에만 실행
         if (ItemCode <> '') and
            (not fnRFID_IsClear(i)) then
@@ -662,23 +670,40 @@ begin
             fnSetOrderError(i, 'RFID Fault');
             LogStr := 'RFID 불일치 RFID 데이터[' + RfidData +'] ' +
                       'ACS 출고요청데이터[' + ItemCode + '] 작업번호[' + JobNo +']' ;
-            InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
-
-            if (SetJobOrder(i, 'I', RfidData, '1', '1')) then
+            InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+            NewJobNo := SetJobOrder(i, 'I', RfidData, '1', '1');
+            if (NewJobNo <> '') then
             begin
-              LogStr := '재입고 작업 생성';
-              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
 
-              if(SetJobOrder(i, 'O', RfidData, '2', '1')) then
+              fnOrder_Update(NewJobNo, 'JOBSTATUS', '4');
+              fnOrder_Update(NewJobNo, 'NOWSTATUS', '4');
+
+              tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H01');
+              tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H02');
+              tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H03');
+              tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H04');
+              tRfidData.Model_No_1 := fnGetRFID_Data(i, 'H17');
+              tRfidData.Model_No_2 := fnGetRFID_Data(i, 'H18');
+              tRfidData.BMA_No := fnGetRFID_Data(i, 'H19');
+              tRfidData.BMA_1 := fnGetRFID_Data(i, 'H21');
+              tRfidData.BMA_2 := fnGetRFID_Data(i, 'H22');
+              tRfidData.BMA_3 := fnGetRFID_Data(i, 'H23');
+              fnOrder_RfidUpdate(NewJobNo, tRfidData);
+
+              LogStr := '재입고 작업 생성';
+              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+
+              NewJobNo := SetJobOrder(i, 'O', RfidData, '2', '1');
+              if(NewJobNo <> '') then
               begin
                 LogStr := '재출고 작업 생성';
-                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
                 fnOrder_Delete(JobNo);
               end
               else
               begin
                 LogStr := '재출고 작업 생성 실패 동일 품목 없음';
-                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
                 fnOrder_Delete(JobNo);
 
                 // ACS 응답 데이터 생성
@@ -699,7 +724,7 @@ begin
             else
             begin
               LogStr := '재입고 작업 생성 실패 공셀 없음';
-              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', '', LogStr, 'PGM', '', '', '');
+              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
             end;
           end
           // RFID가 정상인 경우
@@ -833,6 +858,7 @@ begin
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
         if (JobNo <> '') then
         begin
+          fnOrder_Update(JobNo, 'JOB_END', '1');
           fnIns_History(i);
         end;
       end;
@@ -871,39 +897,69 @@ begin
           RfidCheck := True;
         end;
 
-        // RFID 값이 일치한 경우
-        if (RfidCheck) then
+        WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+                    '   And JOBD    = ''1'' ' +
+                    '   And JOB_END = ''0'' ' +
+                    '   And IS_AUTO = ''Y'' ' +
+                    '   And NOWMC   = ''4'' ';
+        JobNo := fnOrder_Value(WhereStr, 'LUGG');
+        if (JobNo <> '') then
         begin
-          WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                      '   And JOBD    = ''1'' ' +
-                      '   And JOB_END = ''0'' ' +
-                      '   And NOWMC   = ''4'' ';
-          JobNo := fnOrder_Value(WhereStr, 'LUGG');
-          if (JobNo <> '') then
-          begin
-            // AGV 작업 완료
-            fnOrder_Update(JobNo, 'NOWSTATUS', '4') ;
-            fnOrder_Update(JobNo, 'JOBSTATUS', '4') ;
-          end;
-        end
-        // 일치하지 않은 경우 RFID값으로 변경함
-        else
-        begin
-          WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                      '   And JOBD    = ''1'' ' +
-                      '   And JOB_END = ''0'' ' +
-                      '   And NOWMC   = ''4'' ';
-          JobNo := fnOrder_Value(WhereStr, 'LUGG');
-          if (JobNo <> '') then
-          begin
-            // Order의 품목코드 변경
-            fnOrder_Update(JobNo, 'ITM_CD', ItemCode);
 
-            // AGV 작업 완료
-            fnOrder_Update(JobNo, 'NOWSTATUS', '4') ;
-            fnOrder_Update(JobNo, 'JOBSTATUS', '4') ;
-          end;
+          tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H01');
+          tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H02');
+          tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H03');
+          tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H04');
+          tRfidData.Model_No_1 := fnGetRFID_Data(i, 'H17');
+          tRfidData.Model_No_2 := fnGetRFID_Data(i, 'H18');
+          tRfidData.BMA_No := fnGetRFID_Data(i, 'H19');
+          tRfidData.BMA_1 := fnGetRFID_Data(i, 'H21');
+          tRfidData.BMA_2 := fnGetRFID_Data(i, 'H22');
+          tRfidData.BMA_3 := fnGetRFID_Data(i, 'H23');
+          fnOrder_RfidUpdate(JobNo, tRfidData);
+
+          // Order의 품목코드 변경
+          fnOrder_Update(JobNo, 'ITM_CD', ItemCode);
+
+          // AGV 작업 완료
+          fnOrder_Update(JobNo, 'NOWSTATUS', '4') ;
+          fnOrder_Update(JobNo, 'JOBSTATUS', '4') ;
         end;
+
+
+//        // RFID 값이 일치한 경우
+//        if (RfidCheck) then
+//        begin
+//          WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+//                      '   And JOBD    = ''1'' ' +
+//                      '   And JOB_END = ''0'' ' +
+//                      '   And NOWMC   = ''4'' ';
+//          JobNo := fnOrder_Value(WhereStr, 'LUGG');
+//          if (JobNo <> '') then
+//          begin
+//            // AGV 작업 완료
+//            fnOrder_Update(JobNo, 'NOWSTATUS', '4') ;
+//            fnOrder_Update(JobNo, 'JOBSTATUS', '4') ;
+//          end;
+//        end
+//        // 일치하지 않은 경우 RFID값으로 변경함
+//        else
+//        begin
+//          WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+//                      '   And JOBD    = ''1'' ' +
+//                      '   And JOB_END = ''0'' ' +
+//                      '   And NOWMC   = ''4'' ';
+//          JobNo := fnOrder_Value(WhereStr, 'LUGG');
+//          if (JobNo <> '') then
+//          begin
+//            // Order의 품목코드 변경
+//            fnOrder_Update(JobNo, 'ITM_CD', ItemCode);
+//
+//            // AGV 작업 완료
+//            fnOrder_Update(JobNo, 'NOWSTATUS', '4') ;
+//            fnOrder_Update(JobNo, 'JOBSTATUS', '4') ;
+//          end;
+//        end;
 
         // RFID 영역 초기화
         if not (fnRFID_IsClear(i)) then
@@ -1018,6 +1074,7 @@ var
 begin
   for i := START_SCNO to END_SCNO do
   begin
+    fnSet_Current('RCP', 'OPTION1', '0');
     fnSetSCSetInfo(i, 'PROGRAM_START', '0') ;
     fnSetSCSetInfo(i, 'PROGRAM_END'  , '1') ;
   end;
@@ -1035,7 +1092,7 @@ procedure TfrmSCComm.sbtClick(Sender: TObject);
 var
   i : integer ;
 begin
-//  for i := START_SCNO to End_SCNO do fnSCIO_Delete(i) ;
+  for i := START_SCNO to End_SCNO do fnSCIO_Delete(i) ;
 
   if (Sender as TBitBtn).Caption = '통신시작' then
   begin
@@ -1825,8 +1882,6 @@ end;
 // SC Control Process
 //==============================================================================
 procedure TfrmSCComm.SCControlProcess(SC_NO:Integer);
-var
-  ErrorCode, ErrHigh, ErrLow, MOV_NO : String ;
 begin
   staInfo.Panels[0].Text := fnGetSCStatus(SC_STAT[SC_NO]) ;
   staInfo.Panels[1].Text := fnGetSCStatus2(SC_STAT[SC_NO]) ;
@@ -2868,6 +2923,16 @@ begin
       SC_JOB[i].JOB_COMPLETE   := '' ; // 작업완료
       SC_JOB[i].DATA_RESET     := '' ; // 데이터초기화
       SC_JOB[i].MOVE_ON        := '' ; // 기동지시
+      SC_JOB[i].RF_LINE_NAME1  := '';
+      SC_JOB[i].RF_LINE_NAME2  := '';
+      SC_JOB[i].RF_PALLET_NO1  := '';
+      SC_JOB[i].RF_PALLET_NO2  := '';
+      SC_JOB[i].RF_MODEL_NO1   := '';
+      SC_JOB[i].RF_MODEL_NO2   := '';
+      SC_JOB[i].RF_BMA_NO      := '';
+      SC_JOB[i].RF_PALLET_BMA1 := '';
+      SC_JOB[i].RF_PALLET_BMA2 := '';
+      SC_JOB[i].RF_PALLET_BMA3 := '';
     end;
   end else
   begin
@@ -2889,6 +2954,16 @@ begin
     SC_JOB[SC_NO].JOB_COMPLETE   := '' ; // 작업완료
     SC_JOB[SC_NO].DATA_RESET     := '' ; // 데이터초기화
     SC_JOB[SC_NO].MOVE_ON        := '' ; // 기동지시
+    SC_JOB[SC_NO].RF_LINE_NAME1  := '';
+    SC_JOB[SC_NO].RF_LINE_NAME2  := '';
+    SC_JOB[SC_NO].RF_PALLET_NO1  := '';
+    SC_JOB[SC_NO].RF_PALLET_NO2  := '';
+    SC_JOB[SC_NO].RF_MODEL_NO1   := '';
+    SC_JOB[SC_NO].RF_MODEL_NO2   := '';
+    SC_JOB[SC_NO].RF_BMA_NO      := '';
+    SC_JOB[SC_NO].RF_PALLET_BMA1 := '';
+    SC_JOB[SC_NO].RF_PALLET_BMA2 := '';
+    SC_JOB[SC_NO].RF_PALLET_BMA3 := '';
   end;
 end;
 
@@ -2921,6 +2996,16 @@ begin
       SC_JOB_OLD[i].JOB_COMPLETE     := '' ; // 작업완료
       SC_JOB_OLD[i].DATA_RESET       := '' ; // 데이터초기화
       SC_JOB_OLD[i].MOVE_ON          := '' ; // 기동지시
+      SC_JOB_OLD[i].RF_LINE_NAME1    := '' ;
+      SC_JOB_OLD[i].RF_LINE_NAME2    := '' ;
+      SC_JOB_OLD[i].RF_PALLET_NO1    := '' ;
+      SC_JOB_OLD[i].RF_PALLET_NO2    := '' ;
+      SC_JOB_OLD[i].RF_MODEL_NO1     := '' ;
+      SC_JOB_OLD[i].RF_MODEL_NO2     := '' ;
+      SC_JOB_OLD[i].RF_BMA_NO        := '' ;
+      SC_JOB_OLD[i].RF_PALLET_BMA1   := '' ;
+      SC_JOB_OLD[i].RF_PALLET_BMA2   := '' ;
+      SC_JOB_OLD[i].RF_PALLET_BMA3   := '' ;
     end;
   end else
   begin
@@ -2942,6 +3027,17 @@ begin
     SC_JOB_OLD[SC_NO].JOB_COMPLETE   := '' ; // 작업완료
     SC_JOB_OLD[SC_NO].DATA_RESET     := '' ; // 데이터초기화
     SC_JOB_OLD[SC_NO].MOVE_ON        := '' ; // 기동지시
+    SC_JOB_OLD[SC_NO].RF_LINE_NAME1  := '' ;
+    SC_JOB_OLD[SC_NO].RF_LINE_NAME2  := '' ;
+    SC_JOB_OLD[SC_NO].RF_PALLET_NO1  := '' ;
+    SC_JOB_OLD[SC_NO].RF_PALLET_NO2  := '' ;
+    SC_JOB_OLD[SC_NO].RF_MODEL_NO1   := '' ;
+    SC_JOB_OLD[SC_NO].RF_MODEL_NO2   := '' ;
+    SC_JOB_OLD[SC_NO].RF_BMA_NO      := '' ;
+    SC_JOB_OLD[SC_NO].RF_PALLET_BMA1 := '' ;
+    SC_JOB_OLD[SC_NO].RF_PALLET_BMA2 := '' ;
+    SC_JOB_OLD[SC_NO].RF_PALLET_BMA3 := '' ;
+
   end;
 end;
 
@@ -2968,6 +3064,16 @@ begin
   SC_JOB_OLD[SC_NO].JOB_COMPLETE   := SC_JOB[SC_NO].JOB_COMPLETE   ; // 작업완료
   SC_JOB_OLD[SC_NO].DATA_RESET     := SC_JOB[SC_NO].DATA_RESET     ; // 데이터초기화
   SC_JOB_OLD[SC_NO].MOVE_ON        := SC_JOB[SC_NO].MOVE_ON        ; // 기동지시
+  SC_JOB_OLD[SC_NO].RF_LINE_NAME1  := SC_JOB[SC_NO].RF_LINE_NAME1  ;
+  SC_JOB_OLD[SC_NO].RF_LINE_NAME2  := SC_JOB[SC_NO].RF_LINE_NAME2  ;
+  SC_JOB_OLD[SC_NO].RF_PALLET_NO1  := SC_JOB[SC_NO].RF_PALLET_NO1  ;
+  SC_JOB_OLD[SC_NO].RF_PALLET_NO2  := SC_JOB[SC_NO].RF_PALLET_NO2  ;
+  SC_JOB_OLD[SC_NO].RF_MODEL_NO1   := SC_JOB[SC_NO].RF_MODEL_NO1   ;
+  SC_JOB_OLD[SC_NO].RF_MODEL_NO2   := SC_JOB[SC_NO].RF_MODEL_NO2   ;
+  SC_JOB_OLD[SC_NO].RF_BMA_NO      := SC_JOB[SC_NO].RF_BMA_NO      ;
+  SC_JOB_OLD[SC_NO].RF_PALLET_BMA1 := SC_JOB[SC_NO].RF_PALLET_BMA1 ;
+  SC_JOB_OLD[SC_NO].RF_PALLET_BMA2 := SC_JOB[SC_NO].RF_PALLET_BMA2 ;
+  SC_JOB_OLD[SC_NO].RF_PALLET_BMA3 := SC_JOB[SC_NO].RF_PALLET_BMA3 ;
 
 end;
 
@@ -2994,6 +3100,16 @@ begin
   SC_JOB[SC_NO].JOB_COMPLETE   := SC_JOB_OLD[SC_NO].JOB_COMPLETE   ; // 작업완료
   SC_JOB[SC_NO].DATA_RESET     := SC_JOB_OLD[SC_NO].DATA_RESET     ; // 데이터초기화
   SC_JOB[SC_NO].MOVE_ON        := SC_JOB_OLD[SC_NO].MOVE_ON        ; // 기동지시
+  SC_JOB[SC_NO].RF_LINE_NAME1  := SC_JOB_OLD[SC_NO].RF_LINE_NAME1  ;
+  SC_JOB[SC_NO].RF_LINE_NAME2  := SC_JOB_OLD[SC_NO].RF_LINE_NAME2  ;
+  SC_JOB[SC_NO].RF_PALLET_NO1  := SC_JOB_OLD[SC_NO].RF_PALLET_NO1  ;
+  SC_JOB[SC_NO].RF_PALLET_NO2  := SC_JOB_OLD[SC_NO].RF_PALLET_NO2  ;
+  SC_JOB[SC_NO].RF_MODEL_NO1   := SC_JOB_OLD[SC_NO].RF_MODEL_NO1   ;
+  SC_JOB[SC_NO].RF_MODEL_NO2   := SC_JOB_OLD[SC_NO].RF_MODEL_NO2   ;
+  SC_JOB[SC_NO].RF_BMA_NO      := SC_JOB_OLD[SC_NO].RF_BMA_NO      ;
+  SC_JOB[SC_NO].RF_PALLET_BMA1 := SC_JOB_OLD[SC_NO].RF_PALLET_BMA1 ;
+  SC_JOB[SC_NO].RF_PALLET_BMA2 := SC_JOB_OLD[SC_NO].RF_PALLET_BMA2 ;
+  SC_JOB[SC_NO].RF_PALLET_BMA3 := SC_JOB_OLD[SC_NO].RF_PALLET_BMA3 ;
 end;
 
 //==============================================================================
@@ -3573,6 +3689,17 @@ begin
         SC_JOB[SC_NO].IO_TYPE    := IO_Gubun ;                                          // 입출고 유형 ( I:입고, O:출고, M:Rack To Rack, C:SC Site to SC Site )
         SC_JOB[SC_NO].ITM_CD     := UpperCase(Trim(FieldByName('ITM_CD').AsString)) ;
 
+        SC_JOB[SC_NO].RF_LINE_NAME1  := Trim(FieldByName('RF_LINE_NAME1').AsString);
+        SC_JOB[SC_NO].RF_LINE_NAME2  := Trim(FieldByName('RF_LINE_NAME2').AsString);
+        SC_JOB[SC_NO].RF_PALLET_NO1  := Trim(FieldByName('RF_PALLET_NO1').AsString);
+        SC_JOB[SC_NO].RF_PALLET_NO2  :=	Trim(FieldByName('RF_PALLET_NO2').AsString);
+        SC_JOB[SC_NO].RF_MODEL_NO1   :=	Trim(FieldByName('RF_MODEL_NO1').AsString);
+        SC_JOB[SC_NO].RF_MODEL_NO2   :=	Trim(FieldByName('RF_MODEL_NO2').AsString);
+        SC_JOB[SC_NO].RF_BMA_NO      :=	Trim(FieldByName('RF_BMA_NO').AsString);
+        SC_JOB[SC_NO].RF_PALLET_BMA1 :=	Trim(FieldByName('RF_PALLET_BMA1').AsString);
+        SC_JOB[SC_NO].RF_PALLET_BMA2 :=	Trim(FieldByName('RF_PALLET_BMA2').AsString);
+        SC_JOB[SC_NO].RF_PALLET_BMA3 :=	Trim(FieldByName('RF_PALLET_BMA3').AsString);
+
         SC_JOB[SC_NO].SC_STEP := 'L'   ;   // 작업 단계 (L:Loading, U:UnLoading)
 
         if JFlag = StoreIn then
@@ -4130,6 +4257,12 @@ begin
           begin
             MainDM.MainDB.CommitTrans ;
 
+            // 수동 입/출고 작업 이력 삽입
+            if (fnOrder_Value(SC_NO, 'IS_AUTO') = 'N')  then
+            begin
+              fnIns_History(SC_JOB[SC_No].ID_ORDLUGG);
+            end;
+
             // 입고완료 또는 랙이동시 이력삽입
             if (SC_JOB[SC_No].IO_TYPE = 'I') or
                (SC_JOB[SC_No].IO_TYPE = 'M') then
@@ -4213,12 +4346,53 @@ begin
 end;
 
 //==============================================================================
+// fnOrder_RfidUpdate : TT_ORDER의 RFID 데이터 업데이트
+//==============================================================================
+function TfrmSCComm.fnOrder_RfidUpdate(JobNo: String; RfidData: TRFID_Data): Boolean;
+var
+  StrSQL : string;
+  ExecNo  : Integer;
+begin
+  Result := False ;
+  StrSQL := ' UPDATE TT_ORDER ' +
+            '    SET RF_LINE_NAME1 = ' + QuotedStr(RfidData.Line_Name_1) +
+               '   , RF_LINE_NAME2 = ' + QuotedStr(RfidData.Line_Name_2) +
+               '   , RF_PALLET_NO1 = ' + QuotedStr(RfidData.Pallet_No_1) +
+               '   , RF_PALLET_NO2 = ' + QuotedStr(RfidData.Pallet_No_2) +
+               '   , RF_MODEL_NO1 = ' + QuotedStr(RfidData.Model_No_1) +
+               '   , RF_MODEL_NO2 = ' + QuotedStr(RfidData.Model_No_2) +
+               '   , RF_BMA_NO = ' + QuotedStr(RfidData.BMA_No) +
+               '   , RF_PALLET_BMA1 = ' + QuotedStr(RfidData.BMA_1) +
+               '   , RF_PALLET_BMA2 = ' + QuotedStr(RfidData.BMA_2) +
+               '   , RF_PALLET_BMA3 = ' + QuotedStr(RfidData.BMA_3) +
+            '  WHERE LUGG = ''' + JobNo + ''' ';
+  try
+    with qryUpdate do
+    begin
+      Close;
+      SQL.Clear;
+      SQL.Text := StrSQL ;
+      ExecNo := ExecSQL ;
+      if ExecNo > 0 then Result := True ;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryUpdate.Close ;
+      ErrorLogWRITE( 'Function fnOrder_Update JobNo(' + JobNo + ') ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
 // fnOrder_Update : TT_ORDER의 필드1 데이터1 업데이트
 //==============================================================================
 function TfrmSCComm.fnOrder_Update(JobNo, FName, FValue: String): Boolean;
 var
-  StrSQL, StrLog : string;
-  ExecNo  : Integer;
+  StrSQL : string;
+  ExecNo : Integer;
 begin
   Result := False ;
   StrSQL := ' UPDATE TT_ORDER ' +
@@ -4250,8 +4424,8 @@ end;
 //==============================================================================
 function TfrmSCComm.fnOrder_Update(SC_No:Integer; FName, FValue:String): Boolean;
 var
-  StrSQL, StrLog : string;
-  ExecNo  : Integer;
+  StrSQL : string;
+  ExecNo : Integer;
 begin
   Result := False ;
   StrSQL := ' UPDATE TT_ORDER ' +
@@ -4284,8 +4458,8 @@ end;
 //==============================================================================
 function TfrmSCComm.fnOrder_Update(SC_No: Integer; FName1, FValue1, FName2, FValue2: String): Boolean;
 var
-  StrSQL, StrLog : string;
-  ExecNo  : Integer;
+  StrSQL : string;
+  ExecNo : Integer;
 begin
   Result := False ;
   if (Trim(FName2) = '') and (Trim(FValue2) = '') then
@@ -4363,7 +4537,6 @@ var
   UdtSQL, StrLog, StrProc, Step : string;
   JobErrorT, JobErrorc, JobErrord : String ;
   ExecNo  : Integer;
-  NowErrCode : String ;
 begin
   Result := False;
 
@@ -4441,7 +4614,6 @@ var
   UdtSQL, StrLog, StrProc, Step : string;
   JobErrorT, JobErrorc, JobErrord : String ;
   ExecNo  : Integer;
-  NowErrCode : String ;
   WhereStr : String;
 begin
   Result := False;
@@ -4695,7 +4867,7 @@ end;
 //==============================================================================
 function TfrmSCComm.fnSCIO_Insert(SC_No: Integer): Boolean;
 var
-  StrSQL, StrLog : String ;
+  StrSQL : String ;
   ExecNo : Integer ;
 begin
   Result := False ;
@@ -4887,6 +5059,16 @@ begin
               '      , ITM_NAME     = ' + QuotedStr(fnITEM_Value(SC_No, 'ITM_NAME', UpperCase(SC_JOB[SC_NO].ITM_CD))) +
               '      , ITM_SPEC     = ' + QuotedStr(fnITEM_Value(SC_No, 'ITM_SPEC', UpperCase(SC_JOB[SC_NO].ITM_CD))) +
               '      , ITM_QTY      = 1' +
+              '      , RF_LINE_NAME1  = ' + QuotedStr(SC_JOB[SC_NO].RF_LINE_NAME1 ) +
+              '      , RF_LINE_NAME2  = ' + QuotedStr(SC_JOB[SC_NO].RF_LINE_NAME2 ) +
+              '      , RF_PALLET_NO1  = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_NO1 ) +
+              '      , RF_PALLET_NO2  = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_NO2 ) +
+              '      , RF_MODEL_NO1   = ' + QuotedStr(SC_JOB[SC_NO].RF_MODEL_NO1  ) +
+              '      , RF_MODEL_NO2   = ' + QuotedStr(SC_JOB[SC_NO].RF_MODEL_NO2  ) +
+              '      , RF_BMA_NO      = ' + QuotedStr(SC_JOB[SC_NO].RF_BMA_NO     ) +
+              '      , RF_PALLET_BMA1 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA1) +
+              '      , RF_PALLET_BMA2 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA2) +
+              '      , RF_PALLET_BMA3 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA3) +
               '      , ID_STATUS    = ' + QuotedStr(CellStatus) +
               '      , STOCK_IN_DT  = GETDATE()   ' +
               '      , ID_MEMO      = ' + QuotedStr(fnOrder_Value(SC_No,'ETC')) +
@@ -4912,6 +5094,16 @@ begin
               '      , ITM_QTY      = 0     ' +
               '      , ID_STATUS    = ''0'' ' +
               '      , ID_MEMO      = ''''  ' +
+              '      , RF_LINE_NAME1  = '''' ' +
+              '      , RF_LINE_NAME2  = '''' ' +
+              '      , RF_PALLET_NO1  = '''' ' +
+              '      , RF_PALLET_NO2  = '''' ' +
+              '      , RF_MODEL_NO1   = '''' ' +
+              '      , RF_MODEL_NO2   = '''' ' +
+              '      , RF_BMA_NO      = '''' ' +
+              '      , RF_PALLET_BMA1 = '''' ' +
+              '      , RF_PALLET_BMA2 = '''' ' +
+              '      , RF_PALLET_BMA3 = '''' ' +
               '  Where ID_HOGI   = '   + QuotedStr(IntToStr(SC_NO)) +
               '    AND ID_BANK   = ''' + Copy(SC_JOB[SC_No].LOAD_BANK, 4, 1)  + ''' ' + // 하역 열
               '    AND ID_BAY    = ''' + Copy(SC_JOB[SC_No].LOAD_BAY, 3, 2)   + ''' ' + // 하역 연
@@ -4934,6 +5126,16 @@ begin
               '      , ITM_QTY      = 0     ' +
               '      , ID_STATUS    = ''0'' ' +
               '      , ID_MEMO      = ''''  ' +
+              '      , RF_LINE_NAME1  = '''' ' +
+              '      , RF_LINE_NAME2  = '''' ' +
+              '      , RF_PALLET_NO1  = '''' ' +
+              '      , RF_PALLET_NO2  = '''' ' +
+              '      , RF_MODEL_NO1   = '''' ' +
+              '      , RF_MODEL_NO2   = '''' ' +
+              '      , RF_BMA_NO      = '''' ' +
+              '      , RF_PALLET_BMA1 = '''' ' +
+              '      , RF_PALLET_BMA2 = '''' ' +
+              '      , RF_PALLET_BMA3 = '''' ' +
               '  Where ID_HOGI   = '   + QuotedStr(IntToStr(SC_NO)) +
               '    AND ID_BANK   = ''' + Copy(SC_JOB[SC_No].LOAD_BANK, 4, 1)  + ''' ' + // 적재 열
               '    AND ID_BAY    = ''' + Copy(SC_JOB[SC_No].LOAD_BAY, 3, 2)   + ''' ' + // 적재 연
@@ -4944,6 +5146,16 @@ begin
                '      , ITM_NAME     = ' + QuotedStr(fnITEM_Value(SC_No, 'ITM_NAME', UpperCase(SC_JOB[SC_NO].ITM_CD))) +
                '      , ITM_SPEC     = ' + QuotedStr(fnITEM_Value(SC_No, 'ITM_SPEC', UpperCase(SC_JOB[SC_NO].ITM_CD))) +
                '      , ITM_QTY      = 1' +
+               '      , RF_LINE_NAME1  = ' + QuotedStr(SC_JOB[SC_NO].RF_LINE_NAME1 ) +
+               '      , RF_LINE_NAME2  = ' + QuotedStr(SC_JOB[SC_NO].RF_LINE_NAME2 ) +
+               '      , RF_PALLET_NO1  = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_NO1 ) +
+               '      , RF_PALLET_NO2  = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_NO2 ) +
+               '      , RF_MODEL_NO1   = ' + QuotedStr(SC_JOB[SC_NO].RF_MODEL_NO1  ) +
+               '      , RF_MODEL_NO2   = ' + QuotedStr(SC_JOB[SC_NO].RF_MODEL_NO2  ) +
+               '      , RF_BMA_NO      = ' + QuotedStr(SC_JOB[SC_NO].RF_BMA_NO     ) +
+               '      , RF_PALLET_BMA1 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA1) +
+               '      , RF_PALLET_BMA2 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA2) +
+               '      , RF_PALLET_BMA3 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA3) +
                '      , ID_STATUS    = ' + QuotedStr(CellStatus) +
                '      , STOCK_IN_DT  = GETDATE()   ' +
                '      , ID_MEMO      = ' + QuotedStr(fnOrder_Value(SC_No,'ETC')) +
@@ -5102,6 +5314,37 @@ begin
 end;
 
 //==============================================================================
+// fnSet_Current : 파라메터 설정.
+//==============================================================================
+procedure TfrmSCComm.fnSet_Current(Cur_Name, FName, FValue: String);
+var
+  StrSQL : string;
+begin
+  StrSQL := '';
+  try
+    with qryTemp do
+    begin
+      Close;
+      SQL.Clear;
+      StrSQL := ' UPDATE TC_CURRENT' +
+                   ' SET ' + FName + ' = ' + QuotedStr(FValue) +
+                 ' WHERE CURRENT_NAME = ' + QuotedStr(Cur_Name);
+      SQL.Text := StrSQL ;
+      ExecSql ;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryStock.Close ;
+      ErrorLogWRITE( 'Function fnSet_Current Cur_Name, FName, FValue(' + Cur_Name + ', ' + FName + ', ' + FValue + ') ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+
+end;
+
+//==============================================================================
 // fnGetSocktCount : 품목 갯수 반환
 //==============================================================================
 function TfrmSCComm.fnGetStockCount(ItemCode: String): Integer;
@@ -5214,7 +5457,7 @@ begin
     begin
       Close;
       SQL.Clear;
-      StrSQL := ' INSERT INTO TT_HISTORY (REG_TIME, LUGG, JOBD, LINE_NO, ' +
+      StrSQL := ' INSERT INTO TT_HISTORY (REG_TIME, LUGG, JOBD, LINE_NO, IS_AUTO, ' +
                                         ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
                             					  ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 					                              '	NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
@@ -5222,7 +5465,7 @@ begin
 					                              ' JOB_END, CVFR, CVTO, CVCURR, ' +
 					                              '	ETC, EMG, ITM_CD, UP_TIME, ' +
 					                              '	HIS_TIME) ' +
-                      ' SELECT REG_TIME, LUGG, JOBD, LINE_NO, ' +
+                      ' SELECT REG_TIME, LUGG, JOBD, LINE_NO, IS_AUTO, ' +
                              ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
 		                         ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 		                         ' NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
@@ -5272,7 +5515,7 @@ begin
     begin
       Close;
       SQL.Clear;
-      StrSQL := ' INSERT INTO TT_HISTORY (REG_TIME, LUGG, JOBD, LINE_NO, ' +
+      StrSQL := ' INSERT INTO TT_HISTORY (REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                                         ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
                             					  ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 					                              '	NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
@@ -5280,7 +5523,7 @@ begin
 					                              ' JOB_END, CVFR, CVTO, CVCURR, ' +
 					                              '	ETC, EMG, ITM_CD, UP_TIME, ' +
 					                              '	HIS_TIME) ' +
-                      ' SELECT REG_TIME, LUGG, JOBD, LINE_NO, ' +
+                      ' SELECT REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                              ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
 		                         ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 		                         ' NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
@@ -5424,7 +5667,7 @@ end;
 //==============================================================================
 function TfrmSCComm.fnCellPosChange(SC_NO: integer; Flag: String): Boolean;
 var
-  StrSQL, StrLog, NewPos, Zone : String ;
+  StrSQL, StrLog, NewPos : String ;
 begin
   Result := False ;
 
@@ -5525,7 +5768,7 @@ end;
 //==============================================================================
 function TfrmSCComm.fnGetFreeLoc : String;
 var
-  StrSQL, StrLog, NewPos, Zone : String ;
+  StrSQL, StrLog, NewPos : String ;
 begin
   Result := '';
 
@@ -5567,8 +5810,7 @@ end;
 //==============================================================================
 function TfrmSCComm.fnGetRFID_Data(PortNo: Integer; FName: String): String;
 var
-  StrSQL, StrLog : String ;
-  ExecNo : Integer ;
+  StrSQL : String ;
 begin
   Result := '' ;
 
@@ -5692,14 +5934,14 @@ end;
 //==============================================================================
 // SetJobOrder [지시 데이터 저장]
 //==============================================================================
-function TfrmSCComm.SetJobOrder(PortNo: Integer; Gubn, ItemCode, NOWMC, EMG: String) : Boolean;
+function TfrmSCComm.SetJobOrder(PortNo: Integer; Gubn, ItemCode, NOWMC, EMG: String) : String;
 var
   i : Integer;
   Loc: String;
   EventDesc : String;
 begin
   try
-    Result := False;
+    Result := '';
 
     if (Gubn = 'I') then
     begin
@@ -5711,6 +5953,7 @@ begin
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
       OrderData.LUGG       := Format('%.4d', [GetJobNo(Gubn)]) ;  // 작업번호
       OrderData.JOBD       := '1';     // 입고지시
+      OrderData.IS_AUTO    := 'Y';     // 자동여부
 
       OrderData.SRCSITE    := '0001';  // 적재 호기
       OrderData.SRCAISLE   := '0000';  // 적재 열
@@ -5756,6 +5999,7 @@ begin
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
       OrderData.LUGG       := Format('%.4d', [GetJobNo(Gubn)]) ;  // 작업번호
       OrderData.JOBD       := '2';     // 출고지시
+      OrderData.IS_AUTO    := 'Y';     // 자동여부
 
       OrderData.SRCSITE    := '0001' ;  // 적재 호기
       OrderData.SRCAISLE   := Format('%.4d', [StrToInt(Copy(Loc, 1, 1))]) ;  // 적재 열
@@ -5780,7 +6024,7 @@ begin
       OrderData.CVTO       := '0';
       OrderData.CVCURR     := '0';
       OrderData.ETC        := '';
-      OrderData.EMG        := '0';
+      OrderData.EMG        := EMG;
       OrderData.LINE_NO    := IntToStr(PortNo);
       OrderData.ITM_CD     := ItemCode;
       OrderData.UP_TIME    := 'GETDATE()';
@@ -5801,7 +6045,7 @@ begin
       SQL.Clear;
       SQL.Text :=
       ' INSERT INTO TT_ORDER (                             ' + #13#10+
-      '    REG_TIME, LUGG, JOBD,                           ' + #13#10 +
+      '    REG_TIME, LUGG, JOBD, IS_AUTO,                  ' + #13#10 +
       '    SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL,            ' + #13#10 +
       '    DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL,            ' + #13#10 +
       '    NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS,        ' + #13#10 +
@@ -5809,7 +6053,7 @@ begin
       '    JOB_END, CVFR, CVTO, CVCURR,                    ' + #13#10 +
       '    ETC, EMG, ITM_CD, LINE_NO, UP_TIME              ' + #13#10 +
       '  ) VALUES (                                        ' + #13#10 +
-      '    :REG_TIME, :LUGG, :JOBD,                        ' + #13#10 +
+      '    :REG_TIME, :LUGG, :JOBD, :IS_AUTO,              ' + #13#10 +
       '    :SRCSITE, :SRCAISLE, :SRCBAY, :SRCLEVEL,        ' + #13#10 +
       '    :DSTSITE, :DSTAISLE, :DSTBAY, :DSTLEVEL,        ' + #13#10 +
       '    :NOWMC, :JOBSTATUS, :NOWSTATUS, :BUFFSTATUS,    ' + #13#10 +
@@ -5823,6 +6067,7 @@ begin
       Parameters[i].Value := OrderData.REG_TIME;    Inc(i);
       Parameters[i].Value := OrderData.LUGG;        Inc(i);
       Parameters[i].Value := OrderData.JOBD;        Inc(i);
+      Parameters[i].Value := OrderData.IS_AUTO;     Inc(i);
       Parameters[i].Value := OrderData.SRCSITE;     Inc(i);
       Parameters[i].Value := OrderData.SRCAISLE;    Inc(i);
       Parameters[i].Value := OrderData.SRCBAY;      Inc(i);
@@ -5850,7 +6095,7 @@ begin
       ExecSql;
       Close;
     end;
-    Result := True;
+    Result := OrderData.LUGG;
 
     if MainDm.MainDB.InTransaction then
        MainDm.MainDB.CommitTrans;

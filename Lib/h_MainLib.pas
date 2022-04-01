@@ -54,6 +54,7 @@ Type
    REG_TIME,
    LUGG,
    JOBD,
+   IS_AUTO,
    SRCSITE,
    SRCAISLE,
    SRCBAY,
@@ -134,6 +135,19 @@ Type
     UNLOAD_LEVEL   ,          // 하역(단)
 
     ITM_CD         ,          // 아이템 코드
+
+    RF_LINE_NAME1  ,
+    RF_LINE_NAME2  ,
+    RF_PALLET_NO1  ,
+    RF_PALLET_NO2  ,
+    RF_MODEL_NO1   ,
+    RF_MODEL_NO2   ,
+    RF_BMA_NO      ,
+    RF_PALLET_BMA1 ,
+    RF_PALLET_BMA2 ,
+    RF_PALLET_BMA3 ,
+
+
 
     SC_STEP        ,          // 작업 단계 ( L : Loading, U : UnLoading, C : Cancel )
 
@@ -359,6 +373,21 @@ Type
     D1390  ,
     D1391  : String;
   end;
+
+  TRFID_DATA = Record
+    Line_Name_1      ,
+    Line_Name_2      ,
+    Pallet_No_1      ,
+    Pallet_No_2      ,
+    Model_No_1       ,
+    Model_No_2       ,
+    BMA_No           ,
+    Cell_Production  ,
+    BMA_1            ,
+    BMA_2            ,
+    BMA_3            : String;
+  End;
+
 
   TPLC_ORDER = Record
     ORDER  ,
