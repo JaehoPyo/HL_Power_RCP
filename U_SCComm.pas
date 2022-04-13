@@ -506,7 +506,7 @@ begin
                     '   And JOB_END = 0 ' ;
         if (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
         begin
-          ItemCode := Rx_AcsData[i].Model_No;
+          ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
 
           // 작업생성
           JobNo := SetJobOrder(i, 'I', ItemCode, '4', '0');
@@ -563,7 +563,8 @@ begin
                   '   And JOBD = ''2'' ';
       if (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
       begin
-        ItemCode := Rx_AcsData[i].Model_No;
+        ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
+
         if (fnGetStockCount(ItemCode) > 0) then
         begin
           HasStock := True;
@@ -638,94 +639,96 @@ begin
           // RFID 확인 사용중
           if (fnGet_Current('RFID_CHECK')) then
           begin
-            if (fnGetRFID_Data(i, 'H01') = 'BM') then
+
+            // 공팔레트 출고요청이고 RFID의 BMA 갯수가 0이면 정상
+            // 실팔레트 출고요청이고 RFID의 BMA 갯수가 36이면 정상
+            if ((Rx_AcsData[i].Model_No = '0') and
+                (fnGetRFID_Data(i, 'H19') = '0')) or
+               ((Rx_AcsData[i].Model_No = '1') and
+                (fnGetRFID_Data(i, 'H19') = '36')) then
             begin
-              RfidData := fnGetRFID_Data(i, 'H17');
-              if (RfidData = ItemCode) then
-              begin
-                RfidCheck := True;
-              end else
-              begin
-                RfidCheck := False;
-              end;
-            end else
+              RfidCheck := True;
+            end
+            else
             begin
-              RfidData := fnGetRFID_Data(i, 'H25');
-              if (RfidData = ItemCode) then
-              begin
-                RfidCheck := True;
-              end else
-              begin
-                RfidCheck := False;
-              end;
+              RfidCheck := False;
             end;
           end else
           begin
             RfidCheck := True;
           end;
 
-          // RFID가 잘못 된 경우.  -- 재입고 후 재출고
+          // RFID가 잘못 된 경우.
           if not (RfidCheck) then
           begin
-            fnSetOrderError(i, 'RFID Fault');
-            LogStr := 'RFID 불일치 RFID 데이터[' + RfidData +'] ' +
-                      'ACS 출고요청데이터[' + ItemCode + '] 작업번호[' + JobNo +']' ;
-            InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
-            NewJobNo := SetJobOrder(i, 'I', RfidData, '1', '1');
-            if (NewJobNo <> '') then
+            // TT_ORDER에 에러 표시
+            if (fnOrder_Value(WhereStr, 'JOBERRORC') <> '1') then
             begin
-
-              fnOrder_Update(NewJobNo, 'JOBSTATUS', '4');
-              fnOrder_Update(NewJobNo, 'NOWSTATUS', '4');
-
-              tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H01');
-              tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H02');
-              tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H03');
-              tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H04');
-              tRfidData.Model_No_1 := fnGetRFID_Data(i, 'H17');
-              tRfidData.Model_No_2 := fnGetRFID_Data(i, 'H18');
-              tRfidData.BMA_No := fnGetRFID_Data(i, 'H19');
-              tRfidData.BMA_1 := fnGetRFID_Data(i, 'H21');
-              tRfidData.BMA_2 := fnGetRFID_Data(i, 'H22');
-              tRfidData.BMA_3 := fnGetRFID_Data(i, 'H23');
-              fnOrder_RfidUpdate(NewJobNo, tRfidData);
-
-              LogStr := '재입고 작업 생성';
-              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
-
-              NewJobNo := SetJobOrder(i, 'O', RfidData, '2', '1');
-              if(NewJobNo <> '') then
-              begin
-                LogStr := '재출고 작업 생성';
-                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
-                fnOrder_Delete(JobNo);
-              end
-              else
-              begin
-                LogStr := '재출고 작업 생성 실패 동일 품목 없음';
-                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
-                fnOrder_Delete(JobNo);
-
-                // ACS 응답 데이터 생성
-                Tx_AcsData[i].Heart_Beat       := '1';
-                Tx_AcsData[i].Line_Name_Source := '';
-                Tx_AcsData[i].Line_No_Source   := '';
-                Tx_AcsData[i].Port_No_Source   := '';
-                Tx_AcsData[i].Line_Name_Dest   := '';
-                Tx_AcsData[i].Line_No_Dest     := '';
-                Tx_AcsData[i].Port_No_Dest     := '';
-                Tx_AcsData[i].Model_No         := '';
-                Tx_AcsData[i].Call_Request     := '0';
-                Tx_AcsData[i].Call_Answer      := '2';
-                Tx_AcsData[i].Docking_Approve  := '0';
-                Tx_AcsData[i].Docking_Complete := '0';
-              end;
-            end
-            else
-            begin
-              LogStr := '재입고 작업 생성 실패 공셀 없음';
-              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+              fnOrder_Update(JobNo, 'JOBERRORC', '1');
+              fnOrder_Update(JobNo, 'JOBERRORT', 'R');
+              fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
             end;
+
+              //  재입고 후 재출고 로직
+//            fnSetOrderError(i, 'RFID Fault');
+//            LogStr := 'RFID 불일치 RFID 데이터[' + RfidData +'] ' +
+//                      'ACS 출고요청데이터[' + ItemCode + '] 작업번호[' + JobNo +']' ;
+//            InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+//            NewJobNo := SetJobOrder(i, 'I', RfidData, '1', '1');
+//            if (NewJobNo <> '') then
+//            begin
+//
+//              fnOrder_Update(NewJobNo, 'JOBSTATUS', '4');
+//              fnOrder_Update(NewJobNo, 'NOWSTATUS', '4');
+//
+//              tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H01');
+//              tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H02');
+//              tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H03');
+//              tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H04');
+//              tRfidData.Model_No_1 := fnGetRFID_Data(i, 'H17');
+//              tRfidData.Model_No_2 := fnGetRFID_Data(i, 'H18');
+//              tRfidData.BMA_No := fnGetRFID_Data(i, 'H19');
+//              tRfidData.BMA_1 := fnGetRFID_Data(i, 'H21');
+//              tRfidData.BMA_2 := fnGetRFID_Data(i, 'H22');
+//              tRfidData.BMA_3 := fnGetRFID_Data(i, 'H23');
+//              fnOrder_RfidUpdate(NewJobNo, tRfidData);
+//
+//              LogStr := '재입고 작업 생성';
+//              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+//
+//              NewJobNo := SetJobOrder(i, 'O', RfidData, '2', '1');
+//              if(NewJobNo <> '') then
+//              begin
+//                LogStr := '재출고 작업 생성';
+//                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+//                fnOrder_Delete(JobNo);
+//              end
+//              else
+//              begin
+//                LogStr := '재출고 작업 생성 실패 동일 품목 없음';
+//                InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+//                fnOrder_Delete(JobNo);
+//
+//                // ACS 응답 데이터 생성
+//                Tx_AcsData[i].Heart_Beat       := '1';
+//                Tx_AcsData[i].Line_Name_Source := '';
+//                Tx_AcsData[i].Line_No_Source   := '';
+//                Tx_AcsData[i].Port_No_Source   := '';
+//                Tx_AcsData[i].Line_Name_Dest   := '';
+//                Tx_AcsData[i].Line_No_Dest     := '';
+//                Tx_AcsData[i].Port_No_Dest     := '';
+//                Tx_AcsData[i].Model_No         := '';
+//                Tx_AcsData[i].Call_Request     := '0';
+//                Tx_AcsData[i].Call_Answer      := '2';
+//                Tx_AcsData[i].Docking_Approve  := '0';
+//                Tx_AcsData[i].Docking_Complete := '0';
+//              end;
+//            end
+//            else
+//            begin
+//              LogStr := '재입고 작업 생성 실패 공셀 없음';
+//              InsertPGMHist('[RCP]', 'E', 'ACSControlProcess', 'ACS 응답단계', '', 'PGM', '', '', LogStr);
+//            end;
           end
           // RFID가 정상인 경우
           else
