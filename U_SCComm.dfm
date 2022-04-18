@@ -4,8 +4,8 @@ object frmSCComm: TfrmSCComm
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
   Caption = 'SC '#51228#50612
-  ClientHeight = 737
-  ClientWidth = 394
+  ClientHeight = 681
+  ClientWidth = 775
   Color = 16185078
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -159,8 +159,8 @@ object frmSCComm: TfrmSCComm
   object pcStatus: TPageControl
     Left = 0
     Top = 0
-    Width = 394
-    Height = 673
+    Width = 775
+    Height = 617
     ActivePage = tsStatus
     Align = alClient
     Font.Charset = GB2312_CHARSET
@@ -170,25 +170,27 @@ object frmSCComm: TfrmSCComm
     Font.Style = []
     ParentFont = False
     TabOrder = 0
+    ExplicitWidth = 394
+    ExplicitHeight = 673
     object tsCommLog: TTabSheet
       Caption = '[ '#53685#49888#47196#44536' ]'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 386
+      ExplicitHeight = 645
       object Pnl_Main: TPanel
         Left = 0
         Top = 0
-        Width = 386
-        Height = 645
+        Width = 767
+        Height = 589
         Align = alClient
         BevelInner = bvLowered
         BevelOuter = bvNone
         TabOrder = 0
+        ExplicitWidth = 386
+        ExplicitHeight = 645
         object ListBoxOrder: TListBox
           Left = 1
-          Top = 413
-          Width = 384
+          Top = 357
+          Width = 765
           Height = 231
           Style = lbOwnerDrawFixed
           Align = alBottom
@@ -206,12 +208,14 @@ object frmSCComm: TfrmSCComm
           MultiSelect = True
           ParentFont = False
           TabOrder = 0
+          ExplicitTop = 413
+          ExplicitWidth = 384
         end
         object CommLog: TMemo
           Left = 1
           Top = 1
-          Width = 384
-          Height = 412
+          Width = 765
+          Height = 356
           Align = alClient
           BiDiMode = bdLeftToRight
           Color = clWhite
@@ -232,17 +236,21 @@ object frmSCComm: TfrmSCComm
           ScrollBars = ssBoth
           ShowHint = False
           TabOrder = 1
+          ExplicitWidth = 384
+          ExplicitHeight = 412
         end
       end
     end
     object tsStatus: TTabSheet
       Caption = '[ '#49345#53468#51221#48372' ]'
       ImageIndex = 3
+      ExplicitWidth = 386
+      ExplicitHeight = 645
       object PnlSC1: TPanel
         Left = 0
         Top = 0
-        Width = 386
-        Height = 645
+        Width = 767
+        Height = 589
         ParentCustomHint = False
         Align = alClient
         BevelOuter = bvNone
@@ -263,13 +271,15 @@ object frmSCComm: TfrmSCComm
         ParentShowHint = False
         ShowHint = False
         TabOrder = 0
+        ExplicitWidth = 386
+        ExplicitHeight = 645
         object gbStatus: TGroupBox
           Left = 0
           Top = 0
           Width = 386
-          Height = 517
+          Height = 589
           ParentCustomHint = False
-          Align = alTop
+          Align = alLeft
           BiDiMode = bdLeftToRight
           Caption = '[ '#49345#53468' ]'
           Color = 16185078
@@ -289,6 +299,8 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 0
+          ExplicitLeft = 4
+          ExplicitHeight = 645
           object Bevel1: TBevel
             Left = 10
             Top = 83
@@ -306,6 +318,13 @@ object frmSCComm: TfrmSCComm
           object Bevel3: TBevel
             Left = 10
             Top = 382
+            Width = 360
+            Height = 9
+            Shape = bsTopLine
+          end
+          object Bevel4: TBevel
+            Left = 10
+            Top = 514
             Width = 360
             Height = 9
             Shape = bsTopLine
@@ -1309,7 +1328,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51077#44256'St1. '#44032#45733
+            Caption = #51077#44256'St1. '#44048#51648
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1440,7 +1459,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #52636#44256'St1. '#44032#45733
+            Caption = #52636#44256'St1. '#44048#51648
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1570,7 +1589,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51077#44256'St3. '#44032#45733
+            Caption = #51077#44256'St3. '#44048#51648
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1648,7 +1667,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51077#44256'St2. '#44032#45733
+            Caption = #51077#44256'St2. '#44048#51648
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1674,7 +1693,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #52636#44256'St3. '#44032#45733
+            Caption = #52636#44256'St3. '#44048#51648
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1752,7 +1771,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #52636#44256'St2. '#44032#45733
+            Caption = #52636#44256'St2. '#44048#51648
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -2396,12 +2415,325 @@ object frmSCComm: TfrmSCComm
             ShowHint = False
             TabOrder = 79
           end
+          object Panel51: TPanel
+            Left = 10
+            Top = 521
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'In St1 RF Read'
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 80
+          end
+          object edt_In_RfRead1: TEdit
+            Left = 106
+            Top = 521
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Color = clWhite
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 81
+          end
+          object edt_Ot_RfRead1: TEdit
+            Left = 290
+            Top = 521
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 82
+          end
+          object Panel52: TPanel
+            Left = 194
+            Top = 521
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'Ot St1 RF Read'
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 83
+          end
+          object Panel53: TPanel
+            Left = 10
+            Top = 562
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'In St3 RF Read'
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 84
+          end
+          object edt_In_RfRead3: TEdit
+            Left = 106
+            Top = 562
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 85
+          end
+          object edt_In_RfRead2: TEdit
+            Left = 106
+            Top = 542
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 86
+          end
+          object Panel54: TPanel
+            Left = 10
+            Top = 542
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'In St2 RF Read'
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 87
+          end
+          object Panel55: TPanel
+            Left = 194
+            Top = 562
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'Ot St3 RF Read'
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 88
+          end
+          object edt_Ot_RfRead3: TEdit
+            Left = 290
+            Top = 562
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 89
+          end
+          object edt_Ot_RfRead2: TEdit
+            Left = 290
+            Top = 542
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 90
+          end
+          object Panel56: TPanel
+            Left = 194
+            Top = 542
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'Ot St2 RF Read'
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 91
+          end
         end
         object gbOrder: TGroupBox
-          Left = 0
-          Top = 517
-          Width = 386
-          Height = 128
+          Left = 386
+          Top = 0
+          Width = 381
+          Height = 589
           ParentCustomHint = False
           Align = alClient
           BiDiMode = bdLeftToRight
@@ -2423,6 +2755,24 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 1
+          ExplicitLeft = 0
+          ExplicitTop = 517
+          ExplicitWidth = 386
+          ExplicitHeight = 128
+          object Bevel5: TBevel
+            Left = 10
+            Top = 124
+            Width = 360
+            Height = 9
+            Shape = bsTopLine
+          end
+          object Bevel6: TBevel
+            Left = 10
+            Top = 196
+            Width = 360
+            Height = 9
+            Shape = bsTopLine
+          end
           object Panel24: TPanel
             Left = 10
             Top = 100
@@ -2588,7 +2938,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51201#51228' '#50672
+            Caption = #51201#51116' '#50672
             Color = 16758639
             Ctl3D = True
             DoubleBuffered = False
@@ -2944,14 +3294,640 @@ object frmSCComm: TfrmSCComm
             ShowHint = False
             TabOrder = 19
           end
+          object Panel57: TPanel
+            Left = 10
+            Top = 172
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #46972#51060#53944#52964#53948'5'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 20
+          end
+          object edt_CurtainW_5: TEdit
+            Left = 106
+            Top = 172
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 21
+          end
+          object Panel58: TPanel
+            Left = 194
+            Top = 132
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #46972#51060#53944#52964#53948'2'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 22
+          end
+          object edt_CurtainW_2: TEdit
+            Left = 290
+            Top = 132
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Color = clWhite
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clBlack
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 23
+          end
+          object Panel59: TPanel
+            Left = 194
+            Top = 172
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #46972#51060#53944#52964#53948'6'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 24
+          end
+          object edt_CurtainW_6: TEdit
+            Left = 290
+            Top = 172
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 25
+          end
+          object Panel60: TPanel
+            Left = 10
+            Top = 132
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #46972#51060#53944#52964#53948'1'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 26
+          end
+          object edt_CurtainW_1: TEdit
+            Left = 106
+            Top = 132
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 27
+          end
+          object edt_CurtainW_3: TEdit
+            Left = 106
+            Top = 152
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 28
+          end
+          object Panel61: TPanel
+            Left = 10
+            Top = 152
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #46972#51060#53944#52964#53948'3'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 29
+          end
+          object edt_CurtainW_4: TEdit
+            Left = 290
+            Top = 152
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 30
+          end
+          object Panel62: TPanel
+            Left = 194
+            Top = 152
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #46972#51060#53944#52964#53948'4'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 31
+          end
+          object Panel63: TPanel
+            Left = 10
+            Top = 243
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'In St3 RF Read'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 32
+          end
+          object edt_RfReadW_5: TEdit
+            Left = 106
+            Top = 243
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 33
+          end
+          object Panel64: TPanel
+            Left = 194
+            Top = 203
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'Ot St1 RF Read'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 34
+          end
+          object edt_RfReadW_2: TEdit
+            Left = 290
+            Top = 203
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Color = clWhite
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clBlack
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 35
+          end
+          object Panel65: TPanel
+            Left = 194
+            Top = 243
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'Ot St3 RF Read'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 36
+          end
+          object edt_RfReadW_6: TEdit
+            Left = 290
+            Top = 243
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 37
+          end
+          object Panel66: TPanel
+            Left = 10
+            Top = 203
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'In St1 RF Read'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 38
+          end
+          object edt_RfReadW_1: TEdit
+            Left = 106
+            Top = 203
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 39
+          end
+          object edt_RfReadW_3: TEdit
+            Left = 106
+            Top = 223
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 40
+          end
+          object Panel67: TPanel
+            Left = 10
+            Top = 223
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'In St2 RF Read'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 41
+          end
+          object edt_RfReadW_4: TEdit
+            Left = 290
+            Top = 223
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 42
+          end
+          object Panel68: TPanel
+            Left = 194
+            Top = 223
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'Ot St2 RF Read'
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 43
+          end
         end
       end
     end
   end
   object staInfo: TStatusBar
     Left = 0
-    Top = 717
-    Width = 394
+    Top = 661
+    Width = 775
     Height = 20
     Panels = <
       item
@@ -2969,11 +3945,13 @@ object frmSCComm: TfrmSCComm
         Text = 'YYYY/MM/DD HH:MM:SS'
         Width = 30
       end>
+    ExplicitTop = 717
+    ExplicitWidth = 394
   end
   object PnlBtm: TPanel
     Left = 0
-    Top = 673
-    Width = 394
+    Top = 617
+    Width = 775
     Height = 44
     ParentCustomHint = False
     Align = alBottom
@@ -2994,6 +3972,8 @@ object frmSCComm: TfrmSCComm
     ParentShowHint = False
     ShowHint = False
     TabOrder = 2
+    ExplicitTop = 673
+    ExplicitWidth = 394
     object gb_SC_COMM: TGroupBox
       Left = 0
       Top = 0
@@ -3025,7 +4005,7 @@ object frmSCComm: TfrmSCComm
     end
     object sbtStart: TBitBtn
       Tag = 1
-      Left = 163
+      Left = 548
       Top = 2
       Width = 110
       Height = 40
@@ -3139,7 +4119,7 @@ object frmSCComm: TfrmSCComm
       OnClick = sbtClick
     end
     object sbtClose: TBitBtn
-      Left = 275
+      Left = 660
       Top = 2
       Width = 110
       Height = 40
@@ -3244,15 +4224,15 @@ object frmSCComm: TfrmSCComm
     Enabled = False
     Interval = 500
     OnTimer = tmrConnectCheckTimer
-    Left = 450
-    Top = 43
+    Left = 666
+    Top = 355
   end
   object tmrStatusRead: TTimer
     Enabled = False
     Interval = 300
     OnTimer = tmrStatusReadTimer
-    Left = 418
-    Top = 43
+    Left = 634
+    Top = 355
   end
   object qryInfo: TADOQuery
     Connection = MainDm.MainDB
@@ -3260,8 +4240,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 450
-    Top = 139
+    Left = 666
+    Top = 451
   end
   object qrySearch: TADOQuery
     Connection = MainDm.MainDB
@@ -3269,8 +4249,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       'SELECT * FROM TM_CURRENT')
-    Left = 450
-    Top = 180
+    Left = 666
+    Top = 492
   end
   object qryUpdate: TADOQuery
     Connection = MainDm.MainDB
@@ -3278,8 +4258,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 482
-    Top = 139
+    Left = 698
+    Top = 451
   end
   object QryDelete: TADOQuery
     Connection = MainDm.MainDB
@@ -3287,8 +4267,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 514
-    Top = 139
+    Left = 730
+    Top = 451
   end
   object qrySCIO: TADOQuery
     Connection = MainDm.MainDB
@@ -3296,8 +4276,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 418
-    Top = 179
+    Left = 634
+    Top = 491
   end
   object qryError: TADOQuery
     Connection = MainDm.MainDB
@@ -3305,8 +4285,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       'SELECT * FROM TM_CURRENT')
-    Left = 482
-    Top = 180
+    Left = 698
+    Top = 492
   end
   object qryRead: TADOQuery
     Connection = MainDm.MainDB
@@ -3314,8 +4294,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 514
-    Top = 180
+    Left = 730
+    Top = 492
   end
   object qryWrite: TADOQuery
     Connection = MainDm.MainDB
@@ -3323,8 +4303,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 419
-    Top = 221
+    Left = 635
+    Top = 533
   end
   object qryStock: TADOQuery
     Connection = MainDm.MainDB
@@ -3332,8 +4312,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 447
-    Top = 91
+    Left = 663
+    Top = 403
   end
   object qryPos: TADOQuery
     Connection = MainDm.MainDB
@@ -3341,8 +4321,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       'SELECT * FROM TM_CURRENT')
-    Left = 482
-    Top = 91
+    Left = 698
+    Top = 403
   end
   object qryDBChk: TADOQuery
     Connection = MainDm.MainDB
@@ -3350,8 +4330,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       'SELECT * FROM TM_CURRENT')
-    Left = 516
-    Top = 91
+    Left = 732
+    Top = 403
   end
   object qryErrorRpt: TADOQuery
     Connection = MainDm.MainDB
@@ -3359,8 +4339,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       'SELECT * FROM TM_CURRENT')
-    Left = 418
-    Top = 139
+    Left = 634
+    Top = 451
   end
   object qryTemp: TADOQuery
     Connection = MainDm.MainDB
@@ -3368,8 +4348,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 418
-    Top = 91
+    Left = 634
+    Top = 403
   end
   object qryACS: TADOQuery
     Connection = MainDm.MainDB
@@ -3377,8 +4357,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 450
-    Top = 221
+    Left = 666
+    Top = 533
   end
   object PD_GET_JOBNO: TADOStoredProc
     Connection = MainDm.MainDB
@@ -3406,8 +4386,8 @@ object frmSCComm: TfrmSCComm
         Size = 10
         Value = Null
       end>
-    Left = 419
-    Top = 268
+    Left = 635
+    Top = 580
   end
   object qryHis: TADOQuery
     Connection = MainDm.MainDB
@@ -3415,8 +4395,8 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 482
-    Top = 221
+    Left = 698
+    Top = 533
   end
   object qryRfid: TADOQuery
     Connection = MainDm.MainDB
@@ -3424,7 +4404,7 @@ object frmSCComm: TfrmSCComm
     Parameters = <>
     SQL.Strings = (
       '')
-    Left = 514
-    Top = 221
+    Left = 730
+    Top = 533
   end
 end

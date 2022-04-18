@@ -117,6 +117,7 @@ Type
 
   TPLC_VAL = Record
     Curtain : Array [1..6] of String;
+    RFID_Read : Array[1..6] of String;
   End;
 
   TSC_JOB = Record
@@ -143,6 +144,7 @@ Type
     RF_MODEL_NO1   ,
     RF_MODEL_NO2   ,
     RF_BMA_NO      ,
+    Cell_Production ,
     RF_PALLET_BMA1 ,
     RF_PALLET_BMA2 ,
     RF_PALLET_BMA3 ,
@@ -174,6 +176,7 @@ Type
     D210  : Array [0..15] of String ;
     D211  : Array [0..15] of String ;
     D212  : Array [0..15] of String ;
+    D213  : Array [0..15] of String ;
 
     D1200  ,
     D1201  ,
