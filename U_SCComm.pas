@@ -616,19 +616,19 @@ begin
 
           // 작업생성
           JobNo := SetJobOrder(i, 'O', ItemCode, '2', '0');
-          if (JobNo <> '') then
-          begin
-            // 커튼 오픈
-            if (PLC_ReadVal.Curtain[i] = '0') then
-            begin
-              if (PLC_WriteVal.Curtain[i] = '0') then
-              begin
-                PLC_ORDER.ORDER := '1';
-                PLC_WRITE_FLAG := ComWrite;
-              end;
-              PLC_WriteVal.Curtain[i] := '1';
-            end;
-          end;
+//          if (JobNo <> '') then
+//          begin
+//            // 커튼 오픈
+//            if (PLC_ReadVal.Curtain[i] = '0') then
+//            begin
+//              if (PLC_WriteVal.Curtain[i] = '0') then
+//              begin
+//                PLC_ORDER.ORDER := '1';
+//                PLC_WRITE_FLAG := ComWrite;
+//              end;
+//              PLC_WriteVal.Curtain[i] := '1';
+//            end;
+//          end;
         end
         // 재고가 없을 때
         else
@@ -666,6 +666,7 @@ begin
       // 재고가 있어서 출고지시 된 경우, 출고 완료 후 응답
       else
       begin
+        JobNo := '';
         // 해당 라인의 출고 완료된 작업을 찾아옴.
         WhereStr := ' Where JOBD      = ''2'' ' +
                       ' And NOWMC     = ''3'' ' +
@@ -680,6 +681,17 @@ begin
         // 출고 된 경우에만 실행
         if (JobNo <> '') then
         begin
+          // 커튼 오픈
+          if (PLC_ReadVal.Curtain[i] = '0') then
+          begin
+            if (PLC_WriteVal.Curtain[i] = '0') then
+            begin
+              PLC_ORDER.ORDER := '1';
+              PLC_WRITE_FLAG := ComWrite;
+            end;
+            PLC_WriteVal.Curtain[i] := '1';
+          end;
+
           if (PLC_WriteVal.RFID_Read[i] = '0') then
           begin
             PLC_WriteVal.RFID_Read[i] := '1';
@@ -708,46 +720,49 @@ begin
                 RfidCheck := False;
               end;
             end;
-          end;
 
-          // RFID가 잘못 된 경우.
-          if not (RfidCheck) then
-          begin
-            // TT_ORDER에 에러 표시
-            if (fnOrder_Value(WhereStr, 'JOBERRORC') <> '1') then
+            // RFID가 잘못 된 경우.
+            if not (RfidCheck) then
             begin
-              fnOrder_Update(JobNo, 'JOBERRORC', '1');
-              fnOrder_Update(JobNo, 'JOBERRORT', 'R');
-              fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
-            end;
-          end
-          // RFID가 정상인 경우
-          else
-          begin
-            // RFID 초기화
-            if (PLC_WriteVal.RFID_Read[i] = '1') and
-               (PLC_ReadVal.RFID_Read[i] = '1')  then
+              // TT_ORDER에 에러 표시
+              if (fnOrder_Value(WhereStr, 'JOBERRORC') <> '1') then
+              begin
+                fnOrder_Update(JobNo, 'JOBERRORC', '1');
+                fnOrder_Update(JobNo, 'JOBERRORT', 'R');
+                fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
+              end;
+            end
+            // RFID가 정상인 경우
+            else
             begin
-              PLC_WriteVal.RFID_Read[i] := '0';
-              PLC_ORDER.ORDER := '1';
-              PLC_WRITE_FLAG := ComWrite;
-            end;
-            // 커튼 열린 상태
-            if (PLC_ReadVal.Curtain[i] = '1') then
-            begin
-              // ACS 응답 데이터 생성
-              Tx_AcsData[i].Heart_Beat       := '1';
-              Tx_AcsData[i].Line_Name_Source := '';
-              Tx_AcsData[i].Line_No_Source   := '';
-              Tx_AcsData[i].Port_No_Source   := '';
-              Tx_AcsData[i].Line_Name_Dest   := '';
-              Tx_AcsData[i].Line_No_Dest     := '';
-              Tx_AcsData[i].Port_No_Dest     := '';
-              Tx_AcsData[i].Model_No         := '';
-              Tx_AcsData[i].Call_Request     := '0';
-              Tx_AcsData[i].Call_Answer      := '1';
-              Tx_AcsData[i].Docking_Approve  := '1';
-              Tx_AcsData[i].Docking_Complete := '0';
+
+              fnOrder_Update(JobNo, 'NOWMC', '4');
+
+              // RFID 초기화
+              if (PLC_WriteVal.RFID_Read[i] = '1') and
+                 (PLC_ReadVal.RFID_Read[i] = '1')  then
+              begin
+                PLC_WriteVal.RFID_Read[i] := '0';
+                PLC_ORDER.ORDER := '1';
+                PLC_WRITE_FLAG := ComWrite;
+              end;
+              // 커튼 열린 상태
+              if (PLC_ReadVal.Curtain[i] = '1') then
+              begin
+                // ACS 응답 데이터 생성
+                Tx_AcsData[i].Heart_Beat       := '1';
+                Tx_AcsData[i].Line_Name_Source := '';
+                Tx_AcsData[i].Line_No_Source   := '';
+                Tx_AcsData[i].Port_No_Source   := '';
+                Tx_AcsData[i].Line_Name_Dest   := '';
+                Tx_AcsData[i].Line_No_Dest     := '';
+                Tx_AcsData[i].Port_No_Dest     := '';
+                Tx_AcsData[i].Model_No         := '';
+                Tx_AcsData[i].Call_Request     := '0';
+                Tx_AcsData[i].Call_Answer      := '1';
+                Tx_AcsData[i].Docking_Approve  := '1';
+                Tx_AcsData[i].Docking_Complete := '0';
+              end;
             end;
           end;
         end;
@@ -767,7 +782,7 @@ begin
       // 없으면 CallAnswer = 2
       if (i in [2, 4, 6]) then
       begin
-        ItemCode := Rx_AcsData[i].Model_No;
+        ItemCode := IfThen(Rx_AcsData[i].Model_No = '1', 'FULL', 'EPLT');
         if (fnGetStockCount(ItemCode) > 0) then
         begin
           Tx_AcsData[i].Call_Answer := '1';
@@ -852,8 +867,9 @@ begin
       // 출고완료
       if (i in [2, 4, 6]) then
       begin
+        JobNo := '';
         WhereStr := ' Where JOBD      = ''2'' ' +
-                      ' And NOWMC     = ''3'' ' +
+                      ' And NOWMC     = ''4'' ' +
                       ' And NOWSTATUS = ''4'' ' +
                       ' And JOBSTATUS = ''4'' ' +
                       ' And JOB_END   = ''0'' ' +
@@ -891,13 +907,14 @@ begin
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
 
-      // 입고 ST이고, 스테이션에 화물이 있으면 RFID읽고 완료 (CV완료)
+      // 입고 ST이고, 스테이션에 화물이 있으면 RFID읽고 완료
       if (i in [1, 3, 5]) then
       begin
         if (i = 1) then IsExist := Boolean(SC_STATUS[SC_NO].D211[08] = '1') //IfThen(SC_STATUS[SC_NO].D211[08] = '1', True, False)
         else if (i = 3) then IsExist := Boolean(SC_STATUS[SC_NO].D211[10] = '1')
         else if (i = 5) then IsExist := Boolean(SC_STATUS[SC_NO].D211[12] = '1');
 
+        JobNo := '';
         WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
                         '   And JOBD    = ''1'' ' +
                         '   And JOB_END = ''0'' ' +
@@ -905,7 +922,8 @@ begin
                         '   And NOWMC   = ''4'' ';
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
-        if (JobNo <> '') then
+        if (JobNo <> '') and
+           (IsExist = True) then
         begin
           if (PLC_ReadVal.RFID_Read[i] = '0') and
              (PLC_WriteVal.RFID_Read[i] = '0') then
@@ -2177,6 +2195,8 @@ begin
          (SC_STATUS[SC_NO].D210[10] <>'1') then // 로딩이 완료 되면 Reset1
       begin
         SC_STAT[SC_NO] := RESET1 ;
+        if (fnOrder_Value(SC_No, 'JOBERRORD') <> '' ) and
+           (fnOrder_Value(SC_No, 'JOBERRORD') <> '0') then fnSetMachError(SC_NO, '0') ;
       end else
       begin
         if (SC_STATUS[SC_NO].D210[15] = '1') then
@@ -2410,6 +2430,8 @@ begin
          (SC_STATUS[SC_NO].D211[02] = '1') then // 작업완료 (0: Off, 1: On )
       begin
         SC_STAT[SC_NO] := RESET2 ;
+        if (fnOrder_Value(SC_No, 'JOBERRORD') <> '' ) and
+           (fnOrder_Value(SC_No, 'JOBERRORD') <> '0') then fnSetMachError(SC_NO, '0') ;
       end else
       begin
         if (SC_STATUS[SC_NO].D210[15] = '1') then
@@ -2515,7 +2537,7 @@ begin
       begin
         fnSetSCSetInfo(SC_No, 'JOB_RETRY', '0');
         SC_JOB[SC_No].JOB_RETRY := '1';
-
+        fnOrder_Update(SC_JOB[SC_NO].ID_ORDLUGG, 'JOBERRORC', '');
         if (SC_STATUS[SC_NO].D211[03] = '1') then // 이중입고
         begin
           if (fnCellPosChange(SC_NO,'1') = True) then
@@ -2841,7 +2863,7 @@ begin
       RfidReq := RfidReq + PLC_WriteVal.RFID_Read[i];
     end;
     TotalWrite := RfidReq + '00' + BinDoor;
-    PLC_ORDER.D111 := FormatFloat('0000', Bin2Dec(TotalWrite));
+    PLC_ORDER.D111 := IntToStr(Bin2Dec(TotalWrite)); //  FormatFloat('0000', Bin2Dec(TotalWrite));
 
     fnSetPLCORDWrite(1, '0'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
   end;
@@ -3739,9 +3761,9 @@ begin
       SQL.Text := StrSQL ;
       Open;
 
-      while not (Eof) do
+      if not (JFlag = RackToRack) then
       begin
-        if not (JFlag = RackToRack) then
+        while not (Eof) do
         begin
           LineNo := FieldByName('LINE_NO').AsInteger + 7;
           if (JFlag = StoreIn) and
@@ -3754,10 +3776,9 @@ begin
           begin
             break;
           end;
+          Next;
         end;
-        Next;
       end;
-
 
       if not (Eof) then
       begin
