@@ -170,12 +170,8 @@ object frmSCComm: TfrmSCComm
     Font.Style = []
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 394
-    ExplicitHeight = 673
     object tsCommLog: TTabSheet
       Caption = '[ '#53685#49888#47196#44536' ]'
-      ExplicitWidth = 386
-      ExplicitHeight = 645
       object Pnl_Main: TPanel
         Left = 0
         Top = 0
@@ -185,8 +181,6 @@ object frmSCComm: TfrmSCComm
         BevelInner = bvLowered
         BevelOuter = bvNone
         TabOrder = 0
-        ExplicitWidth = 386
-        ExplicitHeight = 645
         object ListBoxOrder: TListBox
           Left = 1
           Top = 357
@@ -208,8 +202,6 @@ object frmSCComm: TfrmSCComm
           MultiSelect = True
           ParentFont = False
           TabOrder = 0
-          ExplicitTop = 413
-          ExplicitWidth = 384
         end
         object CommLog: TMemo
           Left = 1
@@ -236,16 +228,12 @@ object frmSCComm: TfrmSCComm
           ScrollBars = ssBoth
           ShowHint = False
           TabOrder = 1
-          ExplicitWidth = 384
-          ExplicitHeight = 412
         end
       end
     end
     object tsStatus: TTabSheet
       Caption = '[ '#49345#53468#51221#48372' ]'
       ImageIndex = 3
-      ExplicitWidth = 386
-      ExplicitHeight = 645
       object PnlSC1: TPanel
         Left = 0
         Top = 0
@@ -271,8 +259,6 @@ object frmSCComm: TfrmSCComm
         ParentShowHint = False
         ShowHint = False
         TabOrder = 0
-        ExplicitWidth = 386
-        ExplicitHeight = 645
         object gbStatus: TGroupBox
           Left = 0
           Top = 0
@@ -299,8 +285,6 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 0
-          ExplicitLeft = 4
-          ExplicitHeight = 645
           object Bevel1: TBevel
             Left = 10
             Top = 83
@@ -1328,7 +1312,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51077#44256'St1. '#44048#51648
+            Caption = 'St1.(In) '#54868#47932
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1459,7 +1443,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #52636#44256'St1. '#44048#51648
+            Caption = 'St2.(Ot) '#54868#47932
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1589,7 +1573,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51077#44256'St3. '#44048#51648
+            Caption = 'St5.(In) '#54868#47932
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1667,7 +1651,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #51077#44256'St2. '#44048#51648
+            Caption = 'St3.(In) '#54868#47932
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1693,7 +1677,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #52636#44256'St3. '#44048#51648
+            Caption = 'St6.(Ot) '#54868#47932
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -1771,7 +1755,7 @@ object frmSCComm: TfrmSCComm
             ParentCustomHint = False
             BevelOuter = bvNone
             BiDiMode = bdLeftToRight
-            Caption = #52636#44256'St2. '#44048#51648
+            Caption = 'St4.(Ot) '#54868#47932
             Color = 16444898
             Ctl3D = True
             DoubleBuffered = False
@@ -2731,11 +2715,10 @@ object frmSCComm: TfrmSCComm
         end
         object gbOrder: TGroupBox
           Left = 386
-          Top = 0
+          Top = 318
           Width = 381
-          Height = 589
+          Height = 271
           ParentCustomHint = False
-          Align = alClient
           BiDiMode = bdLeftToRight
           Caption = '[ '#51648#49884' ]'
           Color = 16185078
@@ -2755,10 +2738,6 @@ object frmSCComm: TfrmSCComm
           ParentShowHint = False
           ShowHint = False
           TabOrder = 1
-          ExplicitLeft = 0
-          ExplicitTop = 517
-          ExplicitWidth = 386
-          ExplicitHeight = 128
           object Bevel5: TBevel
             Left = 10
             Top = 124
@@ -3921,6 +3900,345 @@ object frmSCComm: TfrmSCComm
             TabOrder = 43
           end
         end
+        object GroupBox1: TGroupBox
+          Left = 386
+          Top = 0
+          Width = 381
+          Height = 312
+          ParentCustomHint = False
+          BiDiMode = bdLeftToRight
+          Caption = '[ '#49345#53468' ]'
+          Color = 16185078
+          Ctl3D = True
+          DoubleBuffered = False
+          Font.Charset = GB2312_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = #46027#50880
+          Font.Style = []
+          ParentBackground = False
+          ParentBiDiMode = False
+          ParentColor = False
+          ParentCtl3D = False
+          ParentDoubleBuffered = False
+          ParentFont = False
+          ParentShowHint = False
+          ShowHint = False
+          TabOrder = 2
+          object Panel70: TPanel
+            Left = 194
+            Top = 60
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'St6.(Ot) '#46020#53433#51473
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 0
+          end
+          object edt_Docking6: TEdit
+            Left = 290
+            Top = 60
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Color = clWhite
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clBlack
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 1
+          end
+          object Panel72: TPanel
+            Left = 10
+            Top = 60
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'St5.(In)'#46020#53433#51473
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 2
+          end
+          object edt_Docking5: TEdit
+            Left = 106
+            Top = 60
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 3
+          end
+          object edt_Docking4: TEdit
+            Left = 290
+            Top = 40
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 4
+          end
+          object Panel73: TPanel
+            Left = 194
+            Top = 40
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'St4.(Ot) '#46020#53433#51473
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 5
+          end
+          object edt_Docking3: TEdit
+            Left = 106
+            Top = 40
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 6
+          end
+          object Panel76: TPanel
+            Left = 10
+            Top = 40
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'St3.(In)'#46020#53433#51473
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 7
+          end
+          object edt_Docking1: TEdit
+            Left = 106
+            Top = 20
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 8
+          end
+          object Panel77: TPanel
+            Left = 10
+            Top = 20
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'St1.(In)'#46020#53433#51473
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 9
+          end
+          object edt_Docking2: TEdit
+            Left = 290
+            Top = 20
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 10
+          end
+          object Panel78: TPanel
+            Left = 194
+            Top = 20
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = 'St2.(Ot) '#46020#53433#51473
+            Color = 16444898
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 11
+          end
+        end
       end
     end
   end
@@ -3945,8 +4263,6 @@ object frmSCComm: TfrmSCComm
         Text = 'YYYY/MM/DD HH:MM:SS'
         Width = 30
       end>
-    ExplicitTop = 717
-    ExplicitWidth = 394
   end
   object PnlBtm: TPanel
     Left = 0
@@ -3972,8 +4288,6 @@ object frmSCComm: TfrmSCComm
     ParentShowHint = False
     ShowHint = False
     TabOrder = 2
-    ExplicitTop = 673
-    ExplicitWidth = 394
     object gb_SC_COMM: TGroupBox
       Left = 0
       Top = 0

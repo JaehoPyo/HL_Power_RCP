@@ -187,6 +187,19 @@ type
     Panel67: TPanel;
     edt_RfReadW_4: TEdit;
     Panel68: TPanel;
+    GroupBox1: TGroupBox;
+    Panel70: TPanel;
+    edt_Docking6: TEdit;
+    Panel72: TPanel;
+    edt_Docking5: TEdit;
+    edt_Docking4: TEdit;
+    Panel73: TPanel;
+    edt_Docking3: TEdit;
+    Panel76: TPanel;
+    edt_Docking1: TEdit;
+    Panel77: TPanel;
+    edt_Docking2: TEdit;
+    Panel78: TPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -279,6 +292,9 @@ type
     // RFID
     function  fnRFID_IsClear(PortNo: Integer): Boolean;
 
+    // PLC_BIT_Write
+    procedure PLC_BIT_Write;
+
     // SCIO 테이블 관련 함수
     function  fnSCIO_Exist (SC_NO:Integer): Boolean;                            // SCIO 작업체크
     function  fnSCIO_ReLoad(SC_NO:Integer): Boolean;                            // SCIO 데이터 ReLoad
@@ -295,7 +311,8 @@ type
     function  fnIsCellEmpty: Boolean;                                              // 창고 자리 있는지 여부
     function  fnGetCellCount(Status: String): Integer;                             // 창고 빈 칸 갯수 반환
 
-    function  fnGet_Current(Cur_Name: String): Boolean;
+    function  fnGet_Current(Cur_Name: String): Boolean; overload;
+    function  fnGet_Current(Cur_Name, FName: String): Integer; overload;
     procedure fnSet_Current(Cur_Name, FName, FValue : String);
 
     // TM_ITEM 테이블 관련 함수
@@ -492,7 +509,7 @@ end;
 //==============================================================================
 procedure TfrmSCComm.ACSControlProcess(SC_NO: Integer);
 var
-  i : Integer;
+  i, Curtain_Param : Integer;
   NewJobNo, JobNo, WhereStr : String;
   ItemCode, RfidData, LogStr: String;
   HasEmptyCell, HasStock, RfidCheck, IsExist : Boolean;
@@ -589,6 +606,7 @@ begin
         Tx_AcsData[i].Call_Answer      := '1';
         Tx_AcsData[i].Docking_Approve  := '1';
         Tx_AcsData[i].Docking_Complete := '0';
+        fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
       end;
     end else
 
@@ -762,6 +780,7 @@ begin
                 Tx_AcsData[i].Call_Answer      := '1';
                 Tx_AcsData[i].Docking_Approve  := '1';
                 Tx_AcsData[i].Docking_Complete := '0';
+                fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
               end;
             end;
           end;
@@ -842,6 +861,7 @@ begin
         Tx_AcsData[i].Call_Answer      := '0';
         Tx_AcsData[i].Docking_Approve  := '1';
         Tx_AcsData[i].Docking_Complete := '0';
+        fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
       end;
     end else
     // *** 적재물이 AGV에서 설비로 이동한 상태, 진출 요청 *** //
@@ -863,24 +883,24 @@ begin
         PLC_WriteVal.Curtain[i] := '1';
       end;
 
-      // 출고작업이면 HISTORY 이동
-      // 출고완료
-      if (i in [2, 4, 6]) then
-      begin
-        JobNo := '';
-        WhereStr := ' Where JOBD      = ''2'' ' +
-                      ' And NOWMC     = ''4'' ' +
-                      ' And NOWSTATUS = ''4'' ' +
-                      ' And JOBSTATUS = ''4'' ' +
-                      ' And JOB_END   = ''0'' ' +
-                      ' And LINE_NO   = ' + QuotedStr(IntToStr(i));
-        JobNo := fnOrder_Value(WhereStr, 'LUGG');
-        if (JobNo <> '') then
-        begin
-          fnOrder_Update(JobNo, 'JOB_END', '1');
-          fnIns_History(i);
-        end;
-      end;
+//      // 출고작업이면 HISTORY 이동
+//      // 출고완료
+//      if (i in [2, 4, 6]) then
+//      begin
+//        JobNo := '';
+//        WhereStr := ' Where JOBD      = ''2'' ' +
+//                      ' And NOWMC     = ''4'' ' +
+//                      ' And NOWSTATUS = ''4'' ' +
+//                      ' And JOBSTATUS = ''4'' ' +
+//                      ' And JOB_END   = ''0'' ' +
+//                      ' And LINE_NO   = ' + QuotedStr(IntToStr(i));
+//        JobNo := fnOrder_Value(WhereStr, 'LUGG');
+//        if (JobNo <> '') then
+//        begin
+//          fnOrder_Update(JobNo, 'JOB_END', '1');
+//          fnIns_History(i);
+//        end;
+//      end;
 
       // 커튼이 열려 있을 때에만 전송
       if (PLC_ReadVal.Curtain[i] = '1') then
@@ -1003,15 +1023,39 @@ begin
       end;
 
 
-      // 커튼 닫음
-      if (PLC_ReadVal.Curtain[i] = '1') then
+      // 출고작업이면 HISTORY 이동
+      // 출고완료
+      if (i in [2, 4, 6]) then
       begin
-        if PLC_WriteVal.Curtain[i] = '1' then
+        JobNo := '';
+        WhereStr := ' Where JOBD      = ''2'' ' +
+                      ' And NOWMC     = ''4'' ' +
+                      ' And NOWSTATUS = ''4'' ' +
+                      ' And JOBSTATUS = ''4'' ' +
+                      ' And JOB_END   = ''0'' ' +
+                      ' And LINE_NO   = ' + QuotedStr(IntToStr(i));
+        JobNo := fnOrder_Value(WhereStr, 'LUGG');
+        if (JobNo <> '') then
         begin
-          PLC_ORDER.ORDER := '1';
-          PLC_WRITE_Flag := ComWrite;
+          fnOrder_Update(JobNo, 'JOB_END', '1');
+          fnIns_History(i);
         end;
-        PLC_WriteVal.Curtain[i] := '0';
+      end;
+
+      //LHB
+      if fnGet_Current('CUR_PARAM','OPTION'+IntToStr(i)) <> 1 then
+      begin
+        // 커튼 닫음
+        if (PLC_ReadVal.Curtain[i] = '1') then
+        begin
+          if PLC_WriteVal.Curtain[i] = '1' then
+          begin
+            PLC_ORDER.ORDER := '1';
+            PLC_WRITE_Flag := ComWrite;
+          end;
+          PLC_WriteVal.Curtain[i] := '0';
+        end;
+        fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '0');
       end;
 
       // ACS 응답 데이터 생성
@@ -1184,6 +1228,8 @@ begin
 
       if CONTROL_FLAG[xMCNo] = ComStart then
          CONTROL_FLAG[xMCNo] := ComRead ;
+
+      PLC_BIT_Write;
 
       SCTWRITE(xMCNo);
 
@@ -1471,6 +1517,46 @@ begin
   if (xListBox.Items.Count >= 50) then xListBox.Items.Delete(0);
   xListBox.Items.Add(Msg);
   xListBox.ItemIndex := xListBox.Items.Count -1;
+end;
+
+//==============================================================================
+// PLC_WriteDisplay
+//==============================================================================
+procedure TfrmSCComm.PLC_BIT_Write;
+var
+  OpenVal, CloseVal : Integer;
+begin
+  OpenVal := fnGet_Current('CURTAIN', 'OPTION1');
+  CloseVal := fnGet_Current('CURTAIN', 'OPTION2');
+  if (OpenVal <> 0) then
+  begin
+    // 커튼 오픈
+    if (PLC_ReadVal.Curtain[OpenVal] = '0') then
+    begin
+      if (PLC_WriteVal.Curtain[OpenVal] = '0') then
+      begin
+        PLC_ORDER.ORDER := '1';
+        PLC_WRITE_FLAG := ComWrite;
+      end;
+      PLC_WriteVal.Curtain[OpenVal] := '1';
+    end;
+    fnSet_Current('CURTAIN', 'OPTION1', '0');
+  end;
+
+  if (CloseVal <> 0) then
+  begin
+    // 커튼 닫음
+    if (PLC_ReadVal.Curtain[CloseVal] = '1') then
+    begin
+      if (PLC_WriteVal.Curtain[CloseVal] = '1') then
+      begin
+        PLC_ORDER.ORDER := '1';
+        PLC_WRITE_FLAG := ComWrite;
+      end;
+      PLC_WriteVal.Curtain[CloseVal] := '0';
+    end;
+    fnSet_Current('CURTAIN', 'OPTION2', '0');
+  end;
 end;
 
 //==============================================================================
@@ -1921,6 +2007,8 @@ end;
 // SC Control Process
 //==============================================================================
 procedure TfrmSCComm.SCControlProcess(SC_NO:Integer);
+var
+  LineNo : Integer;
 begin
   staInfo.Panels[0].Text := fnGetSCStatus(SC_STAT[SC_NO]) ;
   staInfo.Panels[1].Text := fnGetSCStatus2(SC_STAT[SC_NO]) ;
@@ -2095,6 +2183,22 @@ begin
         Exit;
       end;
 
+      if not fnSCIO_Exist(SC_NO) then
+      begin
+        SC_JOBClear(SC_NO) ;
+        CONTROL_FLAG[SC_NO] := ComRead ;
+        SC_STAT[SC_NO] := STANDBY ;
+      end;
+
+      //+++++++++++++++
+      // 도킹중인 경우 다음 단계 진행 X
+      //+++++++++++++++
+      LineNo := StrToInt(fnOrder_Value(SC_NO, 'LINE_NO'));
+      if (SC_STATUS[SC_NO].D213[LineNo + 9] = '1') then
+      begin
+        Exit;
+      end;
+
 
       //++++++++++++++++
       // 로딩 데이터 체크
@@ -2134,13 +2238,6 @@ begin
         end;
       end;
 
-
-      if not fnSCIO_Exist(SC_NO) then
-      begin
-        SC_JOBClear(SC_NO) ;
-        CONTROL_FLAG[SC_NO] := ComRead ;
-        SC_STAT[SC_NO] := STANDBY ;
-      end;
     end;
 
 
@@ -2184,6 +2281,21 @@ begin
         Exit;
       end;
 
+      if not fnSCIO_Exist(SC_NO) then
+      begin
+        SC_JOBClear(SC_NO) ;
+        CONTROL_FLAG[SC_NO] := ComRead ;
+        SC_STAT[SC_NO] := STANDBY ;
+      end;
+
+      //+++++++++++++++
+      // 도킹중인 경우 다음 단계 진행 X
+      //+++++++++++++++
+      LineNo := StrToInt(fnOrder_Value(SC_NO, 'LINE_NO'));
+      if (SC_STATUS[SC_NO].D213[LineNo + 9] = '1') then
+      begin
+        Exit;
+      end;
 
       //++++++++++++++++
       // 로딩 완료 체크
@@ -2216,13 +2328,6 @@ begin
         end;
       end;
 
-
-      if not fnSCIO_Exist(SC_NO) then
-      begin
-        SC_JOBClear(SC_NO) ;
-        CONTROL_FLAG[SC_NO] := ComRead ;
-        SC_STAT[SC_NO] := STANDBY ;
-      end;
     end;
 
 
@@ -2266,6 +2371,22 @@ begin
         Exit;
       end;
 
+      if not fnSCIO_Exist(SC_NO) then
+      begin
+        SC_JOBClear(SC_NO) ;
+        CONTROL_FLAG[SC_NO] := ComRead ;
+        SC_STAT[SC_NO] := STANDBY ;
+      end;
+
+      //+++++++++++++++
+      // 도킹중인 경우 다음 단계 진행 X
+      //+++++++++++++++
+      LineNo := StrToInt(fnOrder_Value(SC_NO, 'LINE_NO'));
+      if (SC_STATUS[SC_NO].D213[LineNo + 9] = '1') then
+      begin
+        Exit;
+      end;
+
 
       //++++++++++++++++
       // 로딩완료 처리
@@ -2279,13 +2400,6 @@ begin
         end;
       end;
 
-
-      if not fnSCIO_Exist(SC_NO) then
-      begin
-        SC_JOBClear(SC_NO) ;
-        CONTROL_FLAG[SC_NO] := ComRead ;
-        SC_STAT[SC_NO] := STANDBY ;
-      end;
     end;
 
 
@@ -2330,6 +2444,23 @@ begin
       end;
 
 
+      if not fnSCIO_Exist(SC_NO) then
+      begin
+        SC_JOBClear(SC_NO) ;
+        CONTROL_FLAG[SC_NO] := ComRead ;
+        SC_STAT[SC_NO] := STANDBY ;
+      end;
+
+      //+++++++++++++++
+      // 도킹중인 경우 다음 단계 진행 X
+      //+++++++++++++++
+      LineNo := StrToInt(fnOrder_Value(SC_NO, 'LINE_NO'));
+      if (SC_STATUS[SC_NO].D213[LineNo + 9] = '1') then
+      begin
+        Exit;
+      end;
+
+
       //++++++++++++++++
       // 언로딩 데이터 체크
       //++++++++++++++++
@@ -2369,13 +2500,6 @@ begin
         end;
       end;
 
-
-      if not fnSCIO_Exist(SC_NO) then
-      begin
-        SC_JOBClear(SC_NO) ;
-        CONTROL_FLAG[SC_NO] := ComRead ;
-        SC_STAT[SC_NO] := STANDBY ;
-      end;
     end;
 
 
@@ -2420,6 +2544,22 @@ begin
       end;
 
 
+      if not fnSCIO_Exist(SC_NO) then
+      begin
+        SC_JOBClear(SC_NO) ;
+        CONTROL_FLAG[SC_NO] := ComRead ;
+        SC_STAT[SC_NO] := STANDBY ;
+      end;
+
+      //+++++++++++++++
+      // 도킹중인 경우 다음 단계 진행 X
+      //+++++++++++++++
+      LineNo := StrToInt(fnOrder_Value(SC_NO, 'LINE_NO'));
+      if (SC_STATUS[SC_NO].D213[LineNo + 9] = '1') then
+      begin
+        Exit;
+      end;
+
       //++++++++++++++++
       // 언로딩 완료 체크
       //++++++++++++++++
@@ -2454,13 +2594,6 @@ begin
         end;
       end;
 
-
-      if not fnSCIO_Exist(SC_NO) then
-      begin
-        SC_JOBClear(SC_NO) ;
-        CONTROL_FLAG[SC_NO] := ComRead ;
-        SC_STAT[SC_NO] := STANDBY ;
-      end;
     end;
 
 
@@ -3767,12 +3900,14 @@ begin
         begin
           LineNo := FieldByName('LINE_NO').AsInteger + 7;
           if (JFlag = StoreIn) and
-             (SC_STATUS[SC_NO].D211[LineNo] = '1') then
+             (SC_STATUS[SC_NO].D211[LineNo] = '1') and
+             (SC_STATUS[SC_NO].D213[LineNo + 2] = '0') then
           begin
             break;
           end else
           if (JFlag = StoreOut) and
-             (SC_STATUS[SC_NO].D211[LineNo] = '0') then
+             (SC_STATUS[SC_NO].D211[LineNo] = '0') and
+             (SC_STATUS[SC_NO].D213[LineNo + 2] = '0') then
           begin
             break;
           end;
@@ -5389,6 +5524,38 @@ end;
 //==============================================================================
 // fnGet_Current : 파라메터 가져옴.
 //==============================================================================
+function TfrmSCComm.fnGet_Current(Cur_Name, FName: String): Integer;
+var
+  StrSQL : string;
+begin
+  Result := 0;
+  StrSQL := '';
+  try
+    with qryTemp do
+    begin
+      Close;
+      SQL.Clear;
+      StrSQL := ' SELECT ' + FName +
+                 '  FROM TC_CURRENT ' +
+                 ' WHERE CURRENT_NAME = ' + QuotedStr(Cur_Name);
+      SQL.Text := StrSQL ;
+      Open ;
+      Result := FieldByName(FName).AsInteger;
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryStock.Close ;
+      ErrorLogWRITE( 'Function fnGet_Current Cur_Name(' + Cur_Name + ') ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// fnGet_Current : 파라메터 가져옴.
+//==============================================================================
 function TfrmSCComm.fnGet_Current(Cur_Name: String): Boolean;
 var
   StrSQL : string;
@@ -5416,7 +5583,6 @@ begin
                      'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
     end;
   end;
-
 end;
 
 //==============================================================================
