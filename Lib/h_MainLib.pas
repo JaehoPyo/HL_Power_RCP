@@ -118,6 +118,7 @@ Type
   TPLC_VAL = Record
     Curtain : Array [1..6] of String;
     RFID_Read : Array[1..6] of String;
+    Alram : String;
   End;
 
   TSC_JOB = Record

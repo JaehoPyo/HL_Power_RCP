@@ -5,7 +5,7 @@ object frmSCComm: TfrmSCComm
   BorderStyle = bsSingle
   Caption = 'SC '#51228#50612
   ClientHeight = 681
-  ClientWidth = 775
+  ClientWidth = 780
   Color = 16185078
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -159,7 +159,7 @@ object frmSCComm: TfrmSCComm
   object pcStatus: TPageControl
     Left = 0
     Top = 0
-    Width = 775
+    Width = 780
     Height = 617
     ActivePage = tsStatus
     Align = alClient
@@ -175,7 +175,7 @@ object frmSCComm: TfrmSCComm
       object Pnl_Main: TPanel
         Left = 0
         Top = 0
-        Width = 767
+        Width = 772
         Height = 589
         Align = alClient
         BevelInner = bvLowered
@@ -184,7 +184,7 @@ object frmSCComm: TfrmSCComm
         object ListBoxOrder: TListBox
           Left = 1
           Top = 357
-          Width = 765
+          Width = 770
           Height = 231
           Style = lbOwnerDrawFixed
           Align = alBottom
@@ -206,7 +206,7 @@ object frmSCComm: TfrmSCComm
         object CommLog: TMemo
           Left = 1
           Top = 1
-          Width = 765
+          Width = 770
           Height = 356
           Align = alClient
           BiDiMode = bdLeftToRight
@@ -237,7 +237,7 @@ object frmSCComm: TfrmSCComm
       object PnlSC1: TPanel
         Left = 0
         Top = 0
-        Width = 767
+        Width = 772
         Height = 589
         ParentCustomHint = False
         Align = alClient
@@ -2715,9 +2715,9 @@ object frmSCComm: TfrmSCComm
         end
         object gbOrder: TGroupBox
           Left = 386
-          Top = 318
+          Top = 278
           Width = 381
-          Height = 271
+          Height = 311
           ParentCustomHint = False
           BiDiMode = bdLeftToRight
           Caption = '[ '#51648#49884' ]'
@@ -2748,6 +2748,13 @@ object frmSCComm: TfrmSCComm
           object Bevel6: TBevel
             Left = 10
             Top = 196
+            Width = 360
+            Height = 9
+            Shape = bsTopLine
+          end
+          object Bevel7: TBevel
+            Left = 10
+            Top = 267
             Width = 360
             Height = 9
             Shape = bsTopLine
@@ -3899,12 +3906,64 @@ object frmSCComm: TfrmSCComm
             ShowHint = False
             TabOrder = 43
           end
+          object Panel69: TPanel
+            Left = 10
+            Top = 274
+            Width = 90
+            Height = 18
+            ParentCustomHint = False
+            BevelOuter = bvNone
+            BiDiMode = bdLeftToRight
+            Caption = #51060#49345' '#50508#46988
+            Color = 16765650
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = []
+            ParentBiDiMode = False
+            ParentBackground = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ShowHint = False
+            TabOrder = 44
+          end
+          object edt_Alram: TEdit
+            Left = 106
+            Top = 274
+            Width = 80
+            Height = 18
+            ParentCustomHint = False
+            Alignment = taCenter
+            AutoSize = False
+            BiDiMode = bdLeftToRight
+            Ctl3D = True
+            DoubleBuffered = False
+            Font.Charset = GB2312_CHARSET
+            Font.Color = clWindowText
+            Font.Height = -13
+            Font.Name = #46027#50880
+            Font.Style = [fsBold]
+            ImeName = 'Microsoft Office IME 2007'
+            ParentBiDiMode = False
+            ParentCtl3D = False
+            ParentDoubleBuffered = False
+            ParentFont = False
+            ParentShowHint = False
+            ReadOnly = True
+            ShowHint = False
+            TabOrder = 45
+          end
         end
         object GroupBox1: TGroupBox
           Left = 386
           Top = 0
           Width = 381
-          Height = 312
+          Height = 274
           ParentCustomHint = False
           BiDiMode = bdLeftToRight
           Caption = '[ '#49345#53468' ]'
@@ -4245,7 +4304,7 @@ object frmSCComm: TfrmSCComm
   object staInfo: TStatusBar
     Left = 0
     Top = 661
-    Width = 775
+    Width = 780
     Height = 20
     Panels = <
       item
@@ -4267,7 +4326,7 @@ object frmSCComm: TfrmSCComm
   object PnlBtm: TPanel
     Left = 0
     Top = 617
-    Width = 775
+    Width = 780
     Height = 44
     ParentCustomHint = False
     Align = alBottom
@@ -4543,7 +4602,7 @@ object frmSCComm: TfrmSCComm
   end
   object tmrStatusRead: TTimer
     Enabled = False
-    Interval = 300
+    Interval = 200
     OnTimer = tmrStatusReadTimer
     Left = 634
     Top = 355
