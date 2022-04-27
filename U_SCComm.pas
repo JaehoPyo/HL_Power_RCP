@@ -5,7 +5,7 @@ interface
 uses
   Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
   StrUtils, Dialogs, h_MainLib, h_ReferLib, d_MainDm, FileLib, DB, ADODB,
-  ExtCtrls, ComCtrls, StdCtrls, Buttons, Inifiles, ScktComp, CheckLst, Vcl.Grids  ;
+  ExtCtrls, ComCtrls, StdCtrls, Buttons, Inifiles, ScktComp, CheckLst, Vcl.Grids, Math  ;
 
 type
   TfrmSCComm = class(TForm)
@@ -308,8 +308,9 @@ type
     function  fnStockUpdate(Loc, FName, FValue: String): Boolean; overload;
     function  fnGetStockLoc(ItemCode : String): String;                            // 품목 위치 반환
     function  fnGetStockCount(ItemCode: String): Integer;                          // 품목 갯수 반환
-    function  fnCanInput: Boolean;                                              // 창고 자리 있는지 여부
-    function  fnCanOutput: Boolean;                             // 창고 빈 칸 갯수 반환
+    function  fnCanInput: Boolean;                                                 // 입고 가능 셀이 있는지 여부
+    function  fnCanOutput: Boolean; overload;                                      // 출고가능 셀이 있는지 여부
+    function  fnCanOutput(ItemCode: String): Boolean; overload;                    // 해당 품목의 출고가능 셀이 있는지 여부
 
     function  fnGet_Current(Cur_Name: String): Boolean; overload;
     function  fnGet_Current(Cur_Name, FName: String): Integer; overload;
@@ -518,6 +519,8 @@ var
   ItemCode, RfidData, LogStr: String;
   HasEmptyCell, HasStock, RfidCheck, IsExist : Boolean;
   tRfidData : TRFID_Data;
+  RfidError : Array [1..6] of Boolean;
+  JobError : String;
 begin
 
   for i := START_STATION to END_STATION do
@@ -544,17 +547,28 @@ begin
     // 출고 포트
     else
     begin
-      // 출고할수 있는 품목이 없을 경우
+      // 출고가능한 공팔레트가 없는 경우
+      if not (fnCanOutput('EPLT')) then
+      begin
+        Tx_AcsData[i].Status := '4';
+      end else
+      // 출고가능한 실팔레트가 없는 경우
+      if not (fnCanoutput('FULL')) then
+      begin
+        Tx_AcsData[i].Status := '3';
+      end else
+      // 출고가능한 팔레트가 전부 없는 경우
       if not (fnCanOutput) then
       begin
         Tx_AcsData[i].Status := '2';
       end else
+      // 출고 가능한 팔레트가 있는 경우
       begin
         Tx_AcsData[i].Status := '0';
       end;
     end;
 
-    
+
     //==================================//
     // (AGV가 커튼 앞에 위치) 입고 작업 //
     //==================================//
@@ -625,10 +639,21 @@ begin
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
 
-      // 해당 AGV의 출고작업이 없을 때 작업 생성
+      IsExist := False;
+      case i of
+        1 : IsExist := Boolean(SC_STATUS[SC_NO].D211[08] = '1');
+        2 : IsExist := Boolean(SC_STATUS[SC_NO].D211[09] = '1');
+        3 : IsExist := Boolean(SC_STATUS[SC_NO].D211[10] = '1');
+        4 : IsExist := Boolean(SC_STATUS[SC_NO].D211[11] = '1');
+        5 : IsExist := Boolean(SC_STATUS[SC_NO].D211[12] = '1');
+        6 : IsExist := Boolean(SC_STATUS[SC_NO].D211[13] = '1');
+      end;
+
+      // 해당 라인의 출고작업이 없을 때 작업 생성
       WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
                   '   And JOBD = ''2'' ';
-      if (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
+      if (fnOrder_Value(WhereStr, 'LINE_NO') = '') and
+         (IsExist = False) then
       begin
         ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
 
@@ -674,17 +699,28 @@ begin
         JobNo := '';
         // 해당 라인의 출고 완료된 작업을 찾아옴.
         WhereStr := ' Where JOBD      = ''2'' ' +
-                      ' And NOWMC     = ''3'' ' +
-                      ' And NOWSTATUS = ''4'' ' +
-                      ' And JOBSTATUS = ''4'' ' +
+                      ' And IS_AUTO   = ''Y'' ' +
+                      ' And NOWMC     = ''4'' ' +
+                      ' And NOWSTATUS = ''2'' ' +
+                      ' And JOBSTATUS = ''2'' ' +
                       ' And JOB_END   = ''0'' ' +
                       ' And LINE_NO   = ' + QuotedStr(IntToStr(i)) +
                     ' Order By REG_TIME Desc ' ;
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
+        JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
 
-        // 출고 된 경우에만 실행
-        if (JobNo <> '') then
+        // Rfid Read 에러 확인
+        RfidError[1] := SC_STATUS[SC_NO].D205 = '0050';
+        RfidError[2] := SC_STATUS[SC_NO].D205 = '0051';
+        RfidError[3] := SC_STATUS[SC_NO].D205 = '0052';
+        RfidError[4] := SC_STATUS[SC_NO].D205 = '0053';
+        RfidError[5] := SC_STATUS[SC_NO].D205 = '0054';
+        RfidError[6] := SC_STATUS[SC_NO].D205 = '0055';
+
+        // 출고 된 경우에 실행
+        if (JobNo <> '') and
+           (JobError = '') then
         begin
           // 커튼 오픈
           if (PLC_ReadVal.Curtain[i] = '0') then
@@ -704,8 +740,11 @@ begin
             PLC_ORDER.ORDER := '1';
             PLC_WRITE_FLAG := ComWrite;
           end else
-          if (PLC_ReadVal.RFID_Read[i] = '1') then
+          if (PLC_ReadVal.RFID_Read[i] = '1') and
+             (RfidError[i] = False) then
           begin
+
+            fnIns_RfidHistory(i);
 
             if (Rx_AcsData[i].Model_No = '0') then
             begin
@@ -731,7 +770,7 @@ begin
             // RFID가 잘못 된 경우.
             if not (RfidCheck) then
             begin
-              fnIns_RfidHistory(i);
+
               // PLC에 알람 요청
               if (PLC_WriteVal.Alram = '0') then
               begin
@@ -741,17 +780,14 @@ begin
               end;
 
               // TT_ORDER에 에러 표시
-              if (fnOrder_Value(WhereStr, 'JOBERRORC') <> '1') then
-              begin
-                fnOrder_Update(JobNo, 'JOBERRORC', '1');
-                fnOrder_Update(JobNo, 'JOBERRORT', 'R');
-                fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
-              end;
+              fnOrder_Update(JobNo, 'JOBERRORC', '1');
+              fnOrder_Update(JobNo, 'JOBERRORT', 'R');
+              fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
             end
             // RFID가 정상인 경우
             else
             begin
-              fnIns_RfidHistory(i);
+
               // RFID 초기화
               if (PLC_WriteVal.RFID_Read[i] = '1') then
               begin
@@ -760,7 +796,24 @@ begin
                 PLC_WRITE_FLAG := ComWrite;
               end;
 
-              fnOrder_Update(JobNo, 'NOWMC', '4');
+              tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H00');
+              tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H01');
+              tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H02');
+              tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H03');
+              tRfidData.Model_No_1  := fnGetRFID_Data(i, 'H16');
+              tRfidData.Model_No_2  := fnGetRFID_Data(i, 'H17');
+              tRfidData.BMA_No      := fnGetRFID_Data(i, 'H18');
+              tRfidData.Cell_Production := fnGetRFID_Data(i, 'H19');
+              tRfidData.BMA_1       := fnGetRFID_Data(i, 'H20');
+              tRfidData.BMA_2       := fnGetRFID_Data(i, 'H21');
+              tRfidData.BMA_3       := fnGetRFID_Data(i, 'H22');
+              fnOrder_RfidUpdate(JobNo, tRfidData);
+
+              if (fnOrder_Value(WhereStr, 'NOWSTATUS') <> '3') then
+              begin
+                fnOrder_Update(JobNo, 'NOWSTATUS', '3');
+                fnOrder_Update(JobNo, 'JOBSTATUS', '3');
+              end;
 
               // 커튼 열린 상태
               if (PLC_ReadVal.Curtain[i] = '1') then
@@ -935,9 +988,13 @@ begin
                         '   And JOBD    = ''1'' ' +
                         '   And JOB_END = ''0'' ' +
                         '   And IS_AUTO = ''Y'' ' +
-                        '   And NOWMC   = ''4'' ';
+                        '   And NOWMC   = ''4'' ' +
+                        '   And NOWSTATUS <> ''4'' ' +
+                        '   And JOBSTATUS <> ''4'' ';
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
+
+        // 작업이 있고 화물도 있는 경우 RFID 확인
         if (JobNo <> '') and
            (IsExist = True) then
         begin
@@ -1020,6 +1077,18 @@ begin
               end;
             end;
           end;
+        end else
+        // 작업 없고 화물 없는 경우
+        if (JobNo = '') and
+           (IsExist = False) then
+        begin
+          // RFID 초기화
+          if (PLC_WriteVal.RFID_Read[i] = '1') then
+          begin
+            PLC_WriteVal.RFID_Read[i] := '0';
+            PLC_ORDER.ORDER := '1';
+            PLC_WRITE_FLAG := ComWrite;
+          end;
         end;
       end;
 
@@ -1031,31 +1100,35 @@ begin
         JobNo := '';
         WhereStr := ' Where JOBD      = ''2'' ' +
                       ' And NOWMC     = ''4'' ' +
-                      ' And NOWSTATUS = ''4'' ' +
-                      ' And JOBSTATUS = ''4'' ' +
+                      ' And IS_AUTO   = ''Y'' ' +
+                      ' And NOWSTATUS = ''3'' ' +
+                      ' And JOBSTATUS = ''3'' ' +
                       ' And JOB_END   = ''0'' ' +
                       ' And LINE_NO   = ' + QuotedStr(IntToStr(i));
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
         if (JobNo <> '') then
         begin
           fnOrder_Update(JobNo, 'JOB_END', '1');
+          fnOrder_Update(JobNo, 'NOWSTATUS', '4');
+          fnOrder_Update(JobNo, 'JOBSTATUS', '4');
           fnIns_History(i);
-        end;
-      end;
 
-      // 작업 없고 RFID 읽힌 상태인경우 초기화
-      if (JobNo = '') and
-         (not IsExist) then
-      begin
-        // RFID 초기화
-        if (PLC_WriteVal.RFID_Read[i] = '1') and
-           (PLC_ReadVal.RFID_Read[i] = '1')  then
-        begin
-          PLC_WriteVal.RFID_Read[i] := '0';
-          PLC_ORDER.ORDER := '1';
-          PLC_WRITE_FLAG := ComWrite;
+          // PLC에 알람 요청신호 해제
+          if (PLC_WriteVal.Alram = '1') then
+          begin
+            PLC_WriteVal.Alram := '0';
+            PLC_ORDER.ORDER := '1';
+            PLC_WRITE_FLAG := ComWrite;
+          end;
 
-          fnIns_RfidHistory(i);
+          // RFID 초기화
+          if (PLC_WriteVal.RFID_Read[i] = '1') and
+             (PLC_ReadVal.RFID_Read[i] = '1')  then
+          begin
+            PLC_WriteVal.RFID_Read[i] := '0';
+            PLC_ORDER.ORDER := '1';
+            PLC_WRITE_FLAG := ComWrite;
+          end;
         end;
       end;
 
@@ -1337,7 +1410,7 @@ begin
   // D205
   TEdit(Self.FindComponent('edt_ErrorCode'    )).Text := SC_STATUS[SC_NO].D205;  // 이상코드
   if (StrToInt(SC_STATUS[SC_NO].D205) > 29) and
-     (StrToInt(SC_STATUS[SC_NO].D205) < 42) then
+     (StrToInt(SC_STATUS[SC_NO].D205) < 70) then
   begin
     TEdit(Self.FindComponent('edt_ErrorDesc'    )).Text := fnGetErrMsg('PLC', SC_NO, 'ERR_NAME', SC_STATUS[SC_NO].D205);  // 이상내용
   end else
@@ -1569,6 +1642,7 @@ end;
 procedure TfrmSCComm.PLC_BIT_Write;
 var
   i, OpenVal, CloseVal : Integer;
+  WhereStr, JobNo : String;
 begin
 
   //****************************
@@ -1612,41 +1686,94 @@ begin
   //******************
   for i := 1 to 6 do
   begin
+    WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+                '   And JOB_END = ''0'' ' +
+                '   And IS_AUTO = ''Y'' ';
+    // 자동 작업이 없을 경우에만
+    if (fnOrder_Value(WhereStr, 'LUGG') = '') then
+    begin
+      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) then
+      begin
+        if (PLC_WriteVal.RFID_Read[i] = '1') then
+        begin
+          PLC_ORDER.ORDER := '1';
+          PLC_WRITE_FLAG := ComWrite;
+          PLC_WriteVal.RFID_Read[i] := '0';
+        end else
+        begin
+          PLC_ORDER.ORDER := '1';
+          PLC_WRITE_FLAG := ComWrite;
+          PLC_WriteVal.RFID_Read[i] := '1';
+          fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '2');
+        end;
+      end else
+      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 2) then
+      begin
+        if (PLC_ReadVal.RFID_Read[i] = '0') then
+        begin
+          Continue;
+        end else
+        if (PLC_ReadVal.RFID_Read[i] = '1') then
+        begin
+          PLC_ORDER.ORDER := '1';
+          PLC_WRITE_FLAG := ComWrite;
+          PLC_WriteVal.RFID_Read[i] := '0';
+          fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '0');
+          fnIns_RfidHistory(i);
+        end;
+      end;
 
-    // RFID Read 요청 OFF
-    if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 3) and
-       (PLC_WriteVal.RFID_Read[i] = '1') then
+//      // RFID Read 요청 OFF
+//      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 3) and
+//         (PLC_WriteVal.RFID_Read[i] = '1') then
+//      begin
+//        PLC_ORDER.ORDER := '1';
+//        PLC_WRITE_FLAG := ComWrite;
+//        PLC_WriteVal.RFID_Read[i] := '0';
+//        fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '0');
+//
+//        fnIns_RfidHistory(i);
+//      end else
+//      // RFID Read 완료 표시
+//      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) and
+//         (PLC_ReadVal.RFID_Read[i] = '1') then
+//      begin
+//        fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '2');
+//      end else
+//      // RFID Read 요청 ON
+//      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) then
+//      begin
+//        if (PLC_WriteVal.RFID_Read[i] = '0') then
+//        begin
+//          PLC_ORDER.ORDER := '1';
+//          PLC_WRITE_FLAG := ComWrite;
+//          PLC_WriteVal.RFID_Read[i] := '1';
+//        end else
+//        if (PLC_WriteVal.RFID_Read[i] = '1') and
+//           (PLC_ReadVal.RFID_Read[i] = '0') then
+//        begin
+//          PLC_ORDER.ORDER := '1';
+//          PLC_WRITE_FLAG := ComWrite;
+//          PLC_WriteVal.RFID_Read[i] := '0';
+//        end;
+//      end;
+    end else
+    // 자동 작업이 있을 경우에는 RFID Write Val 초기화
+    if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) then
     begin
       PLC_ORDER.ORDER := '1';
       PLC_WRITE_FLAG := ComWrite;
       PLC_WriteVal.RFID_Read[i] := '0';
       fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '0');
 
-      fnIns_RfidHistory(i);
-    end else
-    // RFID Read 완료 표시
-    if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) and
-       (PLC_ReadVal.RFID_Read[i] = '1' ) then
-    begin
-      fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '2');
-    end else
-    // RFID Read 요청 ON
-    if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) then
-    begin
-      if (PLC_WriteVal.RFID_Read[i] = '0') then
+      if (fnOrder_Value(WhereStr, 'JOBERRORC') <> '') then
       begin
-        PLC_ORDER.ORDER := '1';
-        PLC_WRITE_FLAG := ComWrite;
-        PLC_WriteVal.RFID_Read[i] := '1';
-      end else
-      if (PLC_WriteVal.RFID_Read[i] = '1') and ((PLC_ReadVal.RFID_Read[i] = '0'))then
-      begin
-        PLC_ORDER.ORDER := '1';
-        PLC_WRITE_FLAG := ComWrite;
-        PLC_WriteVal.RFID_Read[i] := '0';
+        JobNo := fnOrder_Value(WhereStr, 'LUGG');
+        fnOrder_Update(JobNo, 'JOBERRORC', '');
+        fnOrder_Update(JobNo, 'JOBERRORD', '');
+        fnOrder_Update(JobNo, 'JOBERRORT', '');
       end;
     end;
-
   end;
 
   //*******************
@@ -2034,7 +2161,7 @@ begin
          (SC_STATUS[SC_NO].D210[02] = '0') and  // 비상정지 (0: Off, 1: On )
          (SC_STATUS[SC_NO].D210[08] = '1') and  // 포크센터 (0: Off, 1: On )
          (SC_STATUS[SC_NO].D210[09] = '0') and  // 화물유무 (0:없음, 1:있음)
-//         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
+         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
          (SC_STATUS[SC_NO].D211[00] = '1') and  // 대기 중  (0: Off, 1: On )
          (SC_STATUS[SC_NO].D211[01] = '0') then // 작업 중  (0: Off, 1: On )
       begin
@@ -2130,7 +2257,7 @@ begin
       if (SC_STATUS[SC_NO].D210[00] = '1') and  // SCT 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[01] = '1') and  // SCC 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[02] = '0') and  // 비상정지 (0: Off, 1: On )
-//         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
+         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
          (SC_STATUS[SC_NO].D210[10] = '1') then // 로딩이 시작 되면 Order1
       begin
         fnOrder_Update(SC_NO, 'JOBSTATUS', '3', 'NOWSTATUS', '3' ) ;
@@ -2227,7 +2354,7 @@ begin
       if (SC_STATUS[SC_NO].D210[00] = '1') and  // SCT 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[01] = '1') and  // SCC 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[02] = '0') and  // 비상정지 (0: Off, 1: On )
-//         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
+         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
          (SC_STATUS[SC_NO].D210[10] <>'1') then // 로딩이 완료 되면 Reset1
       begin
         SC_STAT[SC_NO] := RESET1 ;
@@ -2391,7 +2518,7 @@ begin
       if (SC_STATUS[SC_NO].D210[00] = '1') and  // SCT 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[01] = '1') and  // SCC 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[02] = '0') and  // 비상정지 (0: Off, 1: On )
-//         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
+         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
          (SC_STATUS[SC_NO].D210[11] = '1') then // 언로딩이 시작 되면 Order2
       begin
         fnOrder_Update(SC_NO, 'JOBSTATUS', '3', 'NOWSTATUS', '3' ) ;
@@ -2490,7 +2617,7 @@ begin
       if (SC_STATUS[SC_NO].D210[00] = '1') and  // SCT 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[01] = '1') and  // SCC 자동 (0:수동, 1:자동)
          (SC_STATUS[SC_NO].D210[02] = '0') and  // 비상정지 (0: Off, 1: On )
-//         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
+         (SC_STATUS[SC_NO].D210[15] = '0') and  // 에러유무 (0:없음, 1:있음)
          (SC_STATUS[SC_NO].D211[02] = '1') then // 작업완료 (0: Off, 1: On )
       begin
         SC_STAT[SC_NO] := RESET2 ;
@@ -4312,13 +4439,27 @@ begin
                    '    AND ID_DT    = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
 
       // Step 3. TT_Order Update
-      ORDERSQL  := ' UPDATE TT_ORDER ' +
-                   '    SET NOWMC     = ''3'' ' +
-                   '      , NOWSTATUS = ''4'' ' +
-                   '      , JOBSTATUS = ''4'' ' +
-                   '      , JOB_END   = ''0'' ' +
-                   '  WHERE LUGG      = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
-                   '    AND REG_TIME  = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
+      if (fnOrder_Value(SC_NO, 'IS_AUTO') = 'N')  then
+      begin
+        ORDERSQL  := ' UPDATE TT_ORDER ' +
+                     '    SET NOWMC     = ''4'' ' +
+                     '      , NOWSTATUS = ''4'' ' +
+                     '      , JOBSTATUS = ''4'' ' +
+                     '      , JOB_END   = ''0'' ' +
+                     '  WHERE LUGG      = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                     '    AND REG_TIME  = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
+      end else
+      begin
+        ORDERSQL  := ' UPDATE TT_ORDER ' +
+                     '    SET NOWMC     = ''4'' ' +
+                     '      , NOWSTATUS = ''2'' ' +
+                     '      , JOBSTATUS = ''2'' ' +
+                     '      , JOB_END   = ''0'' ' +
+                     '  WHERE LUGG      = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
+                     '    AND REG_TIME  = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
+      end;
+
+
 
     end else Exit;
   end else
@@ -5579,6 +5720,53 @@ end;
 //==============================================================================
 // fnCanOutput
 //==============================================================================
+function TfrmSCComm.fnCanOutput(ItemCode: String): Boolean;
+var
+  StrSQL : string;
+begin
+  Result := False;
+  StrSQL := '';
+  try
+    with qryStock do
+    begin
+      Close;
+      SQL.Clear;
+
+      if (ItemCode = 'EPLT') then
+      begin
+        StrSQL := ' SELECT COUNT(*) as CNT ' +
+                  '   FROM TT_STOCK with(NOLOCK)' +
+                  '  WHERE ID_STATUS = ''1'' ' +
+                  '    AND OT_USED = ''1'' ' +
+                  '    AND ITM_CD = ''EPLT'' ';
+      end else
+      if (ItemCode = 'FULL') then
+      begin
+        StrSQL := ' SELECT COUNT(*) as CNT ' +
+                  '   FROM TT_STOCK with(NOLOCK)' +
+                  '  WHERE ID_STATUS = ''2'' ' +
+                  '    AND OT_USED = ''1'' ' +
+                  '    AND ITM_CD = ''FULL'' ';
+      end;
+
+      SQL.Text := StrSQL ;
+      Open ;
+      Result := Boolean(FieldByName('CNT').AsInteger);
+      Close ;
+    end;
+  except
+    on E: Exception do
+    begin
+      qryStock.Close ;
+      ErrorLogWRITE( 'Function fnCanoutput ' +
+                     'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
+    end;
+  end;
+end;
+
+//==============================================================================
+// fnCanOutput
+//==============================================================================
 function TfrmSCComm.fnCanoutput: Boolean;
 var
   StrSQL : string;
@@ -5624,21 +5812,28 @@ begin
     begin
       Close;
       SQL.Clear;
-      StrSQL := ' INSERT INTO TT_HISTORY (REG_TIME, LUGG, JOBD, LINE_NO, IS_AUTO, ' +
+      StrSQL := ' INSERT INTO TT_HISTORY (REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                                         ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
                             					  ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 					                              '	NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
 					                              '	JOBREWORK, JOBERRORT, JOBERRORC, JOBERRORD, ' +
 					                              ' JOB_END, CVFR, CVTO, CVCURR, ' +
-					                              '	ETC, EMG, ITM_CD, UP_TIME, ' +
-					                              '	HIS_TIME) ' +
-                      ' SELECT REG_TIME, LUGG, JOBD, LINE_NO, IS_AUTO, ' +
+					                              '	ETC, EMG, ITM_CD, UP_TIME, HIS_TIME,' +
+                                        ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
+                                        ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
+                                        ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
+                                        ' RF_PALLET_BMA3, RF_AREA) ' +
+                      ' SELECT REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                              ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
 		                         ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 		                         ' NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
 		                         ' JOBREWORK, JOBERRORT, JOBERRORC, JOBERRORD, ' +
 		                         ' JOB_END, CVFR, CVTO, CVCURR, ' +
-		                         ' ETC, EMG, ITM_CD, UP_TIME, GETDATE() ' +
+		                         ' ETC, EMG, ITM_CD, UP_TIME, GETDATE(), ' +
+                             ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
+                             ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
+                             ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
+                             ' RF_PALLET_BMA3, RF_AREA ' +
                         ' FROM TT_ORDER ' +
                        ' WHERE LINE_NO = '  + IntToStr(Line_No) ;
       SQL.Text := StrSQL ;
@@ -5688,15 +5883,22 @@ begin
 					                              '	NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
 					                              '	JOBREWORK, JOBERRORT, JOBERRORC, JOBERRORD, ' +
 					                              ' JOB_END, CVFR, CVTO, CVCURR, ' +
-					                              '	ETC, EMG, ITM_CD, UP_TIME, ' +
-					                              '	HIS_TIME) ' +
+					                              '	ETC, EMG, ITM_CD, UP_TIME, HIS_TIME,' +
+                                        ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
+                                        ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
+                                        ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
+                                        ' RF_PALLET_BMA3, RF_AREA) ' +
                       ' SELECT REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                              ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
 		                         ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
 		                         ' NOWMC, JOBSTATUS, NOWSTATUS, BUFFSTATUS, ' +
 		                         ' JOBREWORK, JOBERRORT, JOBERRORC, JOBERRORD, ' +
 		                         ' JOB_END, CVFR, CVTO, CVCURR, ' +
-		                         ' ETC, EMG, ITM_CD, UP_TIME, GETDATE() ' +
+		                         ' ETC, EMG, ITM_CD, UP_TIME, GETDATE(), ' +
+                             ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
+                             ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
+                             ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
+                             ' RF_PALLET_BMA3, RF_AREA ' +
                         ' FROM TT_ORDER ' +
                        ' WHERE LUGG = '  + QuotedStr(JobNo) ;
       SQL.Text := StrSQL ;
@@ -5918,7 +6120,7 @@ begin
             fnOrder_Update(SC_NO, 'DSTAISLE', FormatFloat('0000',StrToInt(Copy(NewPos,1,1)))) ;
             fnOrder_Update(SC_NO, 'DSTBAY'  , FormatFloat('0000',StrToInt(Copy(NewPos,2,2)))) ;
             fnOrder_Update(SC_NO, 'DSTLEVEL', FormatFloat('0000',StrToInt(Copy(NewPos,4,2)))) ;
-            fnStockUpdate(NewPos, 'ID_STATUS', '3');
+            fnStockUpdate(NewPos, 'ID_STATUS', '4');
             StrLog := ' COMD SC'+IntToStr(SC_No)+
                       ' | 이중입고 하역위치 변경 성공 ' +
                       ' | 하역위치- ' + SC_JOB[SC_NO].UNLOAD_BANK  +  // 현재 하역 열
@@ -5934,7 +6136,7 @@ begin
             fnOrder_Update(SC_NO, 'SRCAISLE', FormatFloat('0000',StrToInt(Copy(NewPos,1,1)))) ;
             fnOrder_Update(SC_NO, 'SRCBAY'  , FormatFloat('0000',StrToInt(Copy(NewPos,2,2)))) ;
             fnOrder_Update(SC_NO, 'SRCLEVEL', FormatFloat('0000',StrToInt(Copy(NewPos,4,2)))) ;
-            fnStockUpdate(NewPos, 'ID_STATUS', '3');
+            fnStockUpdate(NewPos, 'ID_STATUS', '5');
             StrLog := ' COMD SC'+IntToStr(SC_No)+
                       ' | 공출고 적재위치 변경 성공 ' +
                       ' | 적재위치- ' + SC_JOB[SC_NO].LOAD_BANK  +  // 현재 적재 열
