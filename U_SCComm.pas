@@ -580,37 +580,49 @@ begin
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
 
-      // 빈 셀이 있고 해당 라인에 작업이 없을 때 작업 생성
-      if (HasEmptyCell) then
-      begin
-        WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+      IsExist := False;
+      case i of
+        1 : IsExist := Boolean(SC_STATUS[SC_NO].D211[08] = '1');
+        2 : IsExist := Boolean(SC_STATUS[SC_NO].D211[09] = '1');
+        3 : IsExist := Boolean(SC_STATUS[SC_NO].D211[10] = '1');
+        4 : IsExist := Boolean(SC_STATUS[SC_NO].D211[11] = '1');
+        5 : IsExist := Boolean(SC_STATUS[SC_NO].D211[12] = '1');
+        6 : IsExist := Boolean(SC_STATUS[SC_NO].D211[13] = '1');
+      end;
+
+      // 빈 셀이 있고
+      // 라인에 작업 없고
+      // 입고대에 화물 없을 때.
+      WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
                     '   And JOBD    = 1 ' +
                     '   And JOB_END = 0 ' ;
-        if (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
-        begin
-          ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
+      if (HasEmptyCell = True) and
+         (IsExist = False) and
+         (fnOrder_Value(WhereStr, 'LINE_NO') = '') then
+      begin
+        ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
 
-          // 작업생성
-          JobNo := SetJobOrder(i, 'I', ItemCode, '4', '0');
-          if (JobNo <> '') then
+        // 작업생성
+        JobNo := SetJobOrder(i, 'I', ItemCode, '4', '0');
+        if (JobNo <> '') then
+        begin
+          // 커튼 오픈
+          if (PLC_ReadVal.Curtain[i] = '0') then
           begin
-            // 커튼 오픈
-            if (PLC_ReadVal.Curtain[i] = '0') then
+            if (PLC_WriteVal.Curtain[i] = '0') then
             begin
-              if (PLC_WriteVal.Curtain[i] = '0') then
-              begin
-                PLC_ORDER.ORDER := '1';
-                PLC_WRITE_FLAG := ComWrite;
-                fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
-              end;
-              PLC_WriteVal.Curtain[i] := '1';
+              PLC_ORDER.ORDER := '1';
+              PLC_WRITE_FLAG := ComWrite;
+              fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
             end;
+            PLC_WriteVal.Curtain[i] := '1';
           end;
         end;
       end;
 
-      // 커튼 열린 상태라면 응답 전송
-      if (PLC_ReadVal.Curtain[i] = '1') then
+      // 커튼 열려있고 화물 없을 때 응답 전송
+      if (PLC_ReadVal.Curtain[i] = '1') and
+         (IsExist = False) then
       begin
         // ACS 응답 데이터 생성
         Tx_AcsData[i].Heart_Beat       := '1';
@@ -720,7 +732,7 @@ begin
 
         // 출고 된 경우에 실행
         if (JobNo <> '') and
-           (JobError = '') then
+           ((JobError = '') or (JobError = '0')) then
         begin
           // 커튼 오픈
           if (PLC_ReadVal.Curtain[i] = '0') then
@@ -803,10 +815,11 @@ begin
               tRfidData.Model_No_1  := fnGetRFID_Data(i, 'H16');
               tRfidData.Model_No_2  := fnGetRFID_Data(i, 'H17');
               tRfidData.BMA_No      := fnGetRFID_Data(i, 'H18');
-              tRfidData.Cell_Production := fnGetRFID_Data(i, 'H19');
+              tRfidData.Area        := fnGetRFID_Data(i, 'H19');
               tRfidData.BMA_1       := fnGetRFID_Data(i, 'H20');
               tRfidData.BMA_2       := fnGetRFID_Data(i, 'H21');
               tRfidData.BMA_3       := fnGetRFID_Data(i, 'H22');
+              tRfidData.NEW_BMA     := IfThen(fnGetRFID_Data(i, 'H23') = '1', '신규', '재고');
               fnOrder_RfidUpdate(JobNo, tRfidData);
 
               if (fnOrder_Value(WhereStr, 'NOWSTATUS') <> '3') then
@@ -993,10 +1006,20 @@ begin
                         '   And JOBSTATUS <> ''4'' ';
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
+        JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
+
+        // Rfid Read 에러 확인
+        RfidError[1] := SC_STATUS[SC_NO].D205 = '0050';
+        RfidError[2] := SC_STATUS[SC_NO].D205 = '0051';
+        RfidError[3] := SC_STATUS[SC_NO].D205 = '0052';
+        RfidError[4] := SC_STATUS[SC_NO].D205 = '0053';
+        RfidError[5] := SC_STATUS[SC_NO].D205 = '0054';
+        RfidError[6] := SC_STATUS[SC_NO].D205 = '0055';
 
         // 작업이 있고 화물도 있는 경우 RFID 확인
         if (JobNo <> '') and
-           (IsExist = True) then
+           (IsExist = True) and
+           ((JobError = '') or (JobError = '0')) then
         begin
           if (PLC_ReadVal.RFID_Read[i] = '0') and
              (PLC_WriteVal.RFID_Read[i] = '0') then
@@ -1005,7 +1028,8 @@ begin
             PLC_ORDER.ORDER := '1';
             PLC_WRITE_FLAG := ComWrite;
           end else
-          if (PLC_ReadVal.RFID_Read[i] = '1') then
+          if (PLC_ReadVal.RFID_Read[i] = '1') and
+             (RfidError[i] = False) then
           begin
 
             fnIns_RfidHistory(i);
@@ -1048,10 +1072,11 @@ begin
               tRfidData.Model_No_1  := fnGetRFID_Data(i, 'H16');
               tRfidData.Model_No_2  := fnGetRFID_Data(i, 'H17');
               tRfidData.BMA_No      := fnGetRFID_Data(i, 'H18');
-              tRfidData.Cell_Production := fnGetRFID_Data(i, 'H19');
+              tRfidData.Area        := fnGetRFID_Data(i, 'H19');
               tRfidData.BMA_1       := fnGetRFID_Data(i, 'H20');
               tRfidData.BMA_2       := fnGetRFID_Data(i, 'H21');
               tRfidData.BMA_3       := fnGetRFID_Data(i, 'H22');
+              tRfidData.NEW_BMA     := IfThen(fnGetRFID_Data(i, 'H23') = '1', '신규', '재고');
               fnOrder_RfidUpdate(JobNo, tRfidData);
 
               // AGV 작업 완료
@@ -1722,41 +1747,6 @@ begin
           fnIns_RfidHistory(i);
         end;
       end;
-
-//      // RFID Read 요청 OFF
-//      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 3) and
-//         (PLC_WriteVal.RFID_Read[i] = '1') then
-//      begin
-//        PLC_ORDER.ORDER := '1';
-//        PLC_WRITE_FLAG := ComWrite;
-//        PLC_WriteVal.RFID_Read[i] := '0';
-//        fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '0');
-//
-//        fnIns_RfidHistory(i);
-//      end else
-//      // RFID Read 완료 표시
-//      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) and
-//         (PLC_ReadVal.RFID_Read[i] = '1') then
-//      begin
-//        fnSet_Current('RF_READ', 'OPTION' + IntToStr(i), '2');
-//      end else
-//      // RFID Read 요청 ON
-//      if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) then
-//      begin
-//        if (PLC_WriteVal.RFID_Read[i] = '0') then
-//        begin
-//          PLC_ORDER.ORDER := '1';
-//          PLC_WRITE_FLAG := ComWrite;
-//          PLC_WriteVal.RFID_Read[i] := '1';
-//        end else
-//        if (PLC_WriteVal.RFID_Read[i] = '1') and
-//           (PLC_ReadVal.RFID_Read[i] = '0') then
-//        begin
-//          PLC_ORDER.ORDER := '1';
-//          PLC_WRITE_FLAG := ComWrite;
-//          PLC_WriteVal.RFID_Read[i] := '0';
-//        end;
-//      end;
     end else
     // 자동 작업이 있을 경우에는 RFID Write Val 초기화
     if (fnGet_Current('RF_READ', 'OPTION' + IntToStr(i)) = 1) then
@@ -3984,10 +3974,11 @@ begin
         SC_JOB[SC_NO].RF_MODEL_NO1    := Trim(FieldByName('RF_MODEL_NO1').AsString);
         SC_JOB[SC_NO].RF_MODEL_NO2    := Trim(FieldByName('RF_MODEL_NO2').AsString);
         SC_JOB[SC_NO].RF_BMA_NO       := Trim(FieldByName('RF_BMA_NO').AsString);
-        SC_JOB[SC_NO].Cell_Production := Trim(FieldByName('RF_AREA').AsString);
+        SC_JOB[SC_NO].RF_AREA         := Trim(FieldByName('RF_AREA').AsString);
         SC_JOB[SC_NO].RF_PALLET_BMA1  := Trim(FieldByName('RF_PALLET_BMA1').AsString);
         SC_JOB[SC_NO].RF_PALLET_BMA2  := Trim(FieldByName('RF_PALLET_BMA2').AsString);
         SC_JOB[SC_NO].RF_PALLET_BMA3  := Trim(FieldByName('RF_PALLET_BMA3').AsString);
+        SC_JOB[SC_NO].RF_NEW_BMA      := Trim(FieldByName('RF_NEW_BMA').AsString);
 
         SC_JOB[SC_NO].SC_STEP := 'L'   ;   // 작업 단계 (L:Loading, U:UnLoading)
 
@@ -4445,7 +4436,7 @@ begin
                      '    SET NOWMC     = ''4'' ' +
                      '      , NOWSTATUS = ''4'' ' +
                      '      , JOBSTATUS = ''4'' ' +
-                     '      , JOB_END   = ''0'' ' +
+                     '      , JOB_END   = ''1'' ' +
                      '  WHERE LUGG      = ''' + SC_JOB[SC_No].ID_ORDLUGG + ''' ' +
                      '    AND REG_TIME  = ''' + SC_JOB[SC_NO].ID_REGTIME + ''' ' ;
       end else
@@ -4620,17 +4611,18 @@ var
 begin
   Result := False ;
   StrSQL := ' UPDATE TT_ORDER ' +
-            '    SET RF_LINE_NAME1 = ' + QuotedStr(RfidData.Line_Name_1) +
-               '   , RF_LINE_NAME2 = ' + QuotedStr(RfidData.Line_Name_2) +
-               '   , RF_PALLET_NO1 = ' + QuotedStr(RfidData.Pallet_No_1) +
-               '   , RF_PALLET_NO2 = ' + QuotedStr(RfidData.Pallet_No_2) +
-               '   , RF_MODEL_NO1 = ' + QuotedStr(RfidData.Model_No_1) +
-               '   , RF_MODEL_NO2 = ' + QuotedStr(RfidData.Model_No_2) +
-               '   , RF_BMA_NO = ' + QuotedStr(RfidData.BMA_No) +
+            '    SET RF_LINE_NAME1  = ' + QuotedStr(RfidData.Line_Name_1) +
+               '   , RF_LINE_NAME2  = ' + QuotedStr(RfidData.Line_Name_2) +
+               '   , RF_PALLET_NO1  = ' + QuotedStr(RfidData.Pallet_No_1) +
+               '   , RF_PALLET_NO2  = ' + QuotedStr(RfidData.Pallet_No_2) +
+               '   , RF_MODEL_NO1   = ' + QuotedStr(RfidData.Model_No_1) +
+               '   , RF_MODEL_NO2   = ' + QuotedStr(RfidData.Model_No_2) +
+               '   , RF_BMA_NO      = ' + QuotedStr(RfidData.BMA_No) +
                '   , RF_PALLET_BMA1 = ' + QuotedStr(RfidData.BMA_1) +
                '   , RF_PALLET_BMA2 = ' + QuotedStr(RfidData.BMA_2) +
                '   , RF_PALLET_BMA3 = ' + QuotedStr(RfidData.BMA_3) +
-               '   , RF_AREA = ' + QuotedStr(RfidData.Cell_Production) +
+               '   , RF_AREA        = ' + QuotedStr(RfidData.Area) +
+               '   , RF_NEW_BMA     = ' + QuotedStr(RfidData.NEW_BMA) +
             '  WHERE LUGG = ''' + JobNo + ''' ';
   try
     with qryUpdate do
@@ -5079,6 +5071,7 @@ begin
       SQL.Clear;
       SQL.Text := StrSQL ;
       ExecNo   := ExecSQL ;
+
       Result   := Boolean( ExecNo > 0 ) ;
       Close ;
     end;
@@ -5335,7 +5328,8 @@ begin
               '      , RF_PALLET_BMA1 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA1) +
               '      , RF_PALLET_BMA2 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA2) +
               '      , RF_PALLET_BMA3 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA3) +
-              '      , RF_AREA        = ' + QuotedStr(SC_JOB[SC_NO].Cell_Production) +
+              '      , RF_AREA        = ' + QuotedStr(SC_JOB[SC_NO].RF_AREA       ) +
+              '      , RF_NEW_BMA     = ' + QuotedStr(SC_JOB[SC_NO].RF_NEW_BMA    ) +
               '      , ID_STATUS    = ' + QuotedStr(CellStatus) +
               '      , STOCK_IN_DT  = GETDATE()   ' +
               '      , ID_MEMO      = ' + QuotedStr(fnOrder_Value(SC_No,'ETC')) +
@@ -5372,6 +5366,7 @@ begin
               '      , RF_PALLET_BMA2 = '''' ' +
               '      , RF_PALLET_BMA3 = '''' ' +
               '      , RF_AREA        = '''' ' +
+              '      , RF_NEW_BMA     = '''' ' +
               '  Where ID_HOGI   = '   + QuotedStr(IntToStr(SC_NO)) +
               '    AND ID_BANK   = ''' + Copy(SC_JOB[SC_No].LOAD_BANK, 4, 1)  + ''' ' + // 하역 열
               '    AND ID_BAY    = ''' + Copy(SC_JOB[SC_No].LOAD_BAY, 3, 2)   + ''' ' + // 하역 연
@@ -5405,6 +5400,7 @@ begin
               '      , RF_PALLET_BMA2 = '''' ' +
               '      , RF_PALLET_BMA3 = '''' ' +
               '      , RF_AREA        = '''' ' +
+              '      , RF_NEW_BMA     = '''' ' +
               '  Where ID_HOGI   = '   + QuotedStr(IntToStr(SC_NO)) +
               '    AND ID_BANK   = ''' + Copy(SC_JOB[SC_No].LOAD_BANK, 4, 1)  + ''' ' + // 적재 열
               '    AND ID_BAY    = ''' + Copy(SC_JOB[SC_No].LOAD_BAY, 3, 2)   + ''' ' + // 적재 연
@@ -5427,7 +5423,8 @@ begin
                  '      , RF_PALLET_BMA1 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA1) +
                  '      , RF_PALLET_BMA2 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA2) +
                  '      , RF_PALLET_BMA3 = ' + QuotedStr(SC_JOB[SC_NO].RF_PALLET_BMA3) +
-                 '      , RF_AREA        = ' + QuotedStr(SC_JOB[SC_NO].Cell_Production) +
+                 '      , RF_AREA        = ' + QuotedStr(SC_JOB[SC_NO].RF_AREA       ) +
+                 '      , RF_NEW_BMA     = ' + QuotedStr(SC_JOB[SC_NO].RF_NEW_BMA    ) +
                  '      , ID_STATUS    = ' + QuotedStr(CellStatus) +
                  '      , STOCK_IN_DT  = GETDATE()   ' +
                  '      , ID_MEMO      = ' + QuotedStr(fnOrder_Value(SC_No,'ETC')) +
@@ -5822,7 +5819,7 @@ begin
                                         ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
                                         ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
                                         ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
-                                        ' RF_PALLET_BMA3, RF_AREA) ' +
+                                        ' RF_PALLET_BMA3, RF_AREA, RF_NEW_BMA) ' +
                       ' SELECT REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                              ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
 		                         ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
@@ -5833,7 +5830,7 @@ begin
                              ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
                              ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
                              ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
-                             ' RF_PALLET_BMA3, RF_AREA ' +
+                             ' RF_PALLET_BMA3, RF_AREA, RF_NEW_BMA ' +
                         ' FROM TT_ORDER ' +
                        ' WHERE LINE_NO = '  + IntToStr(Line_No) ;
       SQL.Text := StrSQL ;
@@ -5887,7 +5884,7 @@ begin
                                         ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
                                         ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
                                         ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
-                                        ' RF_PALLET_BMA3, RF_AREA) ' +
+                                        ' RF_PALLET_BMA3, RF_AREA, RF_NEW_BMA) ' +
                       ' SELECT REG_TIME, LUGG, JOBD, IS_AUTO, LINE_NO, ' +
                              ' SRCSITE, SRCAISLE, SRCBAY, SRCLEVEL, ' +
 		                         ' DSTSITE, DSTAISLE, DSTBAY, DSTLEVEL, ' +
@@ -5898,7 +5895,7 @@ begin
                              ' RF_LINE_NAME1, RF_LINE_NAME2, RF_PALLET_NO1, ' +
                              ' RF_PALLET_NO2, RF_MODEL_NO1, RF_MODEL_NO2, ' +
                              ' RF_BMA_NO, RF_PALLET_BMA1, RF_PALLET_BMA2, ' +
-                             ' RF_PALLET_BMA3, RF_AREA ' +
+                             ' RF_PALLET_BMA3, RF_AREA, RF_NEW_BMA ' +
                         ' FROM TT_ORDER ' +
                        ' WHERE LUGG = '  + QuotedStr(JobNo) ;
       SQL.Text := StrSQL ;

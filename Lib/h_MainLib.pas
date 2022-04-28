@@ -145,11 +145,11 @@ Type
     RF_MODEL_NO1   ,
     RF_MODEL_NO2   ,
     RF_BMA_NO      ,
-    Cell_Production ,
+    RF_AREA ,
     RF_PALLET_BMA1 ,
     RF_PALLET_BMA2 ,
     RF_PALLET_BMA3 ,
-
+    RF_NEW_BMA     ,
 
 
     SC_STEP        ,          // 작업 단계 ( L : Loading, U : UnLoading, C : Cancel )
@@ -386,10 +386,11 @@ Type
     Model_No_1       ,
     Model_No_2       ,
     BMA_No           ,
-    Cell_Production  ,
+    Area             ,
     BMA_1            ,
     BMA_2            ,
-    BMA_3            : String;
+    BMA_3            ,
+    NEW_BMA           : String;
   End;
 
 
