@@ -641,7 +641,7 @@ begin
     end else
 
     //==================================//
-    // (AGV가 커튼 앞에 위치)  출고작업 //
+    // (AGV가 커튼 앞에 위치) 출고완료됐을경우 진입허가 //
     //==================================//
     if (i in [2, 4, 6] )                       and
        (Rx_AcsData[i].Model_No         <> '' ) and
@@ -651,6 +651,7 @@ begin
        (Rx_AcsData[i].Docking_Complete = '0' ) then
     begin
 
+      RfidCheck := False;
       IsExist := False;
       case i of
         1 : IsExist := Boolean(SC_STATUS[SC_NO].D211[08] = '1');
@@ -661,35 +662,40 @@ begin
         6 : IsExist := Boolean(SC_STATUS[SC_NO].D211[13] = '1');
       end;
 
-      // 해당 라인의 출고작업이 없을 때 작업 생성
-      WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                  '   And JOBD = ''2'' ';
-      if (fnOrder_Value(WhereStr, 'LINE_NO') = '') and
-         (IsExist = False) then
+
+      // 화물이 있고 RFID를 읽었을 경우  ( RFID를 읽으면 NOWSTATUS가 2에서 3으로 바뀜 )
+      WhereStr := ' Where JOBD      = ''2'' ' +
+                    ' And IS_AUTO   = ''Y'' ' +
+                    ' And NOWMC     = ''4'' ' +
+                    ' And NOWSTATUS = ''3'' ' +
+                    ' And JOBSTATUS = ''3'' ' +
+                    ' And JOB_END   = ''0'' ' +
+                    ' And LINE_NO   = ' + QuotedStr(IntToStr(i));
+      JobNo := '';
+      JobNo := fnOrder_Value(WhereStr, 'LUGG');
+      JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
+      if (JobNo <> '') and
+         (IsExist = True) and
+         ((JobError = '') or (JobError = '0')) then
       begin
-        ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
 
-        if (fnGetStockCount(ItemCode) > 0) then
-        begin
-          HasStock := True;
+        //RfidCheck := True;
 
-          // 작업생성
-          JobNo := SetJobOrder(i, 'O', ItemCode, '2', '0');
-        end
-        // 재고가 없을 때
-        else
+        // 커튼 오픈
+        if (PLC_ReadVal.Curtain[i] = '0') then
         begin
-          HasStock := False;
+          if (PLC_WriteVal.Curtain[i] = '0') then
+          begin
+            PLC_ORDER.ORDER := '1';
+            PLC_WRITE_FLAG := ComWrite;
+            PLC_WriteVal.Curtain[i] := '1';
+            fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
+          end;
         end;
-      end
-      // 작업이 있는 경우
-      else
-      begin
-        HasStock := True;
       end;
 
-      // 재고가 없을 경우
-      if not (HasStock) then
+      // 커튼 열린 상태
+      if (PLC_ReadVal.Curtain[i] = '1') then
       begin
         // ACS 응답 데이터 생성
         Tx_AcsData[i].Heart_Beat       := '1';
@@ -701,153 +707,9 @@ begin
         Tx_AcsData[i].Port_No_Dest     := '';
         Tx_AcsData[i].Model_No         := '';
         Tx_AcsData[i].Call_Request     := '0';
-        Tx_AcsData[i].Call_Answer      := '2';
-        Tx_AcsData[i].Docking_Approve  := '0';
+        Tx_AcsData[i].Call_Answer      := '1';
+        Tx_AcsData[i].Docking_Approve  := '1';
         Tx_AcsData[i].Docking_Complete := '0';
-      end
-      // 재고가 있어서 출고지시 된 경우, 출고 완료 후 응답
-      else
-      begin
-        JobNo := '';
-        // 해당 라인의 출고 완료된 작업을 찾아옴.
-        WhereStr := ' Where JOBD      = ''2'' ' +
-                      ' And IS_AUTO   = ''Y'' ' +
-                      ' And NOWMC     = ''4'' ' +
-                      ' And NOWSTATUS = ''2'' ' +
-                      ' And JOBSTATUS = ''2'' ' +
-                      ' And JOB_END   = ''0'' ' +
-                      ' And LINE_NO   = ' + QuotedStr(IntToStr(i)) +
-                    ' Order By REG_TIME Desc ' ;
-        ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
-        JobNo := fnOrder_Value(WhereStr, 'LUGG');
-        JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
-
-        // Rfid Read 에러 확인
-        RfidError[1] := SC_STATUS[SC_NO].D205 = '0050';
-        RfidError[2] := SC_STATUS[SC_NO].D205 = '0051';
-        RfidError[3] := SC_STATUS[SC_NO].D205 = '0052';
-        RfidError[4] := SC_STATUS[SC_NO].D205 = '0053';
-        RfidError[5] := SC_STATUS[SC_NO].D205 = '0054';
-        RfidError[6] := SC_STATUS[SC_NO].D205 = '0055';
-
-        // 출고 된 경우에 실행
-        if (JobNo <> '') and
-           ((JobError = '') or (JobError = '0')) then
-        begin
-          // 커튼 오픈
-          if (PLC_ReadVal.Curtain[i] = '0') then
-          begin
-            if (PLC_WriteVal.Curtain[i] = '0') then
-            begin
-              PLC_ORDER.ORDER := '1';
-              PLC_WRITE_FLAG := ComWrite;
-              fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
-            end;
-            PLC_WriteVal.Curtain[i] := '1';
-          end;
-
-          if (PLC_WriteVal.RFID_Read[i] = '0') then
-          begin
-            PLC_WriteVal.RFID_Read[i] := '1';
-            PLC_ORDER.ORDER := '1';
-            PLC_WRITE_FLAG := ComWrite;
-          end else
-          if (PLC_ReadVal.RFID_Read[i] = '1') and
-             (RfidError[i] = False) then
-          begin
-
-            fnIns_RfidHistory(i);
-
-            if (Rx_AcsData[i].Model_No = '0') then
-            begin
-              if (fnGetRFID_Data(i, 'H18') = '0') then
-              begin
-                RfidCheck := True;
-              end else
-              begin
-                RfidCheck := False;
-              end;
-            end else
-            if (Rx_AcsData[i].Model_No = '1') then
-            begin
-              if (fnGetRFID_Data(i, 'H18') = '36') then
-              begin
-                RfidCheck := True;
-              end else
-              begin
-                RfidCheck := False;
-              end;
-            end;
-
-            // RFID가 잘못 된 경우.
-            if not (RfidCheck) then
-            begin
-
-              // PLC에 알람 요청
-              if (PLC_WriteVal.Alram = '0') then
-              begin
-                PLC_WriteVal.Alram := '1';
-                PLC_ORDER.ORDER := '1';
-                PLC_WRITE_FLAG := ComWrite;
-              end;
-
-              // TT_ORDER에 에러 표시
-              fnOrder_Update(JobNo, 'JOBERRORC', '1');
-              fnOrder_Update(JobNo, 'JOBERRORT', 'R');
-              fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
-            end
-            // RFID가 정상인 경우
-            else
-            begin
-
-              // RFID 초기화
-              if (PLC_WriteVal.RFID_Read[i] = '1') then
-              begin
-                PLC_WriteVal.RFID_Read[i] := '0';
-                PLC_ORDER.ORDER := '1';
-                PLC_WRITE_FLAG := ComWrite;
-              end;
-
-              tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H00');
-              tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H01');
-              tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H02');
-              tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H03');
-              tRfidData.Model_No_1  := fnGetRFID_Data(i, 'H16');
-              tRfidData.Model_No_2  := fnGetRFID_Data(i, 'H17');
-              tRfidData.BMA_No      := fnGetRFID_Data(i, 'H18');
-              tRfidData.Area        := fnGetRFID_Data(i, 'H19');
-              tRfidData.BMA_1       := fnGetRFID_Data(i, 'H20');
-              tRfidData.BMA_2       := fnGetRFID_Data(i, 'H21');
-              tRfidData.BMA_3       := fnGetRFID_Data(i, 'H22');
-              tRfidData.NEW_BMA     := IfThen(fnGetRFID_Data(i, 'H23') = '1', '신규', '재고');
-              fnOrder_RfidUpdate(JobNo, tRfidData);
-
-              if (fnOrder_Value(WhereStr, 'NOWSTATUS') <> '3') then
-              begin
-                fnOrder_Update(JobNo, 'NOWSTATUS', '3');
-                fnOrder_Update(JobNo, 'JOBSTATUS', '3');
-              end;
-
-              // 커튼 열린 상태
-              if (PLC_ReadVal.Curtain[i] = '1') then
-              begin
-                // ACS 응답 데이터 생성
-                Tx_AcsData[i].Heart_Beat       := '1';
-                Tx_AcsData[i].Line_Name_Source := '';
-                Tx_AcsData[i].Line_No_Source   := '';
-                Tx_AcsData[i].Port_No_Source   := '';
-                Tx_AcsData[i].Line_Name_Dest   := '';
-                Tx_AcsData[i].Line_No_Dest     := '';
-                Tx_AcsData[i].Port_No_Dest     := '';
-                Tx_AcsData[i].Model_No         := '';
-                Tx_AcsData[i].Call_Request     := '0';
-                Tx_AcsData[i].Call_Answer      := '1';
-                Tx_AcsData[i].Docking_Approve  := '1';
-                Tx_AcsData[i].Docking_Complete := '0';
-              end;
-            end;
-          end;
-        end;
       end;
     end;
 
@@ -865,31 +727,191 @@ begin
       if (i in [2, 4, 6]) then
       begin
         ItemCode := IfThen(Rx_AcsData[i].Model_No = '1', 'FULL', 'EPLT');
-        if (fnGetStockCount(ItemCode) > 0) then
+        // 해당 라인의 출고작업이 없을 때 작업 생성
+        WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+                    '   And JOBD = ''2'' ';
+        JobNo := fnOrder_Value(WhereStr, 'LUGG');
+        // 재고가 있거나 작업이 있을 때
+        if (fnGetStockCount(ItemCode) > 0) or
+           (JobNo <> '') then
         begin
-          Tx_AcsData[i].Call_Answer := '1';
+          IsExist := False;
+          case i of
+            1 : IsExist := Boolean(SC_STATUS[SC_NO].D211[08] = '1');
+            2 : IsExist := Boolean(SC_STATUS[SC_NO].D211[09] = '1');
+            3 : IsExist := Boolean(SC_STATUS[SC_NO].D211[10] = '1');
+            4 : IsExist := Boolean(SC_STATUS[SC_NO].D211[11] = '1');
+            5 : IsExist := Boolean(SC_STATUS[SC_NO].D211[12] = '1');
+            6 : IsExist := Boolean(SC_STATUS[SC_NO].D211[13] = '1');
+          end;
+
+
+          // 해당 라인의 출고작업이 없을 때 작업 생성
+          WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
+                      '   And JOBD = ''2'' ';
+          if (fnOrder_Value(WhereStr, 'LINE_NO') = '') and
+             (IsExist = False) then
+          begin
+            JobNo := '';
+            ItemCode := IfThen(Rx_AcsData[i].Model_No = '0', 'EPLT', 'FULL');
+            JobNo := SetJobOrder(i, 'O', ItemCode, '2', '0');
+          end;
+
+          // 작업 생성 후 출고 완료 된 경우
+          // 해당 라인의 출고 완료된 작업을 찾아옴.
+          WhereStr := ' Where JOBD      = ''2'' ' +
+                        ' And IS_AUTO   = ''Y'' ' +
+                        ' And NOWMC     = ''4'' ' +
+                        ' And NOWSTATUS = ''2'' ' +
+                        ' And JOBSTATUS = ''2'' ' +
+                        ' And JOB_END   = ''0'' ' +
+                        ' And LINE_NO   = ' + QuotedStr(IntToStr(i)) +
+                      ' Order By REG_TIME Desc ' ;
+          JobNo := '';
+          JobNo := fnOrder_Value(WhereStr, 'LUGG');
+          JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
+
+          // Rfid Read 에러 확인
+          RfidError[1] := Boolean(SC_STATUS[SC_NO].D205 = '0050');
+          RfidError[2] := Boolean(SC_STATUS[SC_NO].D205 = '0051');
+          RfidError[3] := Boolean(SC_STATUS[SC_NO].D205 = '0052');
+          RfidError[4] := Boolean(SC_STATUS[SC_NO].D205 = '0053');
+          RfidError[5] := Boolean(SC_STATUS[SC_NO].D205 = '0054');
+          RfidError[6] := Boolean(SC_STATUS[SC_NO].D205 = '0055');
+
+          if (JobNo <> '') and
+             (IsExist = True) and
+             ((JobError = '') or (JobError = '0')) then
+          begin
+
+            // RFID 읽기
+            if (PLC_WriteVal.RFID_Read[i] = '0') then
+            begin
+              PLC_WriteVal.RFID_Read[i] := '1';
+              PLC_ORDER.ORDER := '1';
+              PLC_WRITE_FLAG := ComWrite;
+            end else
+            if (PLC_ReadVal.RFID_Read[i] = '1') and
+               (RfidError[i] = False) then
+            begin
+
+              fnIns_RfidHistory(i);
+
+              if (Rx_AcsData[i].Model_No = '0') then
+              begin
+                if (fnGetRFID_Data(i, 'H18') = '0') then
+                begin
+                  RfidCheck := True;
+                end else
+                begin
+                  RfidCheck := False;
+                end;
+              end else
+              if (Rx_AcsData[i].Model_No = '1') then
+              begin
+                if (fnGetRFID_Data(i, 'H18') = '36') then
+                begin
+                  RfidCheck := True;
+                end else
+                begin
+                  RfidCheck := False;
+                end;
+              end;
+
+              // RFID가 잘못 된 경우.
+              if not (RfidCheck) then
+              begin
+
+                // PLC에 알람 요청
+                if (PLC_WriteVal.Alram = '0') then
+                begin
+                  PLC_WriteVal.Alram := '1';
+                  PLC_ORDER.ORDER := '1';
+                  PLC_WRITE_FLAG := ComWrite;
+                end;
+
+                // TT_ORDER에 에러 표시
+                fnOrder_Update(JobNo, 'JOBERRORC', '1');
+                fnOrder_Update(JobNo, 'JOBERRORT', 'R');
+                fnOrder_Update(JobNo, 'JOBERRORD', 'RFID 불일치');
+              end
+              // RFID가 정상인 경우
+              else
+              begin
+
+                // RFID 초기화
+                if (PLC_WriteVal.RFID_Read[i] = '1') then
+                begin
+                  PLC_WriteVal.RFID_Read[i] := '0';
+                  PLC_ORDER.ORDER := '1';
+                  PLC_WRITE_FLAG := ComWrite;
+                end;
+
+                tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H00');
+                tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H01');
+                tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H02');
+                tRfidData.Pallet_No_2 := fnGetRFID_Data(i, 'H03');
+                tRfidData.Model_No_1  := fnGetRFID_Data(i, 'H16');
+                tRfidData.Model_No_2  := fnGetRFID_Data(i, 'H17');
+                tRfidData.BMA_No      := fnGetRFID_Data(i, 'H18');
+                tRfidData.Area        := fnGetRFID_Data(i, 'H19');
+                tRfidData.BMA_1       := fnGetRFID_Data(i, 'H20');
+                tRfidData.BMA_2       := fnGetRFID_Data(i, 'H21');
+                tRfidData.BMA_3       := fnGetRFID_Data(i, 'H22');
+                tRfidData.NEW_BMA     := IfThen(fnGetRFID_Data(i, 'H23') = '1', '신규', '재고');
+                fnOrder_RfidUpdate(JobNo, tRfidData);
+
+                fnOrder_Update(JobNo, 'NOWSTATUS', '3');
+                fnOrder_Update(JobNo, 'JOBSTATUS', '3');
+
+                Tx_AcsData[i].Heart_Beat       := '1';
+                Tx_AcsData[i].Line_Name_Source := '';
+                Tx_AcsData[i].Line_No_Source   := '';
+                Tx_AcsData[i].Port_No_Source   := '';
+                Tx_AcsData[i].Line_Name_Dest   := '';
+                Tx_AcsData[i].Line_No_Dest     := '';
+                Tx_AcsData[i].Port_No_Dest     := '';
+                Tx_AcsData[i].Model_No         := '';
+                Tx_AcsData[i].Call_Request     := '0';
+                Tx_AcsData[i].Call_Answer      := '1';
+                Tx_AcsData[i].Docking_Approve  := '0';
+                Tx_AcsData[i].Docking_Complete := '0';
+
+              end;
+            end;
+          end;
         end else
+        // 재고가 없을 경우
         begin
-          Tx_AcsData[i].Call_Answer := '2';
+          Tx_AcsData[i].Heart_Beat       := '1';
+          Tx_AcsData[i].Line_Name_Source := '';
+          Tx_AcsData[i].Line_No_Source   := '';
+          Tx_AcsData[i].Port_No_Source   := '';
+          Tx_AcsData[i].Line_Name_Dest   := '';
+          Tx_AcsData[i].Line_No_Dest     := '';
+          Tx_AcsData[i].Port_No_Dest     := '';
+          Tx_AcsData[i].Model_No         := '';
+          Tx_AcsData[i].Call_Request     := '0';
+          Tx_AcsData[i].Call_Answer      := '2';
+          Tx_AcsData[i].Docking_Approve  := '0';
+          Tx_AcsData[i].Docking_Complete := '0';
         end;
       end else
+      // 입고 스테이션 응답
       begin
-        Tx_AcsData[i].Call_Answer := '1';
+        Tx_AcsData[i].Heart_Beat       := '1';
+        Tx_AcsData[i].Line_Name_Source := '';
+        Tx_AcsData[i].Line_No_Source   := '';
+        Tx_AcsData[i].Port_No_Source   := '';
+        Tx_AcsData[i].Line_Name_Dest   := '';
+        Tx_AcsData[i].Line_No_Dest     := '';
+        Tx_AcsData[i].Port_No_Dest     := '';
+        Tx_AcsData[i].Model_No         := '';
+        Tx_AcsData[i].Call_Request     := '0';
+        Tx_AcsData[i].Call_Answer      := '1';
+        Tx_AcsData[i].Docking_Approve  := '0';
+        Tx_AcsData[i].Docking_Complete := '0';
       end;
-
-      // ACS 응답 데이터 생성
-      Tx_AcsData[i].Heart_Beat       := '1';
-      Tx_AcsData[i].Line_Name_Source := '';
-      Tx_AcsData[i].Line_No_Source   := '';
-      Tx_AcsData[i].Port_No_Source   := '';
-      Tx_AcsData[i].Line_Name_Dest   := '';
-      Tx_AcsData[i].Line_No_Dest     := '';
-      Tx_AcsData[i].Port_No_Dest     := '';
-      Tx_AcsData[i].Model_No         := '';
-      Tx_AcsData[i].Call_Request     := '0';
-//      Tx_AcsData.Call_Answer      := '1';
-      Tx_AcsData[i].Docking_Approve  := '0';
-      Tx_AcsData[i].Docking_Complete := '0';
     end else
     // *** 도킹 완료 *** //
     if (Rx_AcsData[i].Call_Request     = '0' ) and
@@ -1009,12 +1031,12 @@ begin
         JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
 
         // Rfid Read 에러 확인
-        RfidError[1] := SC_STATUS[SC_NO].D205 = '0050';
-        RfidError[2] := SC_STATUS[SC_NO].D205 = '0051';
-        RfidError[3] := SC_STATUS[SC_NO].D205 = '0052';
-        RfidError[4] := SC_STATUS[SC_NO].D205 = '0053';
-        RfidError[5] := SC_STATUS[SC_NO].D205 = '0054';
-        RfidError[6] := SC_STATUS[SC_NO].D205 = '0055';
+        RfidError[1] := Boolean(SC_STATUS[SC_NO].D205 = '0050');
+        RfidError[2] := Boolean(SC_STATUS[SC_NO].D205 = '0051');
+        RfidError[3] := Boolean(SC_STATUS[SC_NO].D205 = '0052');
+        RfidError[4] := Boolean(SC_STATUS[SC_NO].D205 = '0053');
+        RfidError[5] := Boolean(SC_STATUS[SC_NO].D205 = '0054');
+        RfidError[6] := Boolean(SC_STATUS[SC_NO].D205 = '0055');
 
         // 작업이 있고 화물도 있는 경우 RFID 확인
         if (JobNo <> '') and
