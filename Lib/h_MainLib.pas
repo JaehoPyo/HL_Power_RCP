@@ -78,6 +78,8 @@ Type
    ETC,
    EMG,
    ITM_CD,
+   JOB_MODEL_NO,
+   JOB_NEW_BMA,
    LINE_NO,
    UP_TIME,
    ID_CODE : String;
@@ -97,6 +99,7 @@ Type
     Docking_Request  : String;
     Docking_Complete : String;
     Status           : String;
+    Sell_Type        : String;
   End;
 
   TTx_AcsData = Record
@@ -113,6 +116,7 @@ Type
     Docking_Approve  : String;
     Docking_Complete : String;
     Status           : String;
+    Sell_Type        : String;
   End;
 
   TPLC_VAL = Record
