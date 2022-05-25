@@ -306,8 +306,8 @@ type
     function  fnStockUpdateAll(SC_NO:Integer): Boolean;                            // 입출고 시 TT_STOCK 처리
     function  fnStockUpdate(SC_No:Integer;FName,FValue:String): Boolean; overload; // 셀 상태 변경 시
     function  fnStockUpdate(Loc, FName, FValue: String): Boolean; overload;
-    function  fnGetStockLoc(ItemCode, NewBMA : String): String;                            // 품목 위치 반환
-    function  fnGetStockCount(ItemCode, NewBMA: String): Integer;                          // 품목 갯수 반환
+    function  fnGetStockLoc(ItemCode, NewBMA, QtyOrder : String): String;                    // 품목 위치 반환
+    function  fnGetStockCount(ItemCode, NewBMA: String): Integer;                  // 품목 갯수 반환
     function  fnCanInput: Boolean;                                                 // 입고 가능 셀이 있는지 여부
     function  fnCanOutput: Boolean; overload;                                      // 출고가능 셀이 있는지 여부
     function  fnCanOutput(ItemCode: String): Boolean; overload;                    // 해당 품목의 출고가능 셀이 있는지 여부
@@ -530,6 +530,7 @@ begin
     GetACS_Status(i);
 
     // ACS 요청에 맞는 대응을 하고 응답 값을 만듦
+    Tx_AcsData[i].Heart_Beat := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
 
     // 입고 포트
     if( i in [1, 3, 5]) then
@@ -641,26 +642,25 @@ begin
           begin
             if (PLC_WriteVal.Curtain[i] = '0') then
             begin
+              PLC_WriteVal.Curtain[i] := '1';
               PLC_ORDER.ORDER := '1';
               PLC_WRITE_FLAG := ComWrite;
               fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
             end;
-            PLC_WriteVal.Curtain[i] := '1';
           end;
         end;
       end;
 
       WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                    '   And JOBD    = 1 ' +
-                    '   And IS_AUTO = ''Y'' ' +
-                    '   And JOB_END = 0 ' ;
+                  '   And JOBD    = 1 ' +
+                  '   And IS_AUTO = ''Y'' ' +
+                  '   And JOB_END = 0 ' ;
       // 커튼 열려있고, 자동작업이 있고, 화물 없을 때 응답 전송
       if (PLC_ReadVal.Curtain[i] = '1') and
          (fnOrder_Value(WhereStr, 'LINE_NO') <> '') and
          (IsExist = False) then
       begin
         // ACS 응답 데이터 생성
-        Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
         Tx_AcsData[i].Line_Name_Source := '';
         Tx_AcsData[i].Line_No_Source   := '';
         Tx_AcsData[i].Port_No_Source   := '';
@@ -733,7 +733,6 @@ begin
          (JobNo <> '') then
       begin
         // ACS 응답 데이터 생성
-        Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
         Tx_AcsData[i].Line_Name_Source := '';
         Tx_AcsData[i].Line_No_Source   := '';
         Tx_AcsData[i].Port_No_Source   := '';
@@ -869,11 +868,9 @@ begin
                   RfidCheck := False;
                 end;
               end else
-              if (ItemCode = 'FULL') then
               begin
                 if (fnGetRFID_Data(i, 'H16') = JobModelNo) and // 차종확인
-                   (fnGetRFID_Data(i, 'H23') = JobNewBMA) and  // 재고/신규 확인
-                   (fnGetRFID_Data(i, 'H18') = '36') then      // full인지 확인
+                   (fnGetRFID_Data(i, 'H23') = JobNewBMA) then // 재고/신규 확인
                 begin
                   RfidCheck := True;
                 end else
@@ -911,6 +908,18 @@ begin
                   PLC_WRITE_FLAG := ComWrite;
                 end;
 
+                // 커튼 오픈
+                if (PLC_ReadVal.Curtain[i] = '0') then
+                begin
+                  if (PLC_WriteVal.Curtain[i] = '0') then
+                  begin
+                    PLC_ORDER.ORDER := '1';
+                    PLC_WRITE_FLAG := ComWrite;
+                    PLC_WriteVal.Curtain[i] := '1';
+                    fnSet_Current('CUR_PARAM', 'OPTION'+IntToStr(i), '2'); //LHB
+                  end;
+                end;
+
                 tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H00');
                 tRfidData.Line_Name_2 := fnGetRFID_Data(i, 'H01');
                 tRfidData.Pallet_No_1 := fnGetRFID_Data(i, 'H02');
@@ -928,7 +937,6 @@ begin
                 fnOrder_Update(JobNo, 'NOWSTATUS', '3');
                 fnOrder_Update(JobNo, 'JOBSTATUS', '3');
 
-                Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
                 Tx_AcsData[i].Line_Name_Source := '';
                 Tx_AcsData[i].Line_No_Source   := '';
                 Tx_AcsData[i].Port_No_Source   := '';
@@ -948,7 +956,6 @@ begin
         end else
         // 재고가 없을 경우
         begin
-          Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
           Tx_AcsData[i].Line_Name_Source := '';
           Tx_AcsData[i].Line_No_Source   := '';
           Tx_AcsData[i].Port_No_Source   := '';
@@ -965,7 +972,6 @@ begin
       end else
       // 입고 스테이션 응답
       begin
-        Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');;
         Tx_AcsData[i].Line_Name_Source := '';
         Tx_AcsData[i].Line_No_Source   := '';
         Tx_AcsData[i].Port_No_Source   := '';
@@ -1002,7 +1008,6 @@ begin
       if (PLC_ReadVal.Curtain[i] = '1') then
       begin
         // ACS 응답 데이터 생성
-        Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
         Tx_AcsData[i].Line_Name_Source := '';
         Tx_AcsData[i].Line_No_Source   := '';
         Tx_AcsData[i].Port_No_Source   := '';
@@ -1041,7 +1046,6 @@ begin
       if (PLC_ReadVal.Curtain[i] = '1') then
       begin
         // ACS 응답 데이터 생성
-        Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');;
         Tx_AcsData[i].Line_Name_Source := '';
         Tx_AcsData[i].Line_No_Source   := '';
         Tx_AcsData[i].Port_No_Source   := '';
@@ -1089,12 +1093,12 @@ begin
 
         JobNo := '';
         WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                        '   And JOBD    = ''1'' ' +
-                        '   And JOB_END = ''0'' ' +
-                        '   And IS_AUTO = ''Y'' ' +
-                        '   And NOWMC   = ''4'' ' +
-                        '   And NOWSTATUS <> ''4'' ' +
-                        '   And JOBSTATUS <> ''4'' ';
+                    '   And JOBD    = ''1'' ' +
+                    '   And JOB_END = ''0'' ' +
+                    '   And IS_AUTO = ''Y'' ' +
+                    '   And NOWMC   = ''4'' ' +
+                    '   And NOWSTATUS <> ''4'' ' +
+                    '   And JOBSTATUS <> ''4'' ';
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
         ItemCode := fnOrder_Value(WhereStr, 'ITM_CD');
         JobError := fnOrder_Value(WhereStr, 'JOBERRORC');
@@ -1127,7 +1131,8 @@ begin
 
             fnIns_RfidHistory(i);
 
-            if (ItemCode = 'EPLT') then
+            // 공팔레트 입고 요청 시
+            if (Copy(ItemCode, 1, 1) = '공') then
             begin
               // 혹시 모르니까 일단 갯수로 비교한다.
               if (fnGetRFID_Data(i, 'H18') = '0') then
@@ -1138,11 +1143,10 @@ begin
                 RfidCheck := False;
               end;
             end else
-            if (ItemCode = 'FULL') then
+            // 실팔레트 입고요청 시
             begin
               if (fnGetRFID_Data(i, 'H16') = JobModelNo) and
-                 (fnGetRFID_Data(i, 'H23') = JobNewBMA) and
-                 (fnGetRFID_Data(i, 'H18') = '36') then
+                 (fnGetRFID_Data(i, 'H23') = JobNewBMA) then
               begin
                 RfidCheck := True;
               end else
@@ -1159,6 +1163,22 @@ begin
                 PLC_WriteVal.RFID_Read[i] := '0';
                 PLC_ORDER.ORDER := '1';
                 PLC_WRITE_FLAG := ComWrite;
+              end;
+
+
+              // 입고 될 ITM_CD값 수정
+              if (Copy(ItemCode, 1, 1) = '공') then
+              begin
+                fnOrder_Update(JobNo, 'ITM_CD', 'EPLT') ;
+              end else
+              begin
+                if (fnGetRFID_Data(i, 'H18') = '36') then
+                begin
+                  fnOrder_Update(JobNo, 'ITM_CD', 'FULL');
+                end else
+                begin
+                  fnOrder_Update(JobNo, 'ITM_CD', 'REMAIN');
+                end;
               end;
 
               tRfidData.Line_Name_1 := fnGetRFID_Data(i, 'H00');
@@ -1212,7 +1232,6 @@ begin
           end;
         end;
       end;
-
 
       // 출고작업이면 HISTORY 이동
       // 출고완료
@@ -1270,7 +1289,6 @@ begin
       end;
 
       // ACS 응답 데이터 생성
-      Tx_AcsData[i].Heart_Beat       := Ifthen(Tx_AcsData[i].Heart_Beat = '0', '1', '0');
       Tx_AcsData[i].Line_Name_Source := '';
       Tx_AcsData[i].Line_No_Source   := '';
       Tx_AcsData[i].Port_No_Source   := '';
@@ -2317,7 +2335,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-        //fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         Exit;
       end;
 
@@ -2415,7 +2433,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-        //fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         Exit;
       end;
 
@@ -2505,7 +2523,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-        //fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         Exit;
       end;
 
@@ -2577,7 +2595,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-        //fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         Exit;
       end;
 
@@ -2677,7 +2695,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-//        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         Exit;
       end;
 
@@ -2771,7 +2789,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-//        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         Exit;
       end;
 
@@ -2878,7 +2896,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-//        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         fnReSetErrReport('SC', SC_NO);
         Exit;
       end;
@@ -2921,7 +2939,7 @@ begin
         SC_STAT[SC_NO] := STANDBY ;
         fnOrder_Cancel(SC_NO, SC_JOB[SC_NO].ID_ORDLUGG, SC_JOB[SC_NO].ID_REGTIME ) ;  // TT_ORDER 삭제
         fnSCIO_Delete(SC_NO) ;                                                        // TT_SCIO 삭제
-//        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
+        fnStockUpdate(SC_NO,'ID_STATUS','9') ;                                        // 셀상태 변경
         fnReSetErrReport('SC', SC_NO);
         Exit;
       end;
@@ -5613,11 +5631,12 @@ begin
 end;
 
 //==============================================================================
-// fnGetStockLoc : 품목 위치 반환
+// fnGetStockLoc : 품목 위치 반환 ex) ItemCode:C2, NewBMA:신규, QtyOrder:ASC or DESC
 //==============================================================================
-function TfrmSCComm.fnGetStockLoc(ItemCode, NewBMA : String): String;
+function TfrmSCComm.fnGetStockLoc(ItemCode, NewBMA, QtyOrder : String): String;
 var
   StrSQL : String;
+  ParsedStr : TStringList;
 begin
   try
     Result := '';
@@ -5627,10 +5646,11 @@ begin
     begin
       Close;
       SQL.Clear;
-      StrSQL := ' Select WMS_HL.DBO.fn_GetItemLoc(:item , :NewBMA) ID_CODE ' ;
+      StrSQL := ' Select WMS_HL.DBO.fn_GetItemLoc(:item , :NewBMA, :QtyOrder) ID_CODE ' ;
       SQL.Text := StrSQL ;
       Parameters[0].Value := ItemCode;
       Parameters[1].Value := NewBMA;
+      Parameters[2].Value := QtyOrder;
       Open ;
 
       if ( RecordCount = 0 ) or
@@ -5638,7 +5658,9 @@ begin
       begin
         Exit;
       end;
-      Result := Copy(FieldByName('ID_CODE').AsString, 5, 5);
+
+      //Result := Copy(FieldByName('ID_CODE').AsString, 5, 5);
+      Result := FieldByName('ID_CODE').AsString;
       Close ;
     end;
   except
@@ -5676,7 +5698,7 @@ begin
   except
     on E: Exception do
     begin
-      qryStock.Close ;
+      qryTemp.Close ;
       ErrorLogWRITE( 'Function fnGet_Current Cur_Name(' + Cur_Name + ') ' +
                      'Error[' + E.Message + '], ' + 'SQL [' + StrSQL + ']' );
     end;
@@ -5835,6 +5857,7 @@ end;
 function TfrmSCComm.fnCanOutput(ItemCode: String): Boolean;
 var
   StrSQL : string;
+  CNT : Integer;
 begin
   Result := False;
   StrSQL := '';
@@ -5857,13 +5880,33 @@ begin
         StrSQL := ' SELECT COUNT(*) as CNT ' +
                   '   FROM TT_STOCK with(NOLOCK)' +
                   '  WHERE ID_STATUS = ''2'' ' +
-                  '    AND OT_USED = ''1'' ' +
-                  '    AND ITM_CD = ''FULL'' ';
+                  '    AND OT_USED = ''1'' ';
       end;
 
       SQL.Text := StrSQL ;
       Open ;
-      Result := Boolean(FieldByName('CNT').AsInteger);
+
+      CNT := FieldByName('CNT').AsInteger;
+
+      if (ItemCode = 'EPLT') then
+      begin
+        if (CNT <= fnGet_Current('EPLT_ALRAM_CNT', 'OPTION1')) then
+        begin
+          Result := False;
+        end else
+        begin
+          Result := True;
+        end;
+      end else
+      begin
+        if (CNT <= fnGet_Current('FULL_ALRAM_CNT', 'OPTION1')) then
+        begin
+          Result := False;
+        end else
+        begin
+          Result := True;
+        end;
+      end;
       Close ;
     end;
   except
@@ -6469,8 +6512,9 @@ end;
 function TfrmSCComm.SetJobOrder(PortNo: Integer; Gubn, ItemCode, NewBMA, NOWMC, EMG: String) : String;
 var
   i : Integer;
-  Loc, StkNewBMA: String;
+  Loc, ItemCD: String;
   EventDesc : String;
+  ParsedStr : TStringList;
 begin
   try
     Result := '';
@@ -6511,7 +6555,7 @@ begin
       OrderData.ETC        := '';
       OrderData.EMG        := EMG;
       OrderData.LINE_NO    := IntToStr(PortNo);
-      OrderData.ITM_CD     := IfThen(ItemCode = 'EPLT', 'EPLT', 'FULL');
+      OrderData.ITM_CD     := IfThen(ItemCode = 'EPLT', '공-입고요청', '실-입고요청');
       OrderData.JOB_MODEL_NO := ItemCode;
       OrderData.JOB_NEW_BMA := NewBMA;
       OrderData.UP_TIME    := 'GETDATE()';
@@ -6526,8 +6570,26 @@ begin
     begin
       // 품목 찾기
       // Loc = 10101 열(1)/연(2)/단(2)
-      Loc := fnGetStockLoc(ItemCode, NewBMA);
-      if (Loc = '') then Exit;
+      //Loc := fnGetStockLoc(ItemCode, NewBMA);
+      //if (Loc = '') then Exit;
+
+
+      try
+        ParsedStr := TStringList.Create;
+        ParsedStr.Delimiter := ':';
+        // True = 만셀 우선, False = 잔량우선
+        if (fnGet_Current('OUT_QTY_ORDER') = False) then
+        begin
+          ParsedStr.DelimitedText := fnGetStockLoc(ItemCode, NewBMA, 'ASC');
+        end else
+        begin
+          ParsedStr.DelimitedText := fnGetStockLoc(ItemCode, NewBMA, 'DESC');
+        end;
+        ItemCD := ParsedStr[1]; // EPLT, FULL, REMAIN
+        Loc := Copy(ParsedStr[2], 2, 5); // 1 1 01 01 (6글자. 호기(1) 열(1) 연(2) 단(2))
+      finally
+        ParsedStr.Free;
+      end;
 
       // 출고작업 데이터 생성
       OrderData.REG_TIME   := FormatDateTime('YYYYMMDD',Now) + FormatDateTime('HHNNSS',Now) ;
@@ -6560,7 +6622,7 @@ begin
       OrderData.ETC        := '';
       OrderData.EMG        := EMG;
       OrderData.LINE_NO    := IntToStr(PortNo);
-      OrderData.ITM_CD     := IfThen(ItemCode = 'EPLT', 'EPLT', 'FULL');
+      OrderData.ITM_CD     := ItemCD;
       OrderData.JOB_MODEL_NO := ItemCode;
       OrderData.JOB_NEW_BMA := NewBMA;
       OrderData.UP_TIME    := 'GETDATE()';
