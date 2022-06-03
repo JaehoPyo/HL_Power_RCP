@@ -524,7 +524,7 @@ var
   JobError : String;
 begin
 
-  for i := START_STATION to END_STATION do
+  for i := END_STATION downto START_STATION do
   begin
     // 글로벌 변수 Rx_AcsData[i]에 저장
     GetACS_Status(i);
@@ -775,7 +775,9 @@ begin
 
         // 현재 라인(포트)의 작업 확인
         WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                    '   And JOBD = ''2'' ';
+                    '   And JOBD = ''2'' ' +
+                    '   And IS_AUTO = ''Y'' ';
+
         JobNo := fnOrder_Value(WhereStr, 'LUGG');
 
         // 재고가 있거나 작업이 있을 때
@@ -795,23 +797,25 @@ begin
 
           // 해당 라인의 출고작업이 없을 때는 작업 생성
           WhereStr := ' Where LINE_NO = ' + QuotedStr(IntToStr(i)) +
-                      '   And JOBD = ''2'' ';
+                      '   And JOBD = ''2'' ' +
+                      '   And IS_AUTO = ''Y'' ';
           if (fnOrder_Value(WhereStr, 'LINE_NO') = '') and
              (IsExist = False) then
           begin
             JobNo := '';
-            if (Rx_AcsData[i].Model_No = '00') then
-            begin
-              ItemCode := 'EPLT';
-            end else
-            begin
-              ItemCode := Rx_AcsData[i].Model_No;
-            end;
 
             // 신규/재고 구분. 신규:1, 재고:2
             NewBMA := Rx_AcsData[i].Sell_Type;
 
-            JobNo := SetJobOrder(i, 'O', ItemCode, NewBMA, '2', '0');
+            if (Rx_AcsData[i].Model_No = '00') then
+            begin
+              ItemCode := 'EPLT';
+              JobNo := SetJobOrder(i, 'O', ItemCode, NewBMA, '2', '0');
+            end else
+            begin
+              ItemCode := Rx_AcsData[i].Model_No;
+              JobNo := SetJobOrder(i, 'O', ItemCode, NewBMA, '2', '1');
+            end;
           end;
 
           // 작업 생성 후 출고 완료 된 경우
@@ -3233,18 +3237,18 @@ begin
              '    SCORD_STATUS, SCORD_DT ) ' +
              ' VALUES ( ' +
              '''' + IntToStr(Sc_No) + ''', ' +             // 스태커 번호
-             '''' + SC_ORDER[SC_NO].SCORD_NO + ''', ' +    // 작업번호
-             '''' + SC_ORDER[SC_NO].SCORD_D100 + ''', ' +  // D100 - 적재 열
-             '''' + SC_ORDER[SC_NO].SCORD_D101 + ''', ' +  // D101 - 적재 연
-             '''' + SC_ORDER[SC_NO].SCORD_D102 + ''', ' +  // D102 - 적재 단
-             '''' + SC_ORDER[SC_NO].SCORD_D103 + ''', ' +  // D103 - 하역 열
-             '''' + SC_ORDER[SC_NO].SCORD_D104 + ''', ' +  // D104 - 하역 연
-             '''' + SC_ORDER[SC_NO].SCORD_D105 + ''', ' +  // D105 - 하역 단
-             '''' + SC_ORDER[SC_NO].SCORD_D106 + ''', ' +  // D106 - 예비
-             '''' + SC_ORDER[SC_NO].SCORD_D107 + ''', ' +  // D107 - 예비
-             '''' + SC_ORDER[SC_NO].SCORD_D108 + ''', ' +  // D108 - 예비
-             '''' + SC_ORDER[SC_NO].SCORD_D109 + ''', ' +  // D109 - 예비
-             '''' + SC_ORDER[SC_NO].SCORD_D110 + ''', ' +  // D110 - 기동 지시 또는 Data Reset
+             '''' + SC_ORDER[Sc_No].SCORD_NO + ''', ' +    // 작업번호
+             '''' + SC_ORDER[Sc_No].SCORD_D100 + ''', ' +  // D100 - 적재 열
+             '''' + SC_ORDER[Sc_No].SCORD_D101 + ''', ' +  // D101 - 적재 연
+             '''' + SC_ORDER[Sc_No].SCORD_D102 + ''', ' +  // D102 - 적재 단
+             '''' + SC_ORDER[Sc_No].SCORD_D103 + ''', ' +  // D103 - 하역 열
+             '''' + SC_ORDER[Sc_No].SCORD_D104 + ''', ' +  // D104 - 하역 연
+             '''' + SC_ORDER[Sc_No].SCORD_D105 + ''', ' +  // D105 - 하역 단
+             '''' + SC_ORDER[Sc_No].SCORD_D106 + ''', ' +  // D106 - 예비
+             '''' + SC_ORDER[Sc_No].SCORD_D107 + ''', ' +  // D107 - 예비
+             '''' + SC_ORDER[Sc_No].SCORD_D108 + ''', ' +  // D108 - 예비
+             '''' + SC_ORDER[Sc_No].SCORD_D109 + ''', ' +  // D109 - 예비
+             '''' + SC_ORDER[Sc_No].SCORD_D110 + ''', ' +  // D110 - 기동 지시 또는 Data Reset
              '''' + Flag + ''', ' +                        // STATUS - 0: 지시데이터 1: 기동지시 또는 Data Reset
              'GETDATE() ) ' ;
   try
@@ -5774,6 +5778,7 @@ end;
 function TfrmSCComm.fnGetStockCount(ItemCode, NewBMA: String): Integer;
 var
   StrSQL : string;
+  CNT : Integer;
 begin
   Result := 0 ;
   StrSQL := '';
@@ -5804,7 +5809,29 @@ begin
 
       SQL.Text := StrSQL ;
       Open ;
-      Result := FieldByName('CNT').AsInteger;
+
+      CNT := FieldByName('CNT').AsInteger;
+      Result := CNT;
+//      if (ItemCode = 'EPLT') then
+//      begin
+//        if (CNT <= fnGet_Current('EPLT_ALRAM_CNT', 'OPTION1')) then
+//        begin
+//          Result := 0;
+//        end else
+//        begin
+//          Result := CNT;
+//        end;
+//      end else
+//      begin
+//        if (CNT <= fnGet_Current('FULL_ALRAM_CNT', 'OPTION1')) then
+//        begin
+//          Result := 0;
+//        end else
+//        begin
+//          Result := CNT;
+//        end;
+//      end;
+
       Close ;
     end;
   except
