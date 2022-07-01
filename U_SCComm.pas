@@ -203,6 +203,7 @@ type
     Panel69: TPanel;
     edt_Alram: TEdit;
     Bevel7: TBevel;
+    ServerSocket1: TServerSocket;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -3024,7 +3025,6 @@ begin
   if (SC_JOB[SC_No].JOB_COMPLETE = '1') or
      (fnGetSCSetInfo(SC_No,'JOB_COMPLETE')) then
   begin
-    Sleep(1000);
     SC_JOB[SC_No].JOB_COMPLETE := '0';
 
     // 작업완료보고 Reset Command 데이터
@@ -3047,7 +3047,6 @@ begin
     SC_JOBClear(SC_NO);
   end else
   begin
-    Sleep(500);
     //--------------------------------------------------------------------------
     // 정상입고&이중입고재기동, 정상출고&공출고재기동
     //--------------------------------------------------------------------------
@@ -3109,7 +3108,6 @@ begin
 
     if (SC_JOB[SC_No].MOVE_ON = '1') then
     begin
-      Sleep(500);
       SC_JOB[SC_No].MOVE_ON := '0' ;
 
       SC_ORDER[SC_NO].SCORD_NO   := SC_JOB[SC_NO].ID_ORDLUGG ; //작업번호
@@ -3130,7 +3128,7 @@ begin
       fnSetSCORDWrite(SC_NO,'1'); // 지시데이터 생성 후 TT_SCORD 테이블에 지시 Insert
     end;
 
-    Sleep(2000);
+    Sleep(1300);
   end;
 end;
 
@@ -3145,7 +3143,6 @@ begin
   // 커튼 on/off
   if (PLC_ORDER.ORDER = '1') then
   begin
-    Sleep(500);
     PLC_ORDER.ORDER := '0';
 
     BinDoor := '';
@@ -3172,7 +3169,7 @@ begin
     end;
   end;
 
-  Sleep(2000);
+  Sleep(1300);
 end;
 
 //==============================================================================
@@ -6742,6 +6739,8 @@ end;
 //==============================================================================
 // SetAcsResponse [ACS 응답 전송 데이터 저장]
 //==============================================================================
+
+
 function TfrmSCComm.SetAcsResponse(PortNo : Integer) : Boolean;
 var
   i : Integer;
