@@ -172,6 +172,10 @@ object frmSCComm: TfrmSCComm
     TabOrder = 0
     object tsCommLog: TTabSheet
       Caption = '[ '#53685#49888#47196#44536' ]'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Pnl_Main: TPanel
         Left = 0
         Top = 0

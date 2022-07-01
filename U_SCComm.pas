@@ -2999,6 +2999,7 @@ begin
      (fnGetSCSetInfo(SC_No,'JOB_CANCLE')) or
      (SC_JOB[SC_No].DATA_RESET = '1') then
   begin
+    Sleep(100);
     SC_JOB[SC_No].DATA_RESET := '0';
     fnSetSCSetInfo(SC_No, 'JOB_CANCLE', '0') ;
     SC_ORDER[SC_NO].SCORD_NO   := SC_JOB[SC_NO].ID_ORDLUGG ; //작업번호
@@ -3025,6 +3026,7 @@ begin
   if (SC_JOB[SC_No].JOB_COMPLETE = '1') or
      (fnGetSCSetInfo(SC_No,'JOB_COMPLETE')) then
   begin
+    Sleep(100);
     SC_JOB[SC_No].JOB_COMPLETE := '0';
 
     // 작업완료보고 Reset Command 데이터
@@ -3047,6 +3049,7 @@ begin
     SC_JOBClear(SC_NO);
   end else
   begin
+    Sleep(100);
     //--------------------------------------------------------------------------
     // 정상입고&이중입고재기동, 정상출고&공출고재기동
     //--------------------------------------------------------------------------
@@ -3108,6 +3111,7 @@ begin
 
     if (SC_JOB[SC_No].MOVE_ON = '1') then
     begin
+      Sleep(100);
       SC_JOB[SC_No].MOVE_ON := '0' ;
 
       SC_ORDER[SC_NO].SCORD_NO   := SC_JOB[SC_NO].ID_ORDLUGG ; //작업번호
